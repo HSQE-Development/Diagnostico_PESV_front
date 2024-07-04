@@ -1,7 +1,9 @@
 import { Button, ConfigProvider, FloatButton, Image, Modal } from "antd";
 import React, { useState } from "react";
+import { FaRegUser } from "react-icons/fa";
+import { GrDocumentConfig } from "react-icons/gr";
 import { IoIosNotificationsOutline } from "react-icons/io";
-import { MdModeEdit } from "react-icons/md";
+import { MdAlternateEmail, MdModeEdit, MdOutlineDocumentScanner } from "react-icons/md";
 
 export default function InfoProfile() {
   const [editModal, setEditModal] = useState<boolean>(false);
@@ -18,7 +20,7 @@ export default function InfoProfile() {
           <span className="font-bold text-blue-800">SuperUser</span>
         </div>
         <div className="flex flex-col md:flex-row flex-1 justify-evenly items-center gap-2">
-          <ConfigProvider
+          {/* <ConfigProvider
             theme={{
               components: {
                 Button: {
@@ -26,18 +28,50 @@ export default function InfoProfile() {
                   colorPrimaryHover: `bg-orange-400`,
                   colorPrimaryActive: `bg-orange-200`,
                   lineWidth: 0,
-                  
                 },
               },
             }}
           >
-            <Button type="primary" size="large" icon={<MdModeEdit />} onClick={() => setEditModal(true)} className="w-full md:w-auto">
+          </ConfigProvider> */}
+            <Button
+              type="primary"
+              size="large"
+              icon={<MdModeEdit />}
+              onClick={() => setEditModal(true)}
+              className="w-full md:w-auto bg-black"
+            >
               Editar
             </Button>
-          </ConfigProvider>
-            <Button size="large" icon={<IoIosNotificationsOutline  />}>
-              Notificaciones
-            </Button>
+          <Button size="large" icon={<IoIosNotificationsOutline />}>
+            Notificaciones
+          </Button>
+        </div>
+        <div className="flex flex-col w-[80%] gap-4 bg-slate-200 p-2 rounded-md">
+          <div className="flex flex-col items-start justify-center">
+            <div className="flex items-center justify-start">
+              <MdAlternateEmail  className="font-bold"/>
+              <span className="ml-2 font-bold">Email</span>
+            </div>
+            <span>daniel@daniel.com</span>
+          </div>
+        </div>
+        <div className="flex flex-col w-[80%] gap-4 bg-slate-200 p-2 rounded-md">
+          <div className="flex flex-col items-start justify-center">
+            <div className="flex items-center justify-start">
+              <MdOutlineDocumentScanner  className="font-bold"/>
+              <span className="ml-2 font-bold">Cédula</span>
+            </div>
+            <span>daniel@daniel.com</span>
+          </div>
+        </div>
+        <div className="flex flex-col w-[80%] gap-4 bg-slate-200 p-2 rounded-md">
+          <div className="flex flex-col items-start justify-center">
+            <div className="flex items-center justify-start">
+              <GrDocumentConfig  className="font-bold"/>
+              <span className="ml-2 font-bold">Licensia</span>
+            </div>
+            <span>daniel@daniel.com</span>
+          </div>
         </div>
       </div>
 
