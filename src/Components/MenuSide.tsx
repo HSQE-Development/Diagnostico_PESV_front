@@ -1,4 +1,3 @@
-import React from 'react'
 import { FaChartArea } from 'react-icons/fa'
 
 export default function MenuSide() {
