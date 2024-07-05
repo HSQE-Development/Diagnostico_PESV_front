@@ -1,8 +1,8 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import LoginPage from './Features/Login/Index';
 import MainPage from './Features/App/Index';
 import AppLayout from './Components/AppLayout';
 import ProfilePage from './Features/Profile/Index';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
 function App() {
 

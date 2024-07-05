@@ -1,6 +1,7 @@
 import { Avatar, Badge, Button, Dropdown, MenuProps } from 'antd'
 import React from 'react'
 import { CiUser } from 'react-icons/ci'
+import { useNavigate } from 'react-router-dom'
 
 interface MiniProfileProps{
     username: string
@@ -8,14 +9,18 @@ interface MiniProfileProps{
 }
 
 export default function MiniProfile({username, cargo}:MiniProfileProps) {
+  const navigate = useNavigate();
+
     const items: MenuProps['items'] = [
         {
           label: 'Perfil',
           key: '1',
+          onClick: () => navigate("/app/my_profile")
         },
         {
           label: 'Cerrar Sesión',
           key: '2',
+          onClick: () => navigate("/login")
         },
       ];
   return (

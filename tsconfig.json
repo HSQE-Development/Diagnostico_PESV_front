@@ -7,13 +7,6 @@
     {
       "path": "./tsconfig.node.json"
     }
-  ],
-  "compilerOptions": {
-    "allowJs": true,
-    "strict": true,
-    "paths": {
-      "@/*":["./src/*"]
-    }
-  }
+  ]
 
 }
