@@ -3,6 +3,7 @@ import MainPage from './Features/App/Index';
 import AppLayout from './Components/AppLayout';
 import ProfilePage from './Features/Profile/Index';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import CompanyPage from './Features/Companies/Index';
 
 function App() {
 
@@ -22,6 +23,10 @@ function App() {
     {
       path: "/app/my_profile",
       element: <AppLayout><ProfilePage/></AppLayout>,
+    },
+    {
+      path: "/app/companies",
+      element: <AppLayout><CompanyPage/></AppLayout>,
     },
   ]);
   return (
