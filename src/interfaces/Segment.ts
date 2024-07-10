@@ -1,4 +1,3 @@
-export interface Segment{
-    id:number
-    name:string
-}
+import { Comun } from "./Comun";
+
+export interface Segment extends Comun {}

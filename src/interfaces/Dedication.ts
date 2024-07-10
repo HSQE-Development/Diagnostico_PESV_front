@@ -1,12 +1,9 @@
-export interface Dedication {
-  id: number;
-  name: string;
-}
+import { Comun } from "./Comun";
 
-export interface CompanySize{
-    id:number
-    name:string
-    description:string
-    dedication:number
-    dedication_detail:Dedication
+export interface Dedication extends Comun {}
+
+export interface CompanySize extends Comun {
+  description: string;
+  dedication: number;
+  dedication_detail: Dedication;
 }

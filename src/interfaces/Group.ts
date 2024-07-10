@@ -1,4 +1,3 @@
-export interface Group {
-  id: number;
-  name: string;
-}
+import { Comun } from "./Comun";
+
+export interface Group extends Comun {}

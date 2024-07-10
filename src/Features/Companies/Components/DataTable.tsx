@@ -12,13 +12,20 @@ import {
   TableColumnsType,
   TablePaginationConfig,
   TableProps,
+  Tooltip,
 } from "antd";
 import { SorterResult } from "antd/es/table/interface";
 import React, { useEffect, useState } from "react";
 import { CiEdit } from "react-icons/ci";
-import { MdDeleteOutline, MdEdit } from "react-icons/md";
+import {
+  MdDeleteOutline,
+  MdEdit,
+  MdOutlineDocumentScanner,
+} from "react-icons/md";
 import CompanyForm from "./CompanyForm";
 import InfoConsultors from "@/Features/Companies/Components/InfoProfile";
+import { useNavigate } from "react-router-dom";
+import { encryptId } from "@/utils/utilsMethods";
 
 interface DataType extends Company {
   key: React.Key;
@@ -32,6 +39,8 @@ interface TableParams {
 }
 
 export default function DataTable() {
+  const navigate = useNavigate();
+
   const [tableParams, setTableParams] = useState<TableParams>({
     pagination: {
       current: 1,
@@ -151,9 +160,13 @@ export default function DataTable() {
     {
       title: "Consultor Asignado",
       dataIndex: ["consultor_detail", "username"],
-      render: (_, record) => (
-        <InfoConsultors consultand={record.consultor_detail} />
-      ),
+      render: (_, record) =>
+        record.consultor_detail != null ? (
+          <InfoConsultors consultand={record.consultor_detail} />
+        ) : (
+          <span>SIN CONSULTOR ASIGNADO</span>
+        ),
+      fixed: "right",
     },
     {
       title: "Acciones",
@@ -161,7 +174,19 @@ export default function DataTable() {
       fixed: "right",
       render: (_, record) =>
         dataSource.length >= 1 ? (
-          <div className="p-2 flex items-center justify-center gap-2">
+          <div className=" flex items-center justify-center gap-2">
+            <Tooltip title="Comenzar Diagnostico para esta empresa">
+              <Button
+                icon={<MdOutlineDocumentScanner />}
+                onClick={() =>
+                  navigate(
+                    `/app/companies/diagnosis/${encryptId(
+                      record.id.toString()
+                    )}`
+                  )
+                }
+              />
+            </Tooltip>
             <Button
               icon={<CiEdit />}
               onClick={() => handleEditModal(record.key)}
@@ -210,6 +235,12 @@ export default function DataTable() {
         scroll={{ x: "max-content" }}
         showSorterTooltip={{ target: "sorter-icon" }}
         loading={isLoading}
+        //@ts-ignore
+        pagination={{
+          defaultPageSize: 10,
+          showSizeChanger: true,
+          pageSizeOptions: ["10", "20", "30"],
+        }}
       />
       <Modal
         title={

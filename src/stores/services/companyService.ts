@@ -1,4 +1,10 @@
-import { Company, CompanyDTO } from "@/interfaces/Company";
+import {
+  Company,
+  CompanyDTO,
+  DriverQuestion,
+  Fleet,
+  VehicleQuestion,
+} from "@/interfaces/Company";
 import { CompanySize, Dedication } from "@/interfaces/Dedication";
 import axiosBaseQuery from "@/utils/axiosBaseQuery";
 import { createApi } from "@reduxjs/toolkit/query/react";
@@ -67,6 +73,24 @@ export const companyService = createApi({
     >({
       query: ({ id }) => ({
         url: `/companies/findcompanySizeByDedicactionId/${id}`,
+        method: "GET",
+      }),
+    }),
+    findAllVehicleQuestions: builder.query<VehicleQuestion[], void>({
+      query: () => ({
+        url: `/companies/findAllVehicleQuestions`,
+        method: "GET",
+      }),
+    }),
+    findAllDriverQuestions: builder.query<DriverQuestion[], void>({
+      query: () => ({
+        url: `/companies/findAllDriverQuestions`,
+        method: "GET",
+      }),
+    }),
+    findFleetsByCompanyId: builder.query<Fleet[], { companyId: number }>({
+      query: ({ companyId }) => ({
+        url: `/companies/findFleetsByCompanyId/${companyId}`,
         method: "GET",
       }),
     }),

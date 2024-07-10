@@ -9,6 +9,7 @@ import { companyService } from "@/stores/services/companyService";
 import { segmentService } from "@/stores/services/segmentServices";
 import { userService } from "@/stores/services/userService";
 import { TOAST_TYPE, toastHandler } from "@/utils/useToast";
+import { formatNIT, removeHyphen } from "@/utils/utilsMethods";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { Button, Input, Select } from "antd";
 import { Formik } from "formik";
@@ -24,7 +25,6 @@ interface CompanyFormProps {
 const initialValues: CompanyDTO = {
   name: "",
   email: "",
-  size: 0,
   nit: "",
   diagnosis: "",
   dependant: "",
@@ -38,21 +38,25 @@ const initialValues: CompanyDTO = {
 };
 
 export default function CompanyForm({ id }: CompanyFormProps) {
-  const [dedicationId, setDedicationId] = useState<number | undefined>();
   const { data: fetchSegments, isLoading } = segmentService.useFindAllQuery();
   const { data: fetchConsultants, isLoading: loadConsultants } =
     userService.useFindAllConsultantsQuery();
 
   const { data: fetchDedications, isLoading: loadDedications } =
     companyService.useFindAllDedicationsQuery();
+  const [dedicationId, setDedicationId] = useState<number | undefined>();
+  const {
+    data: fetchCompanySize,
+    isLoading: loadCompanySize,
+    refetch,
+    isUninitialized,
+  } = companyService.useFindcompanySizeByDedicactionIdQuery(
+    dedicationId ? { id: dedicationId } : skipToken
+  );
+
   const { data: fetchCompany } = companyService.useFindByIdQuery(
     id ? { id } : skipToken
   );
-  const { data: fetchCompanySize } =
-    companyService.useFindcompanySizeByDedicactionIdQuery(
-      dedicationId ? { id: dedicationId } : skipToken
-    );
-
   const dispatch = useAppDispatch();
   const segments = useAppSelector((state) => state.segment.segments);
   const [filteredSegments, setFilteredSegments] = useState(segments || []);
@@ -63,6 +67,9 @@ export default function CompanyForm({ id }: CompanyFormProps) {
   const [filteredCompanySize, setFilteredCompanySize] = useState<CompanySize[]>(
     []
   );
+  useEffect(() => {
+    if (!isUninitialized) refetch();
+  }, [dedicationId, isUninitialized]);
   useEffect(() => {
     if (fetchSegments) {
       dispatch(setSegments(fetchSegments));
@@ -79,11 +86,12 @@ export default function CompanyForm({ id }: CompanyFormProps) {
       setFiltereddedications(fetchDedications);
     }
   }, [fetchDedications]);
+
   useEffect(() => {
     if (fetchCompanySize) {
       setFilteredCompanySize(fetchCompanySize);
     }
-  }, [dedicationId, fetchCompanySize]);
+  }, [fetchCompanySize]);
 
   const [save, { isLoading: saveLoad }] = companyService.useSaveMutation();
   const [updateCompany] = companyService.useUpdateCompanyMutation();
@@ -140,13 +148,12 @@ export default function CompanyForm({ id }: CompanyFormProps) {
     email: Yup.string()
       .email("Correo electronico invalido")
       .required("Campo Obligatorio"),
-    size: Yup.number().required("Campo Obligatorio"),
     nit: Yup.string().required("Campo Obligatorio"),
-    diagnosis: Yup.string().required("Campo Obligatorio"),
+    // diagnosis: Yup.string().required("Campo Obligatorio"),
     dependant: Yup.string().required("Campo Obligatorio"),
     dependant_phone: Yup.string().required("Campo Obligatorio"),
-    activities_ciiu: Yup.string().required("Campo Obligatorio"),
-    acquired_certification: Yup.string().required("Campo Obligatorio"),
+    // activities_ciiu: Yup.string().required("Campo Obligatorio"),
+    // acquired_certification: Yup.string().required("Campo ObligatoriformatNIT(e.target.value)o"),
     segment: Yup.number().required("Campo Obligatorio"),
   });
 
@@ -157,19 +164,28 @@ export default function CompanyForm({ id }: CompanyFormProps) {
       email: values.email,
       acquired_certification: values.acquired_certification,
       activities_ciiu: values.activities_ciiu,
-      nit: values.nit,
-      size: values.size,
+      nit: removeHyphen(values.nit, "-"),
       diagnosis: values.diagnosis,
       dependant: values.dependant,
       dependant_phone: values.dependant_phone,
       segment: values.segment,
-      consultor: values.consultor ?? 0,
+      consultor: values.consultor ?? undefined,
+      dedication: values.dedication ?? undefined,
+      company_size: values.company_size ?? undefined,
     }).unwrap();
     toastHandler(TOAST_TYPE.SUCCESS_TOAST, "Actualizado Correctamente");
     dispatch(setUpdateCompany(updatedCompany));
   };
 
   const createCompany = async (values: CompanyDTO) => {
+    values.nit = removeHyphen(values.nit, "-");
+    values.acquired_certification =
+      values.acquired_certification == ""
+        ? null
+        : values.acquired_certification;
+    values.activities_ciiu =
+      values.activities_ciiu == "" ? null : values.activities_ciiu;
+    values.diagnosis = values.diagnosis == "" ? null : values.diagnosis;
     const savedCompany = await save(values).unwrap(); //Metodo que guarda
     toastHandler(TOAST_TYPE.SUCCESS_TOAST, "Registrado Correctamente");
     dispatch(setCompany(savedCompany));
@@ -209,7 +225,6 @@ export default function CompanyForm({ id }: CompanyFormProps) {
               acquired_certification: fetchCompany.acquired_certification,
               activities_ciiu: fetchCompany.activities_ciiu,
               nit: fetchCompany.nit,
-              size: fetchCompany.size,
               diagnosis: fetchCompany.diagnosis,
               dependant: fetchCompany.dependant,
               dependant_phone: fetchCompany.dependant_phone,
@@ -219,6 +234,7 @@ export default function CompanyForm({ id }: CompanyFormProps) {
               dedication: fetchCompany.dedication_detail.id,
             });
           }
+          setDedicationId(fetchCompany?.dedication_detail.id);
         }, [fetchCompany, id]);
         return (
           <form
@@ -242,7 +258,9 @@ export default function CompanyForm({ id }: CompanyFormProps) {
                   <Input
                     id="nit"
                     name="nit"
-                    onChange={props.handleChange}
+                    onChange={(e) => {
+                      props.setFieldValue("nit", formatNIT(e.target.value));
+                    }}
                     onBlur={props.handleBlur}
                     value={props.values.nit}
                   />
@@ -410,7 +428,7 @@ export default function CompanyForm({ id }: CompanyFormProps) {
                     showSearch
                     optionFilterProp="label"
                     onSearch={onSearchCompanySize}
-                    loading={loadConsultants}
+                    loading={loadCompanySize}
                     options={companySizeOptions}
                     className="w-full"
                     onChange={(value) =>
