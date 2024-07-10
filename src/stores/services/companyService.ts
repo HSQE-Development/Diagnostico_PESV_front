@@ -1,7 +1,7 @@
 import { Company, CompanyDTO } from "@/interfaces/Company";
+import { CompanySize, Dedication } from "@/interfaces/Dedication";
 import axiosBaseQuery from "@/utils/axiosBaseQuery";
 import { createApi } from "@reduxjs/toolkit/query/react";
-
 
 /**
  * IMPORTANTE:
@@ -16,44 +16,59 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 // const { useLoginMutation } = companyService;
 // export { useLoginMutation }; // Esta exportación causa un error de TypeScript
 export const companyService = createApi({
-    reducerPath: "companyApi",
-    baseQuery: axiosBaseQuery,
-    endpoints: (builder) => ({
-        findAll: builder.query<Company[], void>({
-            query: () => ({
-                url: "/companies/",
-                method: "GET",
-            })
-        }),
-        findById: builder.query<Company, {id:number}>({
-            query: ({id}) => ({
-                url: `/companies/${id}`,
-                method: "GET",
-            })
-        }),
-        updateCompany: builder.mutation<Company, Partial<Company>>({
-            query: (updatedCompany) => ({
-                url: `/companies/update`,
-                method: "PATCH",
-                data: {
-                    ...updatedCompany
-                }
-            })
-        }),
-        deleteCompany: builder.mutation<Company, {id:number}>({
-            query: ({id}) => ({
-                url: `/companies/delete/${id}`,
-                method: "DELETE",
-            })
-        }),
-        save: builder.mutation<Company, CompanyDTO>({
-            query: (companyData) => ({
-                url: `/companies/save/`,
-                method: "POST",
-                data:{
-                    ...companyData
-                }
-            })
-        })
-    })
-})
+  reducerPath: "companyApi",
+  baseQuery: axiosBaseQuery,
+  endpoints: (builder) => ({
+    findAll: builder.query<Company[], void>({
+      query: () => ({
+        url: "/companies/",
+        method: "GET",
+      }),
+    }),
+    findById: builder.query<Company, { id: number }>({
+      query: ({ id }) => ({
+        url: `/companies/${id}`,
+        method: "GET",
+      }),
+    }),
+    updateCompany: builder.mutation<Company, Partial<Company>>({
+      query: (updatedCompany) => ({
+        url: `/companies/update`,
+        method: "PATCH",
+        data: {
+          ...updatedCompany,
+        },
+      }),
+    }),
+    deleteCompany: builder.mutation<Company, { id: number }>({
+      query: ({ id }) => ({
+        url: `/companies/delete/${id}`,
+        method: "DELETE",
+      }),
+    }),
+    save: builder.mutation<Company, CompanyDTO>({
+      query: (companyData) => ({
+        url: `/companies/save/`,
+        method: "POST",
+        data: {
+          ...companyData,
+        },
+      }),
+    }),
+    findAllDedications: builder.query<Dedication[], void>({
+      query: () => ({
+        url: `/companies/findAllDedications`,
+        method: "GET",
+      }),
+    }),
+    findcompanySizeByDedicactionId: builder.query<
+      CompanySize[],
+      { id: number }
+    >({
+      query: ({ id }) => ({
+        url: `/companies/findcompanySizeByDedicactionId/${id}`,
+        method: "GET",
+      }),
+    }),
+  }),
+});

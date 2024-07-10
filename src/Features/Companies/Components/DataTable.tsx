@@ -7,7 +7,7 @@ import {
   message,
   Modal,
   Popconfirm,
-  PopconfirmProps,
+  Popover,
   Table,
   TableColumnsType,
   TablePaginationConfig,
@@ -15,9 +15,10 @@ import {
 } from "antd";
 import { SorterResult } from "antd/es/table/interface";
 import React, { useEffect, useState } from "react";
-import { CiEdit, CiSaveDown1 } from "react-icons/ci";
+import { CiEdit } from "react-icons/ci";
 import { MdDeleteOutline, MdEdit } from "react-icons/md";
 import CompanyForm from "./CompanyForm";
+import InfoConsultors from "@/Features/Companies/Components/InfoProfile";
 
 interface DataType extends Company {
   key: React.Key;
@@ -38,7 +39,11 @@ export default function DataTable() {
     },
   });
   // const [messageApi, contextHolder] = message.useMessage();
-  const { data: fetchCompanies, refetch } = companyService.useFindAllQuery();
+  const {
+    data: fetchCompanies,
+    refetch,
+    isLoading,
+  } = companyService.useFindAllQuery();
   const dispatch = useAppDispatch();
   const companies = useAppSelector((state) => state.company.companies);
   const [deleteCompany] = companyService.useDeleteCompanyMutation();
@@ -108,8 +113,20 @@ export default function DataTable() {
       dataIndex: "nit",
     },
     {
+      title: "Dedicación",
+      dataIndex: ["dedication_detail", "name"],
+    },
+    {
       title: "Tamaño",
-      dataIndex: "size",
+      dataIndex: ["company_size_detail", "name"],
+      render: (_, record) => (
+        <Popover
+          placement="topLeft"
+          title={record.company_size_detail.description}
+        >
+          <span>{record.company_size_detail.name}</span>
+        </Popover>
+      ),
     },
     {
       title: "Segmento",
@@ -132,8 +149,16 @@ export default function DataTable() {
       dataIndex: "diagnosis",
     },
     {
+      title: "Consultor Asignado",
+      dataIndex: ["consultor_detail", "username"],
+      render: (_, record) => (
+        <InfoConsultors consultand={record.consultor_detail} />
+      ),
+    },
+    {
       title: "Acciones",
       key: "Operation",
+      fixed: "right",
       render: (_, record) =>
         dataSource.length >= 1 ? (
           <div className="p-2 flex items-center justify-center gap-2">
@@ -184,6 +209,7 @@ export default function DataTable() {
         onChange={handleTableChange}
         scroll={{ x: "max-content" }}
         showSorterTooltip={{ target: "sorter-icon" }}
+        loading={isLoading}
       />
       <Modal
         title={

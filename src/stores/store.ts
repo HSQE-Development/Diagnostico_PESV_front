@@ -5,11 +5,12 @@ import createWebStorage from "redux-persist/es/storage/createWebStorage";
 import persistReducer from "redux-persist/es/persistReducer";
 import persistStore from "redux-persist/es/persistStore";
 import { authService } from "./services/authService";
-import sidebarReducer from "@/stores/features/sideBarSlice"
-import companyReducer from "@/stores/features/companySlice"
-import segmentReducer from "@/stores/features/segmentSlice"
+import sidebarReducer from "@/stores/features/sideBarSlice";
+import companyReducer from "@/stores/features/companySlice";
+import segmentReducer from "@/stores/features/segmentSlice";
 import { companyService } from "./services/companyService";
 import { segmentService } from "./services/segmentServices";
+import { userService } from "./services/userService";
 
 const createNoobStorage = () => {
   return {
@@ -38,17 +39,13 @@ const rootReducer = combineReducers({
   [authService.reducerPath]: authService.reducer,
   [companyService.reducerPath]: companyService.reducer,
   [segmentService.reducerPath]: segmentService.reducer,
+  [userService.reducerPath]: userService.reducer,
 });
 
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: [
-    "auth",
-    "sidebar",
-    "companies",
-    "segments"
-  ], // Nombre del slice que quieres persistir
+  whitelist: ["auth", "sidebar", "companies", "segments"], // Nombre del slice que quieres persistir
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
@@ -59,10 +56,11 @@ export const store = configureStore({
     getDefaultMiddleware({
       serializableCheck: false,
     }).concat(
-      authService.middleware, 
+      authService.middleware,
       companyService.middleware,
-      segmentService.middleware
-    )
+      segmentService.middleware,
+      userService.middleware
+    ),
 });
 
 setupListeners(store.dispatch);

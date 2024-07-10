@@ -1,18 +1,21 @@
 import { useAppSelector } from "@/stores/hooks";
 import { getUservatarUrl } from "@/utils/getUserAvatarImage";
-import { Avatar, Badge, Button, Dropdown, MenuProps } from "antd";
+import { Avatar, Badge, Dropdown, MenuProps } from "antd";
 import React from "react";
-import { CiUser } from "react-icons/ci";
 import { useNavigate } from "react-router-dom";
 
 interface MiniProfileProps {
   username: string;
   cargo: string;
+  avatar?: string;
 }
 
-export default function MiniProfile({ username, cargo }: MiniProfileProps) {
+export default function MiniProfile({
+  username,
+  cargo,
+  avatar,
+}: MiniProfileProps) {
   const navigate = useNavigate();
-  const userAuth = useAppSelector((state) => state.auth.authUser);
 
   const items: MenuProps["items"] = [
     {
@@ -26,7 +29,7 @@ export default function MiniProfile({ username, cargo }: MiniProfileProps) {
       onClick: () => navigate("/login"),
     },
   ];
-  const avatarUrl = getUservatarUrl(userAuth?.user.avatar ?? undefined);
+  const avatarUrl = getUservatarUrl(avatar ?? undefined);
 
   return (
     <div className="flex justify-evenly items-center gap-x-2">

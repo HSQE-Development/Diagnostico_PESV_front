@@ -1,18 +1,20 @@
 import FloatLabel from "@/Components/FloatLabel";
-import { Company, CompanyDTO } from "@/interfaces/Company";
+import { CompanyDTO } from "@/interfaces/Company";
+import { CompanySize, Dedication } from "@/interfaces/Dedication";
+import { IUser } from "@/interfaces/IUser";
 import { setCompany, setUpdateCompany } from "@/stores/features/companySlice";
 import { setSegments } from "@/stores/features/segmentSlice";
 import { useAppDispatch, useAppSelector } from "@/stores/hooks";
 import { companyService } from "@/stores/services/companyService";
 import { segmentService } from "@/stores/services/segmentServices";
+import { userService } from "@/stores/services/userService";
 import { TOAST_TYPE, toastHandler } from "@/utils/useToast";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { Button, Input, Select } from "antd";
-import { Formik, useFormik } from "formik";
-import React, { ChangeEvent, useEffect, useState } from "react";
+import { Formik } from "formik";
+import React, { useEffect, useState } from "react";
 import { CiSaveDown1 } from "react-icons/ci";
 import { MdEdit } from "react-icons/md";
-import { useToast } from "react-toastify";
 import * as Yup from "yup";
 
 interface CompanyFormProps {
@@ -29,37 +31,108 @@ const initialValues: CompanyDTO = {
   dependant_phone: "",
   activities_ciiu: "",
   acquired_certification: "",
-  segment: 0,
+  segment: null,
+  consultor: null,
+  company_size: null,
+  dedication: null,
 };
 
 export default function CompanyForm({ id }: CompanyFormProps) {
+  const [dedicationId, setDedicationId] = useState<number | undefined>();
   const { data: fetchSegments, isLoading } = segmentService.useFindAllQuery();
+  const { data: fetchConsultants, isLoading: loadConsultants } =
+    userService.useFindAllConsultantsQuery();
+
+  const { data: fetchDedications, isLoading: loadDedications } =
+    companyService.useFindAllDedicationsQuery();
   const { data: fetchCompany } = companyService.useFindByIdQuery(
     id ? { id } : skipToken
   );
+  const { data: fetchCompanySize } =
+    companyService.useFindcompanySizeByDedicactionIdQuery(
+      dedicationId ? { id: dedicationId } : skipToken
+    );
+
   const dispatch = useAppDispatch();
   const segments = useAppSelector((state) => state.segment.segments);
   const [filteredSegments, setFilteredSegments] = useState(segments || []);
+  const [filteredConsultands, setFilteredConsultands] = useState<IUser[]>([]);
+  const [filteredDedications, setFiltereddedications] = useState<Dedication[]>(
+    []
+  );
+  const [filteredCompanySize, setFilteredCompanySize] = useState<CompanySize[]>(
+    []
+  );
   useEffect(() => {
     if (fetchSegments) {
       dispatch(setSegments(fetchSegments));
       setFilteredSegments(fetchSegments);
     }
   }, [fetchSegments]);
+  useEffect(() => {
+    if (fetchConsultants) {
+      setFilteredConsultands(fetchConsultants);
+    }
+  }, [fetchConsultants]);
+  useEffect(() => {
+    if (fetchDedications) {
+      setFiltereddedications(fetchDedications);
+    }
+  }, [fetchDedications]);
+  useEffect(() => {
+    if (fetchCompanySize) {
+      setFilteredCompanySize(fetchCompanySize);
+    }
+  }, [dedicationId, fetchCompanySize]);
 
   const [save, { isLoading: saveLoad }] = companyService.useSaveMutation();
   const [updateCompany] = companyService.useUpdateCompanyMutation();
 
-  const onSearch = (value: string) => {
+  const onSearchSegments = (value: string) => {
     const filtered = segments?.filter((segment) =>
       segment.name.toLowerCase().includes(value.toLowerCase())
     );
     setFilteredSegments(filtered || []);
   };
+  const onSearchConsultands = (value: string) => {
+    const filtered = filteredConsultands?.filter((consultand) => {
+      if (consultand.first_name)
+        consultand.first_name.toLowerCase().includes(value.toLowerCase());
+    });
+    setFilteredConsultands(filtered || []);
+  };
+  const onSearchDedications = (value: string) => {
+    const filtered = filteredDedications?.filter((dedication) => {
+      if (dedication.name)
+        dedication.name.toLowerCase().includes(value.toLowerCase());
+    });
+    setFiltereddedications(filtered || []);
+  };
+  const onSearchCompanySize = (value: string) => {
+    const filtered = filteredCompanySize?.filter((companySize) => {
+      if (companySize.name)
+        companySize.name.toLowerCase().includes(value.toLowerCase());
+    });
+    setFilteredCompanySize(filtered || []);
+  };
 
   const segmentOptions = filteredSegments.map((segment) => ({
     value: segment.id,
     label: segment.name,
+  }));
+
+  const consultandOptions = filteredConsultands.map((consultand) => ({
+    value: consultand.id,
+    label: consultand.first_name + " " + consultand.last_name,
+  }));
+
+  const dedicationOptions = filteredDedications.map((dedication) => ({
+    value: dedication.id,
+    label: dedication.name,
+  }));
+  const companySizeOptions = filteredCompanySize.map((companySize) => ({
+    value: companySize.id,
+    label: companySize.name,
   }));
 
   const validationSchema = Yup.object().shape({
@@ -90,6 +163,7 @@ export default function CompanyForm({ id }: CompanyFormProps) {
       dependant: values.dependant,
       dependant_phone: values.dependant_phone,
       segment: values.segment,
+      consultor: values.consultor ?? 0,
     }).unwrap();
     toastHandler(TOAST_TYPE.SUCCESS_TOAST, "Actualizado Correctamente");
     dispatch(setUpdateCompany(updatedCompany));
@@ -140,6 +214,9 @@ export default function CompanyForm({ id }: CompanyFormProps) {
               dependant: fetchCompany.dependant,
               dependant_phone: fetchCompany.dependant_phone,
               segment: fetchCompany.segment_detail.id || 0,
+              consultor: fetchCompany.consultor_detail?.id ?? null,
+              company_size: fetchCompany.company_size_detail.id,
+              dedication: fetchCompany.dedication_detail.id,
             });
           }
         }, [fetchCompany, id]);
@@ -205,32 +282,39 @@ export default function CompanyForm({ id }: CompanyFormProps) {
                   </div>
                 ) : null}
               </div>
-              <div className="col-span-12 md:col-span-3">
-                <FloatLabel label="Tamaño Empresa">
-                  <Input
-                    id="size"
-                    name="size"
-                    value={props.values.size}
-                    onChange={props.handleChange}
-                    onBlur={props.handleBlur}
-                  />
-                </FloatLabel>
-                {props.touched.size && props.errors.size ? (
-                  <div className="text-red-600">{props.errors.size}</div>
-                ) : null}
-              </div>
+
               <div className="col-span-12 md:col-span-3">
                 <FloatLabel label="Segmento al que pertenece">
                   <Select
                     showSearch
                     optionFilterProp="label"
-                    onSearch={onSearch}
+                    onSearch={onSearchSegments}
                     loading={isLoading}
                     options={segmentOptions}
                     className="w-full"
                     onChange={(value) => props.setFieldValue("segment", value)}
                     onBlur={props.handleBlur}
                     value={props.values.segment}
+                  />
+                </FloatLabel>
+                {props.touched.segment && props.errors.segment ? (
+                  <div className="text-red-600">{props.errors.segment}</div>
+                ) : null}
+              </div>
+              <div className="col-span-12 md:col-span-3">
+                <FloatLabel label="Consultor a cargo">
+                  <Select
+                    showSearch
+                    optionFilterProp="label"
+                    onSearch={onSearchConsultands}
+                    loading={loadConsultants}
+                    options={consultandOptions}
+                    className="w-full"
+                    onChange={(value) =>
+                      props.setFieldValue("consultor", value)
+                    }
+                    onBlur={props.handleBlur}
+                    value={props.values.consultor}
                   />
                 </FloatLabel>
                 {props.touched.segment && props.errors.segment ? (
@@ -297,6 +381,47 @@ export default function CompanyForm({ id }: CompanyFormProps) {
                 </FloatLabel>
                 {props.touched.diagnosis && props.errors.diagnosis ? (
                   <div className="text-red-600">{props.errors.diagnosis}</div>
+                ) : null}
+              </div>
+              <div className="col-span-12 md:col-span-9">
+                <FloatLabel label="Misionalidad de la empresa">
+                  <Select
+                    showSearch
+                    optionFilterProp="label"
+                    onSearch={onSearchDedications}
+                    loading={loadDedications}
+                    options={dedicationOptions}
+                    className="w-full"
+                    onChange={(value) => {
+                      setDedicationId(value);
+                      props.setFieldValue("dedication", value);
+                    }}
+                    onBlur={props.handleBlur}
+                    value={props.values.dedication}
+                  />
+                </FloatLabel>
+                {props.touched.segment && props.errors.segment ? (
+                  <div className="text-red-600">{props.errors.segment}</div>
+                ) : null}
+              </div>
+              <div className="col-span-12 md:col-span-3">
+                <FloatLabel label="Tamaño de la empresa">
+                  <Select
+                    showSearch
+                    optionFilterProp="label"
+                    onSearch={onSearchCompanySize}
+                    loading={loadConsultants}
+                    options={companySizeOptions}
+                    className="w-full"
+                    onChange={(value) =>
+                      props.setFieldValue("company_size", value)
+                    }
+                    onBlur={props.handleBlur}
+                    value={props.values.company_size}
+                  />
+                </FloatLabel>
+                {props.touched.segment && props.errors.segment ? (
+                  <div className="text-red-600">{props.errors.segment}</div>
                 ) : null}
               </div>
             </div>
