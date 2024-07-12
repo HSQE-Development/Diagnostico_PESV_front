@@ -1,6 +1,7 @@
 import {
   Company,
   CompanyDTO,
+  Driver,
   DriverQuestion,
   Fleet,
   SaveQuestionsDTO,
@@ -95,6 +96,12 @@ export const companyService = createApi({
         method: "GET",
       }),
     }),
+    findDriversByCompanyId: builder.query<Driver[], { companyId: number }>({
+      query: ({ companyId }) => ({
+        url: `/companies/findDriversByCompanyId/${companyId}`,
+        method: "GET",
+      }),
+    }),
     saveAnswerCuestions: builder.mutation<SaveQuestionsDTO, SaveQuestionsDTO>({
       query: (questionsDTO) => ({
         url: `/companies/saveAnswerCuestions`,
@@ -104,5 +111,5 @@ export const companyService = createApi({
         },
       }),
     }),
-  }), 
+  }),
 });

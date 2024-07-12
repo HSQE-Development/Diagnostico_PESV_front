@@ -6,7 +6,7 @@ import {
 } from "@/stores/features/vehicleQuestionsSlice";
 import { useAppDispatch, useAppSelector } from "@/stores/hooks";
 import { companyService } from "@/stores/services/companyService";
-import { InputNumber, Table, TableColumnsType, TableProps } from "antd";
+import { Input, Table, TableColumnsType, TableProps } from "antd";
 import React, { useEffect, useState } from "react";
 
 interface Props {
@@ -80,6 +80,7 @@ export default function Vehiculos({ companyId }: Props) {
         };
       });
       setInputValues(initialInputValues);
+      dispatch(setFleetData(fleetByCompany));
     }
   }, [fleetByCompany, isLoadingFleetByCompany]);
 
@@ -192,14 +193,16 @@ export default function Vehiculos({ companyId }: Props) {
           leasing: 0,
           renting: 0,
         };
-        // console.log(fleetInfo);
         return (
           <>
-            <InputNumber
-              min={0}
-              defaultValue={fleetInfo.owned ?? 0}
-              onChange={(value) =>
-                handleFleetChange(value ?? 0, record.id, "owned")
+            <Input
+              value={fleetInfo.owned ?? 0}
+              onChange={(e) =>
+                handleFleetChange(
+                  parseInt(e.target.value) ?? 0,
+                  record.id,
+                  "owned"
+                )
               }
             />
           </>
@@ -216,11 +219,15 @@ export default function Vehiculos({ companyId }: Props) {
         // console.log(fleetInfo);
         return (
           <>
-            <InputNumber
+            <Input
               min={0}
-              defaultValue={fleetInfo.third_party ?? 0}
-              onChange={(value) =>
-                handleFleetChange(value ?? 0, record.id, "third_party")
+              value={fleetInfo.third_party ?? 0}
+              onChange={(e) =>
+                handleFleetChange(
+                  parseInt(e.target.value) ?? 0,
+                  record.id,
+                  "third_party"
+                )
               }
             />
           </>
@@ -237,11 +244,15 @@ export default function Vehiculos({ companyId }: Props) {
         // console.log(fleetInfo);
         return (
           <>
-            <InputNumber
+            <Input
               min={0}
-              defaultValue={fleetInfo.arrended ?? 0}
-              onChange={(value) =>
-                handleFleetChange(value ?? 0, record.id, "arrended")
+              value={fleetInfo.arrended ?? 0}
+              onChange={(e) =>
+                handleFleetChange(
+                  parseInt(e.target.value) ?? 0,
+                  record.id,
+                  "arrended"
+                )
               }
             />
           </>
@@ -258,11 +269,15 @@ export default function Vehiculos({ companyId }: Props) {
         // console.log(fleetInfo);
         return (
           <>
-            <InputNumber
+            <Input
               min={0}
-              defaultValue={fleetInfo.contractors ?? 0}
-              onChange={(value) =>
-                handleFleetChange(value ?? 0, record.id, "contractors")
+              value={fleetInfo.contractors ?? 0}
+              onChange={(e) =>
+                handleFleetChange(
+                  parseInt(e.target.value) ?? 0,
+                  record.id,
+                  "contractors"
+                )
               }
             />
           </>
@@ -279,11 +294,15 @@ export default function Vehiculos({ companyId }: Props) {
         // console.log(fleetInfo);
         return (
           <>
-            <InputNumber
+            <Input
               min={0}
-              defaultValue={fleetInfo.intermediation ?? 0}
-              onChange={(value) =>
-                handleFleetChange(value ?? 0, record.id, "intermediation")
+              value={fleetInfo.intermediation ?? 0}
+              onChange={(e) =>
+                handleFleetChange(
+                  parseInt(e.target.value) ?? 0,
+                  record.id,
+                  "intermediation"
+                )
               }
             />
           </>
@@ -300,11 +319,15 @@ export default function Vehiculos({ companyId }: Props) {
         // console.log(fleetInfo);
         return (
           <>
-            <InputNumber
+            <Input
               min={0}
-              defaultValue={fleetInfo.leasing ?? 0}
-              onChange={(value) =>
-                handleFleetChange(value ?? 0, record.id, "leasing")
+              value={fleetInfo.leasing ?? 0}
+              onChange={(e) =>
+                handleFleetChange(
+                  parseInt(e.target.value) ?? 0,
+                  record.id,
+                  "leasing"
+                )
               }
             />
           </>
@@ -321,11 +344,15 @@ export default function Vehiculos({ companyId }: Props) {
         // console.log(fleetInfo);
         return (
           <>
-            <InputNumber
+            <Input
               min={0}
-              defaultValue={fleetInfo.renting ?? 0}
-              onChange={(value) =>
-                handleFleetChange(value ?? 0, record.id, "renting")
+              value={fleetInfo.renting ?? 0}
+              onChange={(e) =>
+                handleFleetChange(
+                  parseInt(e.target.value) ?? 0,
+                  record.id,
+                  "renting"
+                )
               }
             />
           </>
@@ -359,7 +386,7 @@ export default function Vehiculos({ companyId }: Props) {
       onChange={handleTableChange}
       scroll={{ x: "max-content" }}
       showSorterTooltip={{ target: "sorter-icon" }}
-      // loading={isLoading}
+      loading={isLoadingFleetByCompany}
       //@ts-ignore
       pagination={{
         defaultPageSize: 10,

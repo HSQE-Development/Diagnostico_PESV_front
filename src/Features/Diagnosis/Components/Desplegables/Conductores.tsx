@@ -1,22 +1,58 @@
-import { DriverDTO } from "@/interfaces/Company";
+import { DriverDTO, DriverQuestion } from "@/interfaces/Company";
+import { TableParams } from "@/interfaces/Comun";
 import {
   setDriverData,
   setDriverQuestions,
 } from "@/stores/features/driverQuestionSlice";
 import { useAppDispatch, useAppSelector } from "@/stores/hooks";
 import { companyService } from "@/stores/services/companyService";
-import { Collapse, CollapseProps, InputNumber, theme } from "antd";
-import React, { CSSProperties, useEffect } from "react";
-import { IoIosArrowDown } from "react-icons/io";
+import { Input, Table, TableColumnsType, TableProps } from "antd";
+import React, { useEffect, useState } from "react";
 
 interface Props {
   companyId: number;
 }
+interface DataType extends DriverQuestion {
+  key: React.Key;
+}
+
 export default function Conductores({ companyId }: Props) {
   const dispatch = useAppDispatch();
-  const driverQuestion = useAppSelector((state) => state.driverQuestion);
   const { data: conductoresPreguntas } =
     companyService.useFindAllDriverQuestionsQuery();
+
+  const { data: driverByCompanyid, isLoading: isLoadingDriverByCompany } =
+    companyService.useFindDriversByCompanyIdQuery({ companyId });
+  const [inputValues, setInputValues] = useState<{
+    [key: number]: {
+      quantity: number;
+    };
+  }>({});
+  const [tableParams, setTableParams] = useState<TableParams<DataType>>({
+    pagination: {
+      current: 1,
+      pageSize: 10,
+    },
+  });
+
+  useEffect(() => {
+    if (driverByCompanyid && !isLoadingDriverByCompany) {
+      const initialInputValues: {
+        [key: number]: {
+          quantity: number;
+        };
+      } = {};
+      driverByCompanyid.forEach((driver) => {
+        initialInputValues[driver.driver_question_detail.id] = {
+          quantity: driver.quantity,
+        };
+      });
+      setInputValues(initialInputValues);
+      dispatch(setDriverData(driverByCompanyid));
+    }
+  }, [driverByCompanyid, isLoadingDriverByCompany]);
+
+  const driverQuestion = useAppSelector((state) => state.driverQuestion);
 
   useEffect(() => {
     if (conductoresPreguntas) {
@@ -29,6 +65,14 @@ export default function Conductores({ companyId }: Props) {
     questionId: number,
     type: "general"
   ) => {
+    const updatedInputValues = {
+      ...inputValues,
+      [questionId]: {
+        ...inputValues[questionId],
+        [type]: value,
+      },
+    };
+    setInputValues(updatedInputValues);
     // Crear una copia del estado actual de fleetData
     const updateDriverData = [...driverQuestion.driverData];
 
@@ -60,75 +104,77 @@ export default function Conductores({ companyId }: Props) {
     // Actualizar el estado con el nuevo arreglo de fleetData
     dispatch(setDriverData(updateDriverData));
   };
-  const { token } = theme.useToken();
-  const panelStyle: React.CSSProperties = {
-    background: token.colorFillAlter,
-    borderRadius: token.borderRadiusLG,
-    border: "none",
-    display: "flex",
-    flexDirection: "column",
-  };
 
-  const personasConducenItems: (
-    panelStyle: CSSProperties
-  ) => CollapseProps["items"] = (panelStyle) => [
+  const columns: TableColumnsType<DataType> = [
     {
-      key: "1",
-      label: (
-        <>
-          <div className="grid grid-cols-6 w-full border-b-2 ">
-            <div className="col-span-4">
-              <span className="text-sm">
-                PERSONAS QUE CONDUCEN CON FINES MISIONALES
-              </span>
-            </div>
-            <div className="col-span-2">
-              <span className="text-sm">CANTIDAD</span>
-            </div>
-          </div>
-        </>
-      ),
-      children: (
-        <>
-          <div className="grid grid-cols-6 gap-2 place-content-start items-center">
-            {driverQuestion.questions.map((question) => (
-              <React.Fragment key={question.id}>
-                <div className="col-span-4 ml-8">
-                  <span>{question.name}</span>
-                </div>
-                <div className="col-span-2">
-                  <InputNumber
-                    min={0}
-                    defaultValue={0}
-                    className="w-full"
-                    onChange={(value) =>
-                      handleFleetChange(value ?? 0, question.id, "general")
-                    }
-                  />
-                </div>
-              </React.Fragment>
-            ))}
-          </div>
-        </>
-      ),
-      style: panelStyle,
+      title: "PERSONAS QUE CONDUCEN CON FINES MISIONALES",
+      dataIndex: ["name"],
+      width: "350px",
+      fixed: "left",
+    },
+    {
+      title: "Cantidad",
+      width: 1,
+      render: (_, record) => {
+        const driverInfo = inputValues[record.id] || {
+          quantity: 0,
+        };
+        // console.log(fleetInfo);
+        return (
+          <>
+            <Input
+              min={0}
+              value={driverInfo.quantity ?? 0}
+              onChange={(e) =>
+                handleFleetChange(
+                  parseInt(e.target.value) ?? 0,
+                  record.id,
+                  "general"
+                )
+              }
+            />
+          </>
+        );
+      },
     },
   ];
 
+  const dataSource = driverQuestion.questions.map(
+    (question: DriverQuestion) => ({
+      ...question,
+      key: question.id,
+    })
+  );
+
+  const handleTableChange: TableProps<DataType>["onChange"] = (
+    pagination,
+    filters,
+    sorter
+  ) => {
+    const isMultipleSort = Array.isArray(sorter);
+    setTableParams({
+      pagination,
+      filters,
+      sortOrder: isMultipleSort ? undefined : sorter.order,
+      sortField: isMultipleSort ? undefined : sorter.field,
+    });
+  };
   return (
-    <Collapse
-      bordered={false}
-      defaultActiveKey={["1"]}
-      expandIcon={({ isActive }) => (
-        <IoIosArrowDown
-          rotate={isActive ? 90 : 0}
-          className={`${
-            isActive ? "rotate-180" : "rotate-0"
-          } flex items-center`}
-        />
-      )}
-      style={{ background: token.colorBgContainer }}
-      items={personasConducenItems(panelStyle)}
+    <Table
+      columns={columns}
+      pagination={tableParams.pagination}
+      dataSource={dataSource}
+      size="small"
+      onChange={handleTableChange}
+      scroll={{ x: "max-content" }}
+      showSorterTooltip={{ target: "sorter-icon" }}
+      loading={isLoadingDriverByCompany}
+      //@ts-ignore
+      pagination={{
+        defaultPageSize: 10,
+        showSizeChanger: true,
+        pageSizeOptions: ["10", "20", "30"],
+      }}
     />
   );
 }

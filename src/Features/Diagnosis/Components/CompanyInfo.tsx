@@ -20,13 +20,14 @@ import { MdEmojiPeople, MdOutlineAlternateEmail } from "react-icons/md";
 
 interface Props {
   companyId: number;
+  onlyInfo?: boolean;
 }
-export default function CompanyInfo({ companyId }: Props) {
+export default function CompanyInfo({ companyId, onlyInfo }: Props) {
   const dispatch = useAppDispatch();
   const current = useAppSelector((state) => state.util.diagnosisCurrent);
   const stepsLenght = useAppSelector((state) => state.util.stepLenght);
 
-  const { data } = companyService.useFindByIdQuery(
+  const { data, refetch } = companyService.useFindByIdQuery(
     companyId ? { id: companyId } : skipToken
   );
   const [company, setCompany] = useState<Company | null>(null);
@@ -54,10 +55,13 @@ export default function CompanyInfo({ companyId }: Props) {
   const confirm = async () => {
     try {
       // Intentar eliminar la compañía
+      console.log("vehicleData", vehicleData);
+      console.log("driverData", driverData);
       await saveAnswerCuestions({
         vehicleData,
         driverData,
       }).unwrap();
+      refetch();
       dispatch(setNextDiagnosisCurrent());
       message.success("Conteo Actualizado correctamente");
     } catch (error: any) {
@@ -154,37 +158,41 @@ export default function CompanyInfo({ companyId }: Props) {
           />
         </div>
       </div>
-      {current < stepsLenght - 1 && (
-        <Popconfirm
-          title="Empezar el diagnostico"
-          description="Confirma todos los datos"
-          onConfirm={async () => await confirm()}
-          onCancel={() => null}
-          okText="Continuar"
-          cancelText="Cancelar"
-        >
-          {/* <Button danger icon={<MdDeleteOutline />} /> */}
-          <Button
-            type="primary"
-            className="col-span-6"
-            disabled={totalGeneral == 0}
-            loading={isLoading}
-          >
-            Continuar
-          </Button>
-        </Popconfirm>
-      )}
-      {current > 0 && (
-        <Button
-          type="primary"
-          className="col-span-6"
-          loading={isLoading}
-          onClick={() => {
-            dispatch(setPrevDiagnosisCurrent());
-          }}
-        >
-          Anterior
-        </Button>
+      {!onlyInfo && (
+        <>
+          {current < stepsLenght - 1 && (
+            <Popconfirm
+              title="Empezar el diagnostico"
+              description="Confirma todos los datos"
+              onConfirm={async () => await confirm()}
+              onCancel={() => null}
+              okText="Continuar"
+              cancelText="Cancelar"
+            >
+              {/* <Button danger icon={<MdDeleteOutline />} /> */}
+              <Button
+                type="primary"
+                className="col-span-6"
+                disabled={totalGeneral == 0}
+                loading={isLoading}
+              >
+                Continuar
+              </Button>
+            </Popconfirm>
+          )}
+          {current > 0 && (
+            <Button
+              type="primary"
+              className="col-span-6"
+              loading={isLoading}
+              onClick={() => {
+                dispatch(setPrevDiagnosisCurrent());
+              }}
+            >
+              Anterior
+            </Button>
+          )}
+        </>
       )}
 
       {/* <div style={{ marginTop: 24 }}>
