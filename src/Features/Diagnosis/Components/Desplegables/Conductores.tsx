@@ -121,7 +121,7 @@ export default function Conductores({ companyId }: Props) {
         };
         // console.log(fleetInfo);
         return (
-          <>
+          <React.Fragment key={record.id}>
             <Input
               min={0}
               value={driverInfo.quantity ?? 0}
@@ -133,7 +133,7 @@ export default function Conductores({ companyId }: Props) {
                 )
               }
             />
-          </>
+          </React.Fragment>
         );
       },
     },

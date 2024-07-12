@@ -182,7 +182,8 @@ export default function Vehiculos({ companyId }: Props) {
     },
     {
       title: "Cantidad Propios",
-      width: 1,
+      width: "10px",
+
       render: (_, record) => {
         const fleetInfo = inputValues[record.id] || {
           owned: 0,
@@ -196,6 +197,7 @@ export default function Vehiculos({ companyId }: Props) {
         return (
           <>
             <Input
+              key={record.id}
               value={fleetInfo.owned ?? 0}
               onChange={(e) =>
                 handleFleetChange(
@@ -211,7 +213,7 @@ export default function Vehiculos({ companyId }: Props) {
     },
     {
       title: "Cantidad Terceros",
-      width: 1,
+      width: "10px",
       render: (_, record) => {
         const fleetInfo = inputValues[record.id] || {
           third_party: 0,
@@ -220,6 +222,7 @@ export default function Vehiculos({ companyId }: Props) {
         return (
           <>
             <Input
+              key={record.id}
               min={0}
               value={fleetInfo.third_party ?? 0}
               onChange={(e) =>
@@ -236,7 +239,7 @@ export default function Vehiculos({ companyId }: Props) {
     },
     {
       title: "Cantidad Arrendados",
-      width: 1,
+      width: "10px",
       render: (_, record) => {
         const fleetInfo = inputValues[record.id] || {
           arrended: 0,
@@ -245,6 +248,7 @@ export default function Vehiculos({ companyId }: Props) {
         return (
           <>
             <Input
+              key={record.id}
               min={0}
               value={fleetInfo.arrended ?? 0}
               onChange={(e) =>
@@ -270,6 +274,7 @@ export default function Vehiculos({ companyId }: Props) {
         return (
           <>
             <Input
+              key={record.id}
               min={0}
               value={fleetInfo.contractors ?? 0}
               onChange={(e) =>
@@ -295,6 +300,7 @@ export default function Vehiculos({ companyId }: Props) {
         return (
           <>
             <Input
+              key={record.id}
               min={0}
               value={fleetInfo.intermediation ?? 0}
               onChange={(e) =>
@@ -320,6 +326,7 @@ export default function Vehiculos({ companyId }: Props) {
         return (
           <>
             <Input
+              key={record.id}
               min={0}
               value={fleetInfo.leasing ?? 0}
               onChange={(e) =>
@@ -345,6 +352,7 @@ export default function Vehiculos({ companyId }: Props) {
         return (
           <>
             <Input
+              key={record.id}
               min={0}
               value={fleetInfo.renting ?? 0}
               onChange={(e) =>
