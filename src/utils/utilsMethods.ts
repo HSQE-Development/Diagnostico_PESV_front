@@ -33,10 +33,12 @@ export const removeHyphen = (value: string, characterToRemove: string) => {
   return value.replace(regex, "");
 };
 
+//CUANDO SE PASEN IDS POR URL ENVIARLOS ENCRIPTADOS
 export function encryptId(id: string): string {
   return btoa(id); // Base64 encoding
 }
 
+//USARLO PARA DESENCRIPTAR EL ID
 export function decryptId(encryptedId: string): string {
   return atob(encryptedId); // Base64 decoding
 }

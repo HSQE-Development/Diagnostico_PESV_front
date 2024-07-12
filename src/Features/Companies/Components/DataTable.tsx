@@ -3,6 +3,7 @@ import { setCompanies, setDeleteCompany } from "@/stores/features/companySlice";
 import { useAppDispatch, useAppSelector } from "@/stores/hooks";
 import { companyService } from "@/stores/services/companyService";
 import {
+  Badge,
   Button,
   message,
   Modal,
@@ -131,9 +132,13 @@ export default function DataTable() {
       render: (_, record) => (
         <Popover
           placement="topLeft"
-          title={record.company_size_detail.description}
+          title={record.company_size_detail?.description}
         >
-          <span>{record.company_size_detail.name}</span>
+          <span>
+            {record.company_size_detail?.name ?? (
+              <Badge count="Por definirse" status="default" />
+            )}
+          </span>
         </Popover>
       ),
     },

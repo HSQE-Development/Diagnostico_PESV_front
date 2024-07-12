@@ -1,15 +1,6 @@
-import { useAppDispatch, useAppSelector } from "@/stores/hooks";
-import {
-  Button,
-  ConfigProvider,
-  FloatButton,
-  Image,
-  Modal,
-  Skeleton,
-  Space,
-} from "antd";
+import { useAppSelector } from "@/stores/hooks";
+import { Button, Image, Modal, Skeleton, Space } from "antd";
 import React, { useState } from "react";
-import { FaRegUser } from "react-icons/fa";
 import { GrDocumentConfig } from "react-icons/gr";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import {
@@ -24,7 +15,6 @@ interface InfoProfileProps {
 export default function InfoProfile({ isLoading }: InfoProfileProps) {
   const [editModal, setEditModal] = useState<boolean>(false);
   const authUser = useAppSelector((state) => state.auth.authUser);
-
 
   return (
     <>
@@ -76,7 +66,6 @@ export default function InfoProfile({ isLoading }: InfoProfileProps) {
             <>
               <Skeleton.Button active={isLoading} size={"default"} />
               <Skeleton.Button active={isLoading} size={"default"} />
-
             </>
           ) : (
             <>
@@ -127,7 +116,11 @@ export default function InfoProfile({ isLoading }: InfoProfileProps) {
                   <GrDocumentConfig className="font-bold" />
                   <span className="ml-2 font-bold">Licensia</span>
                 </div>
-                <span className="ml-4">{(authUser?.user.licensia_sst ) ? authUser?.user.licensia_sst : "Sin Licencia"}</span>
+                <span className="ml-4">
+                  {authUser?.user.licensia_sst
+                    ? authUser?.user.licensia_sst
+                    : "Sin Licencia"}
+                </span>
               </div>
             </div>
           </>

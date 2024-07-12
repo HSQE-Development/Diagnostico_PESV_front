@@ -1,33 +1,58 @@
-import { companyService } from "@/stores/services/companyService";
-import { decryptId, formatNIT } from "@/utils/utilsMethods";
-import { skipToken } from "@reduxjs/toolkit/query";
-import { Breadcrumb, Button, Popover } from "antd";
-import React, { useEffect, useState } from "react";
+import { decryptId } from "@/utils/utilsMethods";
+import { Breadcrumb, Steps } from "antd";
+import React from "react";
 import { IoBusiness } from "react-icons/io5";
-import {
-  MdOutlineAlternateEmail,
-  MdOutlineDocumentScanner,
-} from "react-icons/md";
+import { MdAccountTree, MdOutlineDocumentScanner } from "react-icons/md";
 import { useParams } from "react-router-dom";
-import InfoConsultors from "../Companies/Components/InfoProfile";
-import { Company } from "@/interfaces/Company";
-import { FaPeopleCarry, FaVoicemail } from "react-icons/fa";
-import { GiSevenPointedStar } from "react-icons/gi";
-import { FaPeopleGroup } from "react-icons/fa6";
-import FlotaVehicular from "./Components/FlotaVehicular";
-import { AiOutlineNumber } from "react-icons/ai";
+import QuantityForm from "./Components/Steps/QuantityForm";
+import { useAppDispatch, useAppSelector } from "@/stores/hooks";
+import DiagnosisForm from "./Components/Steps/DiagnosisForm";
+import { FaClipboardCheck } from "react-icons/fa";
+import { setStepsLenght } from "@/stores/features/utilsSlice";
 
 export default function DiagnosisPage() {
+  const dispatch = useAppDispatch();
   const { idCompany } = useParams();
   const companyId = parseInt(decryptId(idCompany ?? ""));
-  const { data } = companyService.useFindByIdQuery(
-    companyId ? { id: companyId } : skipToken
-  );
-  const [company, setCompany] = useState<Company | null>(null);
+  const current = useAppSelector((state) => state.util.diagnosisCurrent);
+  const steps = [
+    {
+      title: "Conteo",
+      content: (
+        <>
+          <QuantityForm companyId={companyId} />
+        </>
+      ),
+      icon: <MdAccountTree className="text-black" />,
+      subTitle: "Aqui se define el nivel de complejidad",
+    },
+    {
+      title: "Lista de Verificación",
+      content: (
+        <>
+          <DiagnosisForm companyId={companyId} />
+        </>
+      ),
+      icon: <FaClipboardCheck />,
+    },
+    {
+      title: "Conteo",
+      content: (
+        <>
+          <small>Adios</small>
+        </>
+      ),
+    },
+  ];
+  const items = steps.map((item) => ({
+    key: item.title,
+    title: item.title,
+    icon: item.icon,
+    subTitle: item.subTitle,
+  }));
 
-  useEffect(() => {
-    if (data) setCompany(data);
-  }, [data]);
+  dispatch(setStepsLenght(steps.length));
+
   return (
     <div className="w-full flex flex-col">
       <div className="p-4 flex items-center">
@@ -57,69 +82,9 @@ export default function DiagnosisPage() {
           ]}
         />
       </div>
-      <div className="flex flex-1 justify-between items-start gap-4">
-        <div className="grid grid-cols-6 gap-2 sticky top-20  w-[30%] ml-8">
-          <div className="w-full bg-gradient-to-r from-zinc-100 to-sky-50 rounded-xl p-4 col-span-6 flex flex-col items-start justify-start">
-            <div className="flex items-center justify-around w-full my-2">
-              <div className="flex items-center justify-start gap-2">
-                <IoBusiness />
-                {data?.name}
-              </div>
-              <InfoConsultors
-                consultand={company ? company.consultor_detail : null}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-2 border-l-4 border-black pl-4">
-              <div className=" col-span-2  flex items-center">
-                <AiOutlineNumber className="font-bold text-xl" />
-                <span className="text-sm p-2">
-                  {formatNIT(company?.nit ?? "")}
-                </span>
-              </div>
-              <div className=" col-span-2  flex items-center">
-                <MdOutlineAlternateEmail className="font-bold text-xl" />
-                <span className="text-sm p-2">{company?.email}</span>
-              </div>
-              <div className="col-span-2  flex items-center">
-                <GiSevenPointedStar className="font-bold text-xl" />
-                <div className="flex flex-col justify-start items-start">
-                  <small className="font-bold">Misionalidad</small>
-                  <span className="text-sm p-2">
-                    {company?.dedication_detail.name}
-                  </span>
-                </div>
-              </div>
-
-              <div className=" col-span-2 flex items-center  ">
-                <FaPeopleCarry className="font-bold text-xl" />
-                <div className="flex flex-col justify-start items-start">
-                  <small className="font-bold">Tamaño</small>
-                  <Popover
-                    placement="topLeft"
-                    title={company?.company_size_detail.description}
-                  >
-                    <span className="text-sm  p-2 ">
-                      {/* <small className="font-bold">Tamaño: </small> */}
-                      {company?.company_size_detail.name}
-                    </span>
-                  </Popover>
-                </div>
-              </div>
-              <div className="col-span-1 flex items-center">
-                <FaPeopleGroup />
-                <span className="text-sm p-2">{company?.dependant}</span> -
-                <FaVoicemail className="ml-1" />
-                <span className="text-sm p-2">{company?.dependant_phone}</span>
-              </div>
-            </div>
-          </div>
-          <Button type="primary" className="col-span-6" disabled>
-            Continuar
-          </Button>
-        </div>
-        <div className="flex flex-col flex-1">
-          <FlotaVehicular companyId={companyId} />
-        </div>
+      <Steps size="small" current={current} items={items} type="navigation" />
+      <div className="mt-4 border-2 border-dashed rounded-xl p-2">
+        {steps[current].content}
       </div>
     </div>
   );

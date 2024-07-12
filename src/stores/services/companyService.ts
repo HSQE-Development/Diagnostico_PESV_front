@@ -3,6 +3,7 @@ import {
   CompanyDTO,
   DriverQuestion,
   Fleet,
+  SaveQuestionsDTO,
   VehicleQuestion,
 } from "@/interfaces/Company";
 import { CompanySize, Dedication } from "@/interfaces/Dedication";
@@ -94,5 +95,14 @@ export const companyService = createApi({
         method: "GET",
       }),
     }),
-  }),
+    saveAnswerCuestions: builder.mutation<SaveQuestionsDTO, SaveQuestionsDTO>({
+      query: (questionsDTO) => ({
+        url: `/companies/saveAnswerCuestions`,
+        method: "POST",
+        data: {
+          ...questionsDTO,
+        },
+      }),
+    }),
+  }), 
 });

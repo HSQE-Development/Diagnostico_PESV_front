@@ -1,15 +1,15 @@
 import FloatLabel from "@/Components/FloatLabel";
+import useCompany from "@/hooks/companyHooks";
 import { CompanyDTO } from "@/interfaces/Company";
 import { CompanySize, Dedication } from "@/interfaces/Dedication";
 import { IUser } from "@/interfaces/IUser";
-import { setCompany, setUpdateCompany } from "@/stores/features/companySlice";
 import { setSegments } from "@/stores/features/segmentSlice";
 import { useAppDispatch, useAppSelector } from "@/stores/hooks";
 import { companyService } from "@/stores/services/companyService";
 import { segmentService } from "@/stores/services/segmentServices";
 import { userService } from "@/stores/services/userService";
 import { TOAST_TYPE, toastHandler } from "@/utils/useToast";
-import { formatNIT, removeHyphen } from "@/utils/utilsMethods";
+import { formatNIT } from "@/utils/utilsMethods";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { Button, Input, Select } from "antd";
 import { Formik } from "formik";
@@ -29,6 +29,7 @@ const initialValues: CompanyDTO = {
   diagnosis: "",
   dependant: "",
   dependant_phone: "",
+  dependant_position: "",
   activities_ciiu: "",
   acquired_certification: "",
   segment: null,
@@ -38,21 +39,22 @@ const initialValues: CompanyDTO = {
 };
 
 export default function CompanyForm({ id }: CompanyFormProps) {
+  const { changeCompany, createCompany, isSaving, isUpdating } = useCompany();
   const { data: fetchSegments, isLoading } = segmentService.useFindAllQuery();
   const { data: fetchConsultants, isLoading: loadConsultants } =
     userService.useFindAllConsultantsQuery();
 
   const { data: fetchDedications, isLoading: loadDedications } =
     companyService.useFindAllDedicationsQuery();
-  const [dedicationId, setDedicationId] = useState<number | undefined>();
-  const {
-    data: fetchCompanySize,
-    isLoading: loadCompanySize,
-    refetch,
-    isUninitialized,
-  } = companyService.useFindcompanySizeByDedicactionIdQuery(
-    dedicationId ? { id: dedicationId } : skipToken
-  );
+  // const [dedicationId, setDedicationId] = useState<number | undefined>();
+  // const {
+  //   data: fetchCompanySize,
+  //   isLoading: loadCompanySize,
+  //   refetch,
+  //   isUninitialized,
+  // } = companyService.useFindcompanySizeByDedicactionIdQuery(
+  //   dedicationId ? { id: dedicationId } : skipToken
+  // );
 
   const { data: fetchCompany } = companyService.useFindByIdQuery(
     id ? { id } : skipToken
@@ -67,9 +69,9 @@ export default function CompanyForm({ id }: CompanyFormProps) {
   const [filteredCompanySize, setFilteredCompanySize] = useState<CompanySize[]>(
     []
   );
-  useEffect(() => {
-    if (!isUninitialized) refetch();
-  }, [dedicationId, isUninitialized]);
+  // useEffect(() => {
+  //   if (!isUninitialized) refetch();
+  // }, [dedicationId, isUninitialized]);
   useEffect(() => {
     if (fetchSegments) {
       dispatch(setSegments(fetchSegments));
@@ -87,14 +89,11 @@ export default function CompanyForm({ id }: CompanyFormProps) {
     }
   }, [fetchDedications]);
 
-  useEffect(() => {
-    if (fetchCompanySize) {
-      setFilteredCompanySize(fetchCompanySize);
-    }
-  }, [fetchCompanySize]);
-
-  const [save, { isLoading: saveLoad }] = companyService.useSaveMutation();
-  const [updateCompany] = companyService.useUpdateCompanyMutation();
+  // useEffect(() => {
+  //   if (fetchCompanySize) {
+  //     setFilteredCompanySize(fetchCompanySize);
+  //   }
+  // }, [fetchCompanySize]);
 
   const onSearchSegments = (value: string) => {
     const filtered = segments?.filter((segment) =>
@@ -116,13 +115,13 @@ export default function CompanyForm({ id }: CompanyFormProps) {
     });
     setFiltereddedications(filtered || []);
   };
-  const onSearchCompanySize = (value: string) => {
-    const filtered = filteredCompanySize?.filter((companySize) => {
-      if (companySize.name)
-        companySize.name.toLowerCase().includes(value.toLowerCase());
-    });
-    setFilteredCompanySize(filtered || []);
-  };
+  // const onSearchCompanySize = (value: string) => {
+  //   const filtered = filteredCompanySize?.filter((companySize) => {
+  //     if (companySize.name)
+  //       companySize.name.toLowerCase().includes(value.toLowerCase());
+  //   });
+  //   setFilteredCompanySize(filtered || []);
+  // };
 
   const segmentOptions = filteredSegments.map((segment) => ({
     value: segment.id,
@@ -145,57 +144,57 @@ export default function CompanyForm({ id }: CompanyFormProps) {
 
   const validationSchema = Yup.object().shape({
     name: Yup.string().required("Campo Obligatorio"),
-    email: Yup.string()
-      .email("Correo electronico invalido")
-      .required("Campo Obligatorio"),
+    email: Yup.string().email("Correo electronico invalido"),
+    // .required("Campo Obligatorio"),
     nit: Yup.string().required("Campo Obligatorio"),
     // diagnosis: Yup.string().required("Campo Obligatorio"),
-    dependant: Yup.string().required("Campo Obligatorio"),
-    dependant_phone: Yup.string().required("Campo Obligatorio"),
+    // dependant: Yup.string().required("Campo Obligatorio"),
+    // dependant_phone: Yup.string().required("Campo Obligatorio"),
     // activities_ciiu: Yup.string().required("Campo Obligatorio"),
     // acquired_certification: Yup.string().required("Campo ObligatoriformatNIT(e.target.value)o"),
     segment: Yup.number().required("Campo Obligatorio"),
   });
 
-  const changeCompany = async (values: CompanyDTO) => {
-    const updatedCompany = await updateCompany({
-      id, //Id de la maquina que se quiere editar
-      name: values.name,
-      email: values.email,
-      acquired_certification: values.acquired_certification,
-      activities_ciiu: values.activities_ciiu,
-      nit: removeHyphen(values.nit, "-"),
-      diagnosis: values.diagnosis,
-      dependant: values.dependant,
-      dependant_phone: values.dependant_phone,
-      segment: values.segment,
-      consultor: values.consultor ?? undefined,
-      dedication: values.dedication ?? undefined,
-      company_size: values.company_size ?? undefined,
-    }).unwrap();
-    toastHandler(TOAST_TYPE.SUCCESS_TOAST, "Actualizado Correctamente");
-    dispatch(setUpdateCompany(updatedCompany));
-  };
+  // const changeCompany = async (values: CompanyDTO) => {
+  //   const updatedCompany = await updateCompany({
+  //     id, //Id de la maquina que se quiere editar
+  //     name: values.name,
+  //     email: values.email,
+  //     acquired_certification: values.acquired_certification,
+  //     activities_ciiu: values.activities_ciiu,
+  //     nit: removeHyphen(values.nit, "-"),
+  //     diagnosis: values.diagnosis,
+  //     dependant: values.dependant,
+  //     dependant_phone: values.dependant_phone,
+  //     dependant_position: values.dependant_position,
+  //     segment: values.segment,
+  //     consultor: values.consultor ?? undefined,
+  //     dedication: values.dedication ?? undefined,
+  //     company_size: values.company_size ?? undefined,
+  //   }).unwrap();
+  //   toastHandler(TOAST_TYPE.SUCCESS_TOAST, "Actualizado Correctamente");
+  //   dispatch(setUpdateCompany(updatedCompany));
+  // };
 
-  const createCompany = async (values: CompanyDTO) => {
-    values.nit = removeHyphen(values.nit, "-");
-    values.acquired_certification =
-      values.acquired_certification == ""
-        ? null
-        : values.acquired_certification;
-    values.activities_ciiu =
-      values.activities_ciiu == "" ? null : values.activities_ciiu;
-    values.diagnosis = values.diagnosis == "" ? null : values.diagnosis;
-    const savedCompany = await save(values).unwrap(); //Metodo que guarda
-    toastHandler(TOAST_TYPE.SUCCESS_TOAST, "Registrado Correctamente");
-    dispatch(setCompany(savedCompany));
-  };
+  // const createCompany = async (values: CompanyDTO) => {
+  //   values.nit = removeHyphen(values.nit, "-");
+  //   values.acquired_certification =
+  //     values.acquired_certification == ""
+  //       ? null
+  //       : values.acquired_certification;
+  //   values.activities_ciiu =
+  //     values.activities_ciiu == "" ? null : values.activities_ciiu;
+  //   values.diagnosis = values.diagnosis == "" ? null : values.diagnosis;
+  //   const savedCompany = await save(values).unwrap(); //Metodo que guarda
+  //   toastHandler(TOAST_TYPE.SUCCESS_TOAST, "Registrado Correctamente");
+  //   dispatch(setCompany(savedCompany));
+  // };
 
   const handleSubmit = async (values: CompanyDTO) => {
     try {
       if (id) {
         //Aqui se edita
-        await changeCompany(values);
+        await changeCompany(id, values);
       } else {
         // Aqui se registra
         await createCompany(values);
@@ -224,17 +223,18 @@ export default function CompanyForm({ id }: CompanyFormProps) {
               email: fetchCompany.email ?? "",
               acquired_certification: fetchCompany.acquired_certification,
               activities_ciiu: fetchCompany.activities_ciiu,
-              nit: fetchCompany.nit,
+              nit: formatNIT(fetchCompany.nit),
               diagnosis: fetchCompany.diagnosis,
               dependant: fetchCompany.dependant,
               dependant_phone: fetchCompany.dependant_phone,
+              dependant_position: fetchCompany.dependant_position,
               segment: fetchCompany.segment_detail.id || 0,
               consultor: fetchCompany.consultor_detail?.id ?? null,
-              company_size: fetchCompany.company_size_detail.id,
+              company_size: fetchCompany.company_size_detail?.id ?? null,
               dedication: fetchCompany.dedication_detail.id,
             });
           }
-          setDedicationId(fetchCompany?.dedication_detail.id);
+          // setDedicationId(fetchCompany?.dedication_detail.id);
         }, [fetchCompany, id]);
         return (
           <form
@@ -354,6 +354,41 @@ export default function CompanyForm({ id }: CompanyFormProps) {
                 ) : null}
               </div>
               <div className="col-span-12 md:col-span-3">
+                <FloatLabel label="Cargo de contacto">
+                  <Input
+                    id="dependant_position"
+                    name="dependant_position"
+                    value={props.values.dependant_position ?? ""}
+                    onChange={props.handleChange}
+                    onBlur={props.handleBlur}
+                  />
+                </FloatLabel>
+                {props.touched.dependant && props.errors.dependant ? (
+                  <div className="text-red-600">{props.errors.dependant}</div>
+                ) : null}
+              </div>
+              <div className="col-span-12 md:col-span-6">
+                <FloatLabel label="Misionalidad de la empresa">
+                  <Select
+                    showSearch
+                    optionFilterProp="label"
+                    onSearch={onSearchDedications}
+                    loading={loadDedications}
+                    options={dedicationOptions}
+                    className="w-full"
+                    onChange={(value) => {
+                      // setDedicationId(value);
+                      props.setFieldValue("dedication", value);
+                    }}
+                    onBlur={props.handleBlur}
+                    value={props.values.dedication}
+                  />
+                </FloatLabel>
+                {props.touched.segment && props.errors.segment ? (
+                  <div className="text-red-600">{props.errors.segment}</div>
+                ) : null}
+              </div>
+              <div className="col-span-12 md:col-span-3">
                 <FloatLabel label="Teléfono Persona de contacto">
                   <Input
                     id="dependant_phone"
@@ -370,7 +405,7 @@ export default function CompanyForm({ id }: CompanyFormProps) {
                   </div>
                 ) : null}
               </div>
-              <div className="col-span-12 md:col-span-6">
+              <div className="col-span-12 md:col-span-3">
                 <FloatLabel label="Certificaciones adquiridas">
                   <Input
                     id="acquired_certification"
@@ -387,7 +422,7 @@ export default function CompanyForm({ id }: CompanyFormProps) {
                   </div>
                 ) : null}
               </div>
-              <div className="col-span-12 md:col-span-6">
+              {/* <div className="col-span-12 md:col-span-6">
                 <FloatLabel label="Diagnósticos realizados">
                   <Input
                     id="diagnosis"
@@ -400,29 +435,9 @@ export default function CompanyForm({ id }: CompanyFormProps) {
                 {props.touched.diagnosis && props.errors.diagnosis ? (
                   <div className="text-red-600">{props.errors.diagnosis}</div>
                 ) : null}
-              </div>
-              <div className="col-span-12 md:col-span-9">
-                <FloatLabel label="Misionalidad de la empresa">
-                  <Select
-                    showSearch
-                    optionFilterProp="label"
-                    onSearch={onSearchDedications}
-                    loading={loadDedications}
-                    options={dedicationOptions}
-                    className="w-full"
-                    onChange={(value) => {
-                      setDedicationId(value);
-                      props.setFieldValue("dedication", value);
-                    }}
-                    onBlur={props.handleBlur}
-                    value={props.values.dedication}
-                  />
-                </FloatLabel>
-                {props.touched.segment && props.errors.segment ? (
-                  <div className="text-red-600">{props.errors.segment}</div>
-                ) : null}
-              </div>
-              <div className="col-span-12 md:col-span-3">
+              </div> */}
+
+              {/* <div className="col-span-12 md:col-span-3">
                 <FloatLabel label="Tamaño de la empresa">
                   <Select
                     showSearch
@@ -441,7 +456,7 @@ export default function CompanyForm({ id }: CompanyFormProps) {
                 {props.touched.segment && props.errors.segment ? (
                   <div className="text-red-600">{props.errors.segment}</div>
                 ) : null}
-              </div>
+              </div> */}
             </div>
             <div className="col-span-12 flex items-center justify-center mt-4">
               <Button
@@ -449,9 +464,11 @@ export default function CompanyForm({ id }: CompanyFormProps) {
                 icon={id ? <MdEdit /> : <CiSaveDown1 />}
                 size="large"
                 className={`${
-                  id ? "bg-orange-400" : "bg-green-500"
+                  id
+                    ? "bg-orange-400 border-2 border-orange-400"
+                    : "bg-green-500 border-2 border-green-400"
                 } text-white`}
-                loading={saveLoad}
+                loading={isSaving || isUpdating}
               >
                 {id ? "Editar" : "Guardar"}
               </Button>

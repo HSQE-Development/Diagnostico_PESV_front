@@ -7,6 +7,11 @@ const initialState = {
   fleetData: [] as FleetDTO[],
   totalOwned: 0,
   totalThirdParty: 0,
+  totalArrended: 0,
+  totalContractors: 0,
+  totalIntermediate: 0,
+  totalLeasing: 0,
+  totalRenting: 0,
   totalQuantity: 0,
 };
 
@@ -51,8 +56,36 @@ const calculateTotals = (state: typeof initialState) => {
     (total, item) => total + item.quantity_third_party,
     0
   );
+  state.totalArrended = state.fleetData.reduce(
+    (total, item) => total + item.quantity_arrended,
+    0
+  );
+  state.totalContractors = state.fleetData.reduce(
+    (total, item) => total + item.quantity_contractors,
+    0
+  );
+  state.totalIntermediate = state.fleetData.reduce(
+    (total, item) => total + item.quantity_intermediation,
+    0
+  );
+  state.totalLeasing = state.fleetData.reduce(
+    (total, item) => total + item.quantity_leasing,
+    0
+  );
+  state.totalRenting = state.fleetData.reduce(
+    (total, item) => total + item.quantity_renting,
+    0
+  );
   state.totalQuantity = state.fleetData.reduce(
-    (total, item) => total + item.quantity_owned + item.quantity_third_party,
+    (total, item) =>
+      total +
+      item.quantity_owned +
+      item.quantity_third_party +
+      item.quantity_arrended +
+      item.quantity_contractors +
+      item.quantity_intermediation +
+      item.quantity_leasing +
+      item.quantity_renting,
     0
   );
 };

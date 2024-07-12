@@ -12,6 +12,8 @@ import { companyService } from "./services/companyService";
 import { segmentService } from "./services/segmentServices";
 import { userService } from "./services/userService";
 import vehicleQuestionSlideReducer from "@/stores/features/vehicleQuestionsSlice";
+import driverQuestionSlideReducer from "@/stores/features/driverQuestionSlice";
+import utilsReducer from "@/stores/features/utilsSlice";
 
 const createNoobStorage = () => {
   return {
@@ -38,6 +40,8 @@ const rootReducer = combineReducers({
   company: companyReducer,
   segment: segmentReducer,
   vehicleQuestion: vehicleQuestionSlideReducer,
+  driverQuestion: driverQuestionSlideReducer,
+  util: utilsReducer,
   [authService.reducerPath]: authService.reducer,
   [companyService.reducerPath]: companyService.reducer,
   [segmentService.reducerPath]: segmentService.reducer,
@@ -47,7 +51,15 @@ const rootReducer = combineReducers({
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["auth", "sidebar", "companies", "segments", "vehicleQuestions"], // Nombre del slice que quieres persistir
+  whitelist: [
+    "auth",
+    "sidebar",
+    "companies",
+    "segments",
+    "vehicleQuestions",
+    "driverQuestions",
+    "util",
+  ], // Nombre del slice que quieres persistir
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

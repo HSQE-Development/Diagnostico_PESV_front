@@ -1,0 +1,371 @@
+import { FleetDTO, VehicleQuestion } from "@/interfaces/Company";
+import { TableParams } from "@/interfaces/Comun";
+import {
+  setFleetData,
+  setVehicleQuestions,
+} from "@/stores/features/vehicleQuestionsSlice";
+import { useAppDispatch, useAppSelector } from "@/stores/hooks";
+import { companyService } from "@/stores/services/companyService";
+import { InputNumber, Table, TableColumnsType, TableProps } from "antd";
+import React, { useEffect, useState } from "react";
+
+interface Props {
+  companyId: number;
+}
+interface DataType extends VehicleQuestion {
+  key: React.Key;
+}
+/**
+ *
+ * @param companyId El id de la empresa para temas de consulta
+ * @returns
+ */
+export default function Vehiculos({ companyId }: Props) {
+  const { data: flotaVehiculosTerrestres, refetch } =
+    companyService.useFindAllVehicleQuestionsQuery();
+
+  const { data: fleetByCompany, isLoading: isLoadingFleetByCompany } =
+    companyService.useFindFleetsByCompanyIdQuery({ companyId });
+  const dispatch = useAppDispatch();
+  const [inputValues, setInputValues] = useState<{
+    [key: number]: {
+      owned: number;
+      third_party: number;
+      arrended: number;
+      contractors: number;
+      intermediation: number;
+      leasing: number;
+      renting: number;
+    };
+  }>({});
+
+  const [tableParams, setTableParams] = useState<TableParams<DataType>>({
+    pagination: {
+      current: 1,
+      pageSize: 10,
+    },
+  });
+
+  useEffect(() => {
+    refetch();
+  }, [companyId]);
+  useEffect(() => {
+    if (flotaVehiculosTerrestres) {
+      dispatch(setVehicleQuestions(flotaVehiculosTerrestres));
+    }
+  }, [flotaVehiculosTerrestres, dispatch]);
+
+  useEffect(() => {
+    if (fleetByCompany && !isLoadingFleetByCompany) {
+      const initialInputValues: {
+        [key: number]: {
+          owned: number;
+          third_party: number;
+          arrended: number;
+          contractors: number;
+          intermediation: number;
+          leasing: number;
+          renting: number;
+        };
+      } = {};
+      fleetByCompany.forEach((fleet) => {
+        initialInputValues[fleet.vehicle_question_detail.id] = {
+          owned: fleet.quantity_owned,
+          third_party: fleet.quantity_third_party,
+          arrended: fleet.quantity_arrended,
+          contractors: fleet.quantity_contractors,
+          intermediation: fleet.quantity_intermediation,
+          leasing: fleet.quantity_leasing,
+          renting: fleet.quantity_renting,
+        };
+      });
+      setInputValues(initialInputValues);
+    }
+  }, [fleetByCompany, isLoadingFleetByCompany]);
+
+  const questionsVehicles = useAppSelector(
+    (state) => state.vehicleQuestion.questions
+  );
+  const vehicleQuestion = useAppSelector((state) => state.vehicleQuestion);
+
+  const handleFleetChange = (
+    value: number,
+    questionId: number,
+    type:
+      | "owned"
+      | "third_party"
+      | "arrended"
+      | "contractors"
+      | "intermediation"
+      | "leasing"
+      | "renting"
+  ) => {
+    const updatedInputValues = {
+      ...inputValues,
+      [questionId]: {
+        ...inputValues[questionId],
+        [type]: value,
+      },
+    };
+    setInputValues(updatedInputValues);
+    // Crear una copia del estado actual de fleetData
+    const updatedFleetData = [...vehicleQuestion.fleetData];
+
+    // Buscar si ya existe un dato para esta pregunta y tipo
+    const existingIndex = updatedFleetData.findIndex(
+      (data) => data.vehicle_question === questionId
+    );
+
+    if (existingIndex !== -1) {
+      // Si existe, crear un nuevo objeto con las propiedades actualizadas
+      const updatedData = {
+        ...updatedFleetData[existingIndex], // Copiar todas las propiedades del objeto existente
+        quantity_owned:
+          type === "owned"
+            ? value
+            : updatedFleetData[existingIndex].quantity_owned,
+        quantity_third_party:
+          type === "third_party"
+            ? value
+            : updatedFleetData[existingIndex].quantity_third_party,
+        quantity_arrended:
+          type === "arrended"
+            ? value
+            : updatedFleetData[existingIndex].quantity_arrended,
+        quantity_contractors:
+          type === "contractors"
+            ? value
+            : updatedFleetData[existingIndex].quantity_contractors,
+        quantity_intermediation:
+          type === "intermediation"
+            ? value
+            : updatedFleetData[existingIndex].quantity_intermediation,
+        quantity_leasing:
+          type === "leasing"
+            ? value
+            : updatedFleetData[existingIndex].quantity_leasing,
+        quantity_renting:
+          type === "renting"
+            ? value
+            : updatedFleetData[existingIndex].quantity_renting,
+      };
+
+      // Reemplazar el objeto existente en el arreglo con el objeto actualizado
+      updatedFleetData[existingIndex] = updatedData;
+    } else {
+      // Si no existe, agregar un nuevo objeto FleetDTO con los valores adecuados
+      const newData: FleetDTO = {
+        quantity_owned: type === "owned" ? value : 0,
+        quantity_third_party: type === "third_party" ? value : 0,
+        quantity_arrended: type === "arrended" ? value : 0,
+        quantity_contractors: type === "contractors" ? value : 0,
+        quantity_intermediation: type === "intermediation" ? value : 0,
+        quantity_leasing: type === "leasing" ? value : 0,
+        quantity_renting: type === "renting" ? value : 0,
+        vehicle_question: questionId,
+        company: companyId,
+      };
+      updatedFleetData.push(newData);
+    }
+
+    // Actualizar el estado con el nuevo arreglo de fleetData
+    dispatch(setFleetData(updatedFleetData));
+  };
+
+  const columns: TableColumnsType<DataType> = [
+    {
+      title: "FLOTA DE VEHICULOS AUTOMOTORES",
+      dataIndex: "name",
+      width: "350px",
+      fixed: "left",
+    },
+    {
+      title: "Cantidad Propios",
+      width: 1,
+      render: (_, record) => {
+        const fleetInfo = inputValues[record.id] || {
+          owned: 0,
+          third_party: 0,
+          arrended: 0,
+          contractors: 0,
+          intermediation: 0,
+          leasing: 0,
+          renting: 0,
+        };
+        // console.log(fleetInfo);
+        return (
+          <>
+            <InputNumber
+              min={0}
+              defaultValue={fleetInfo.owned ?? 0}
+              onChange={(value) =>
+                handleFleetChange(value ?? 0, record.id, "owned")
+              }
+            />
+          </>
+        );
+      },
+    },
+    {
+      title: "Cantidad Terceros",
+      width: 1,
+      render: (_, record) => {
+        const fleetInfo = inputValues[record.id] || {
+          third_party: 0,
+        };
+        // console.log(fleetInfo);
+        return (
+          <>
+            <InputNumber
+              min={0}
+              defaultValue={fleetInfo.third_party ?? 0}
+              onChange={(value) =>
+                handleFleetChange(value ?? 0, record.id, "third_party")
+              }
+            />
+          </>
+        );
+      },
+    },
+    {
+      title: "Cantidad Arrendados",
+      width: 1,
+      render: (_, record) => {
+        const fleetInfo = inputValues[record.id] || {
+          arrended: 0,
+        };
+        // console.log(fleetInfo);
+        return (
+          <>
+            <InputNumber
+              min={0}
+              defaultValue={fleetInfo.arrended ?? 0}
+              onChange={(value) =>
+                handleFleetChange(value ?? 0, record.id, "arrended")
+              }
+            />
+          </>
+        );
+      },
+    },
+    {
+      title: "Cantidad Contratistas",
+      width: 1,
+      render: (_, record) => {
+        const fleetInfo = inputValues[record.id] || {
+          contractors: 0,
+        };
+        // console.log(fleetInfo);
+        return (
+          <>
+            <InputNumber
+              min={0}
+              defaultValue={fleetInfo.contractors ?? 0}
+              onChange={(value) =>
+                handleFleetChange(value ?? 0, record.id, "contractors")
+              }
+            />
+          </>
+        );
+      },
+    },
+    {
+      title: "Cantidad Intermediación",
+      width: 1,
+      render: (_, record) => {
+        const fleetInfo = inputValues[record.id] || {
+          intermediation: 0,
+        };
+        // console.log(fleetInfo);
+        return (
+          <>
+            <InputNumber
+              min={0}
+              defaultValue={fleetInfo.intermediation ?? 0}
+              onChange={(value) =>
+                handleFleetChange(value ?? 0, record.id, "intermediation")
+              }
+            />
+          </>
+        );
+      },
+    },
+    {
+      title: "Cantidad Leasing",
+      width: 1,
+      render: (_, record) => {
+        const fleetInfo = inputValues[record.id] || {
+          leasing: 0,
+        };
+        // console.log(fleetInfo);
+        return (
+          <>
+            <InputNumber
+              min={0}
+              defaultValue={fleetInfo.leasing ?? 0}
+              onChange={(value) =>
+                handleFleetChange(value ?? 0, record.id, "leasing")
+              }
+            />
+          </>
+        );
+      },
+    },
+    {
+      title: "Cantidad Renting",
+      width: 1,
+      render: (_, record) => {
+        const fleetInfo = inputValues[record.id] || {
+          renting: 0,
+        };
+        // console.log(fleetInfo);
+        return (
+          <>
+            <InputNumber
+              min={0}
+              defaultValue={fleetInfo.renting ?? 0}
+              onChange={(value) =>
+                handleFleetChange(value ?? 0, record.id, "renting")
+              }
+            />
+          </>
+        );
+      },
+    },
+  ];
+  const handleTableChange: TableProps<DataType>["onChange"] = (
+    pagination,
+    filters,
+    sorter
+  ) => {
+    const isMultipleSort = Array.isArray(sorter);
+    setTableParams({
+      pagination,
+      filters,
+      sortOrder: isMultipleSort ? undefined : sorter.order,
+      sortField: isMultipleSort ? undefined : sorter.field,
+    });
+  };
+  const dataSource = questionsVehicles.map((question: VehicleQuestion) => ({
+    ...question,
+    key: question.id,
+  }));
+  return (
+    <Table
+      columns={columns}
+      pagination={tableParams.pagination}
+      dataSource={dataSource}
+      size="small"
+      onChange={handleTableChange}
+      scroll={{ x: "max-content" }}
+      showSorterTooltip={{ target: "sorter-icon" }}
+      // loading={isLoading}
+      //@ts-ignore
+      pagination={{
+        defaultPageSize: 10,
+        showSizeChanger: true,
+        pageSizeOptions: ["10", "20", "30"],
+      }}
+    />
+  );
+}

@@ -9,6 +9,7 @@ export interface Company extends Comun {
   segment_detail: Segment;
   dependant: string | null;
   dependant_phone: string | null;
+  dependant_position: string | null;
   activities_ciiu: string | null;
   email: string | null;
   acquired_certification: string | null;
@@ -18,7 +19,7 @@ export interface Company extends Comun {
   dedication: number;
   dedication_detail: Dedication;
   company_size: number;
-  company_size_detail: CompanySize;
+  company_size_detail: CompanySize | null;
 }
 
 export type CompanyDTO = {
@@ -28,6 +29,7 @@ export type CompanyDTO = {
   consultor: number | null;
   dependant: string | null;
   dependant_phone: string | null;
+  dependant_position: string | null;
   activities_ciiu: string | null;
   email: string;
   acquired_certification: string | null;
@@ -42,6 +44,11 @@ export interface Fleet {
   id: number;
   quantity_owned: number;
   quantity_third_party: number;
+  quantity_arrended: number;
+  quantity_contractors: number;
+  quantity_intermediation: number;
+  quantity_leasing: number;
+  quantity_renting: number;
   vehicle_question: number;
   vehicle_question_detail: VehicleQuestion;
   company: number;
@@ -51,6 +58,11 @@ export interface Fleet {
 export type FleetDTO = {
   quantity_owned: number;
   quantity_third_party: number;
+  quantity_arrended: number;
+  quantity_contractors: number;
+  quantity_intermediation: number;
+  quantity_leasing: number;
+  quantity_renting: number;
   vehicle_question: number;
   company: number;
 };
@@ -69,4 +81,9 @@ export type DriverDTO = {
   quantity: number;
   driver_question: number;
   company: number;
+};
+
+export type SaveQuestionsDTO = {
+  vehicleData: FleetDTO[];
+  driverData: DriverDTO[];
 };
