@@ -3,6 +3,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 const initialState = {
   companies: [] as Company[],
+  company: null as Company | null,
 };
 
 export const companySlice = createSlice({

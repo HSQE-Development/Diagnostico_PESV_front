@@ -18,6 +18,9 @@ export const utilsSlice = createSlice({
     setStepsLenght: (state, action: PayloadAction<number>) => {
       state.stepLenght = action.payload;
     },
+    setDiagnosisCurrent: (state, action: PayloadAction<number>) => {
+      state.diagnosisCurrent = action.payload;
+    },
   },
 });
 
@@ -25,5 +28,6 @@ export const {
   setNextDiagnosisCurrent,
   setPrevDiagnosisCurrent,
   setStepsLenght,
+  setDiagnosisCurrent,
 } = utilsSlice.actions;
 export default utilsSlice.reducer;

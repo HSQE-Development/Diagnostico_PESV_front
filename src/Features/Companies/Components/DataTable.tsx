@@ -9,6 +9,7 @@ import {
   Modal,
   Popconfirm,
   Popover,
+  Steps,
   Table,
   TableColumnsType,
   TablePaginationConfig,
@@ -109,6 +110,22 @@ export default function DataTable() {
     });
   };
 
+  const items = [
+    {
+      title: "Paso 1",
+      description: "Conteo",
+      icon: <MdOutlineDocumentScanner />,
+    },
+    {
+      title: "Paso 2",
+      description: "Lista de Verificación",
+    },
+    {
+      title: "Paso 3",
+      description: "Plan de Trabajo",
+    },
+  ];
+
   const columns: TableColumnsType<DataType> = [
     {
       title: "Nombre Empresa",
@@ -123,7 +140,7 @@ export default function DataTable() {
       dataIndex: "nit",
     },
     {
-      title: "Dedicación",
+      title: "Misionalidad",
       dataIndex: ["dedication_detail", "name"],
     },
     {
@@ -172,6 +189,15 @@ export default function DataTable() {
           <span>SIN CONSULTOR ASIGNADO</span>
         ),
       fixed: "right",
+    },
+    {
+      title: "Diagnostico",
+      fixed: "right",
+      render: (_, record) => {
+        return (
+          <Steps type="inline" current={record.diagnosis_step} items={items} />
+        );
+      },
     },
     {
       title: "Acciones",
@@ -233,6 +259,7 @@ export default function DataTable() {
   return (
     <>
       <Table
+        size="small"
         columns={columns}
         dataSource={dataSource}
         pagination={tableParams.pagination}

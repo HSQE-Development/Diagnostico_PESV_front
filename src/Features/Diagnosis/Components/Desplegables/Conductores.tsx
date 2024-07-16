@@ -15,10 +15,14 @@ interface Props {
 interface DataType extends DriverQuestion {
   key: React.Key;
 }
-
+/**
+ *
+ * @param companyId El id de la empresa para temas de consulta
+ * @returns
+ */
 export default function Conductores({ companyId }: Props) {
   const dispatch = useAppDispatch();
-  const { data: conductoresPreguntas } =
+  const { data: conductoresPreguntas, refetch } =
     companyService.useFindAllDriverQuestionsQuery();
 
   const { data: driverByCompanyid, isLoading: isLoadingDriverByCompany } =
@@ -34,7 +38,14 @@ export default function Conductores({ companyId }: Props) {
       pageSize: 10,
     },
   });
-
+  useEffect(() => {
+    refetch();
+  }, [companyId]);
+  useEffect(() => {
+    if (conductoresPreguntas) {
+      dispatch(setDriverQuestions(conductoresPreguntas));
+    }
+  }, [conductoresPreguntas, dispatch]);
   useEffect(() => {
     if (driverByCompanyid && !isLoadingDriverByCompany) {
       const initialInputValues: {
@@ -52,24 +63,17 @@ export default function Conductores({ companyId }: Props) {
     }
   }, [driverByCompanyid, isLoadingDriverByCompany]);
 
+  const questionDriver = useAppSelector(
+    (state) => state.driverQuestion.questions
+  );
   const driverQuestion = useAppSelector((state) => state.driverQuestion);
 
-  useEffect(() => {
-    if (conductoresPreguntas) {
-      dispatch(setDriverQuestions(conductoresPreguntas));
-    }
-  }, [conductoresPreguntas, dispatch]);
-
-  const handleFleetChange = (
-    value: number,
-    questionId: number,
-    type: "general"
-  ) => {
+  const handleDriverChange = (value: number, questionId: number) => {
     const updatedInputValues = {
       ...inputValues,
       [questionId]: {
         ...inputValues[questionId],
-        [type]: value,
+        quantity: value,
       },
     };
     setInputValues(updatedInputValues);
@@ -85,8 +89,7 @@ export default function Conductores({ companyId }: Props) {
       // Si existe, crear un nuevo objeto con las propiedades actualizadas
       const updatedData = {
         ...updateDriverData[existingIndex], // Copiar todas las propiedades del objeto existente
-        quantity:
-          type === "general" ? value : updateDriverData[existingIndex].quantity,
+        quantity: value ?? updateDriverData[existingIndex].quantity,
       };
 
       // Reemplazar el objeto existente en el arreglo con el objeto actualizado
@@ -94,7 +97,7 @@ export default function Conductores({ companyId }: Props) {
     } else {
       // Si no existe, agregar un nuevo objeto FleetDTO con los valores adecuados
       const newData: DriverDTO = {
-        quantity: type === "general" ? value : 0,
+        quantity: value ?? 0,
         driver_question: questionId,
         company: companyId,
       };
@@ -108,7 +111,7 @@ export default function Conductores({ companyId }: Props) {
   const columns: TableColumnsType<DataType> = [
     {
       title: "PERSONAS QUE CONDUCEN CON FINES MISIONALES",
-      dataIndex: ["name"],
+      dataIndex: "name",
       width: "350px",
       fixed: "left",
     },
@@ -119,32 +122,21 @@ export default function Conductores({ companyId }: Props) {
         const driverInfo = inputValues[record.id] || {
           quantity: 0,
         };
-        // console.log(fleetInfo);
+        console.log(driverInfo);
         return (
-          <React.Fragment key={record.id}>
+          <>
             <Input
-              min={0}
+              key={record.id}
               value={driverInfo.quantity ?? 0}
               onChange={(e) =>
-                handleFleetChange(
-                  parseInt(e.target.value) ?? 0,
-                  record.id,
-                  "general"
-                )
+                handleDriverChange(parseInt(e.target.value) ?? 0, record.id)
               }
             />
-          </React.Fragment>
+          </>
         );
       },
     },
   ];
-
-  const dataSource = driverQuestion.questions.map(
-    (question: DriverQuestion) => ({
-      ...question,
-      key: question.id,
-    })
-  );
 
   const handleTableChange: TableProps<DataType>["onChange"] = (
     pagination,
@@ -159,6 +151,11 @@ export default function Conductores({ companyId }: Props) {
       sortField: isMultipleSort ? undefined : sorter.field,
     });
   };
+
+  const dataSource = questionDriver.map((question: DriverQuestion) => ({
+    ...question,
+    key: question.id,
+  }));
   return (
     <Table
       columns={columns}

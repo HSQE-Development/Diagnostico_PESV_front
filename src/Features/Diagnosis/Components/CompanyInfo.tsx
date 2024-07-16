@@ -55,8 +55,6 @@ export default function CompanyInfo({ companyId, onlyInfo }: Props) {
   const confirm = async () => {
     try {
       // Intentar eliminar la compañía
-      console.log("vehicleData", vehicleData);
-      console.log("driverData", driverData);
       await saveAnswerCuestions({
         vehicleData,
         driverData,

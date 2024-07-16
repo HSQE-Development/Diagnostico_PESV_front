@@ -20,6 +20,7 @@ export interface Company extends Comun {
   dedication_detail: Dedication;
   company_size: number;
   company_size_detail: CompanySize | null;
+  diagnosis_step: number;
 }
 
 export type CompanyDTO = {

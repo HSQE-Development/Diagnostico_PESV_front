@@ -80,7 +80,7 @@ export default function Vehiculos({ companyId }: Props) {
         };
       });
       setInputValues(initialInputValues);
-      dispatch(setFleetData(fleetByCompany));
+      // dispatch(setFleetData(fleetByCompany));
     }
   }, [fleetByCompany, isLoadingFleetByCompany]);
 
@@ -101,6 +101,8 @@ export default function Vehiculos({ companyId }: Props) {
       | "leasing"
       | "renting"
   ) => {
+    console.log("value", value);
+    console.log("questionId", questionId);
     const updatedInputValues = {
       ...inputValues,
       [questionId]: {
@@ -108,9 +110,11 @@ export default function Vehiculos({ companyId }: Props) {
         [type]: value,
       },
     };
+
     setInputValues(updatedInputValues);
     // Crear una copia del estado actual de fleetData
     const updatedFleetData = [...vehicleQuestion.fleetData];
+    console.log("vehicleQuestion", vehicleQuestion);
 
     // Buscar si ya existe un dato para esta pregunta y tipo
     const existingIndex = updatedFleetData.findIndex(
@@ -168,7 +172,7 @@ export default function Vehiculos({ companyId }: Props) {
       };
       updatedFleetData.push(newData);
     }
-
+    console.log(updatedFleetData);
     // Actualizar el estado con el nuevo arreglo de fleetData
     dispatch(setFleetData(updatedFleetData));
   };

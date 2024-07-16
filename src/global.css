@@ -5,3 +5,27 @@
 }
 @tailwind components;
 @tailwind utilities;
+
+.segmented-option {
+  padding: 8px 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  /* Estilos por defecto para opciones */
+  background-color: #ffffff;
+  color: #333333;
+}
+
+.segmented-option.selected {
+  /* Estilos cuando la opción está seleccionada */
+  background-color: #1890ff; /* Fondo azul cuando seleccionado */
+  color: #ffffff; /* Texto blanco cuando seleccionado */
+}
+
+.segmented-option:hover {
+  /* Estilos cuando se pasa el mouse sobre la opción */
+  background-color: #f5f5f5; /* Fondo gris claro al pasar el mouse */
+  color: #333333; /* Texto negro al pasar el mouse */
+}

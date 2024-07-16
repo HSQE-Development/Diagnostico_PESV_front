@@ -1,6 +1,6 @@
 import { decryptId } from "@/utils/utilsMethods";
 import { Breadcrumb, Steps } from "antd";
-import React from "react";
+import React, { useEffect } from "react";
 import { IoBusiness } from "react-icons/io5";
 import { MdAccountTree, MdOutlineDocumentScanner } from "react-icons/md";
 import { useParams } from "react-router-dom";
@@ -8,13 +8,62 @@ import QuantityForm from "./Components/Steps/QuantityForm";
 import { useAppDispatch, useAppSelector } from "@/stores/hooks";
 import DiagnosisForm from "./Components/Steps/DiagnosisForm";
 import { FaClipboardCheck } from "react-icons/fa";
-import { setStepsLenght } from "@/stores/features/utilsSlice";
+import {
+  setDiagnosisCurrent,
+  setStepsLenght,
+} from "@/stores/features/utilsSlice";
+import { skipToken } from "@reduxjs/toolkit/query";
+import { companyService } from "@/stores/services/companyService";
+import { setFleetData } from "@/stores/features/vehicleQuestionsSlice";
+import { setDriverData } from "@/stores/features/driverQuestionSlice";
+import { DriverDTO, FleetDTO } from "@/interfaces/Company";
 
 export default function DiagnosisPage() {
   const dispatch = useAppDispatch();
   const { idCompany } = useParams();
   const companyId = parseInt(decryptId(idCompany ?? ""));
   const current = useAppSelector((state) => state.util.diagnosisCurrent);
+  const { data: companyById, isLoading } = companyService.useFindByIdQuery(
+    companyId ? { id: companyId } : skipToken
+  );
+  const { data: driverByCompanyid, isLoading: isLoadingDriverByCompany } =
+    companyService.useFindDriversByCompanyIdQuery({ companyId });
+
+  const { data: fleetByCompany, isLoading: isLoadingFleetByCompany } =
+    companyService.useFindFleetsByCompanyIdQuery({ companyId });
+
+  useEffect(() => {
+    if (companyById) {
+      dispatch(setDiagnosisCurrent(companyById.diagnosis_step));
+    }
+  }, [companyById, isLoading]);
+
+  useEffect(() => {
+    if (fleetByCompany && !isLoadingFleetByCompany) {
+      const fleetData: FleetDTO[] = fleetByCompany.map((item) => ({
+        company: item.company_detail.id,
+        quantity_arrended: item.quantity_arrended,
+        quantity_leasing: item.quantity_leasing,
+        quantity_contractors: item.quantity_contractors,
+        quantity_intermediation: item.quantity_intermediation,
+        quantity_owned: item.quantity_owned,
+        quantity_renting: item.quantity_renting,
+        quantity_third_party: item.quantity_third_party,
+        vehicle_question: item.vehicle_question_detail.id,
+      }));
+      dispatch(setFleetData(fleetData));
+    }
+  }, [fleetByCompany, isLoadingFleetByCompany]);
+  useEffect(() => {
+    if (driverByCompanyid && !isLoadingDriverByCompany) {
+      const driverData: DriverDTO[] = driverByCompanyid.map((item) => ({
+        company: item.company_detail.id,
+        driver_question: item.driver_question_detail.id,
+        quantity: item.quantity,
+      }));
+      dispatch(setDriverData(driverData));
+    }
+  }, [driverByCompanyid, isLoadingDriverByCompany]);
   const steps = [
     {
       title: "Conteo",
@@ -50,7 +99,8 @@ export default function DiagnosisPage() {
     icon: item.icon,
     subTitle: item.subTitle,
   }));
-
+  const validCurrent = current >= 0 && current < steps.length;
+  const contentToRender = validCurrent ? steps[current].content : null;
   dispatch(setStepsLenght(steps.length));
 
   return (
@@ -67,7 +117,7 @@ export default function DiagnosisPage() {
                   <span>Empresas</span>
                 </>
               ),
-              href: "/app/companies",
+              href: "/app/companies", //Ruta donde redirije
               className: "flex items-center justify-around gap-2 p-1",
             },
             {
@@ -84,7 +134,7 @@ export default function DiagnosisPage() {
       </div>
       <Steps size="small" current={current} items={items} type="navigation" />
       <div className="mt-4 border-2 border-dashed rounded-xl p-2">
-        {steps[current].content}
+        {contentToRender}
       </div>
     </div>
   );
