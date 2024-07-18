@@ -1,5 +1,5 @@
-import { decryptId } from "@/utils/utilsMethods";
-import { Breadcrumb, Steps } from "antd";
+import { decryptId, downloadBase64File } from "@/utils/utilsMethods";
+import { Breadcrumb, Button, Steps } from "antd";
 import React, { useEffect } from "react";
 import { IoBusiness } from "react-icons/io5";
 import { MdAccountTree, MdOutlineDocumentScanner } from "react-icons/md";
@@ -17,13 +17,14 @@ import { companyService } from "@/stores/services/companyService";
 import { setFleetData } from "@/stores/features/vehicleQuestionsSlice";
 import { setDriverData } from "@/stores/features/driverQuestionSlice";
 import { DriverDTO, FleetDTO } from "@/interfaces/Company";
+import { diagnosisService } from "@/stores/services/diagnosisServices";
 
 export default function DiagnosisPage() {
   const dispatch = useAppDispatch();
   const { idCompany } = useParams();
   const companyId = parseInt(decryptId(idCompany ?? ""));
   const current = useAppSelector((state) => state.util.diagnosisCurrent);
-  const { data: companyById, isLoading } = companyService.useFindByIdQuery(
+  const { data: companyById } = companyService.useFindByIdQuery(
     companyId ? { id: companyId } : skipToken
   );
   const { data: driverByCompanyid, isLoading: isLoadingDriverByCompany } =
@@ -36,7 +37,7 @@ export default function DiagnosisPage() {
     if (companyById) {
       dispatch(setDiagnosisCurrent(companyById.diagnosis_step));
     }
-  }, [companyById, isLoading]);
+  }, [companyById, dispatch]);
 
   useEffect(() => {
     if (fleetByCompany && !isLoadingFleetByCompany) {
@@ -53,7 +54,7 @@ export default function DiagnosisPage() {
       }));
       dispatch(setFleetData(fleetData));
     }
-  }, [fleetByCompany, isLoadingFleetByCompany]);
+  }, [fleetByCompany, isLoadingFleetByCompany, dispatch]);
   useEffect(() => {
     if (driverByCompanyid && !isLoadingDriverByCompany) {
       const driverData: DriverDTO[] = driverByCompanyid.map((item) => ({
@@ -63,7 +64,9 @@ export default function DiagnosisPage() {
       }));
       dispatch(setDriverData(driverData));
     }
-  }, [driverByCompanyid, isLoadingDriverByCompany]);
+  }, [driverByCompanyid, isLoadingDriverByCompany, dispatch]);
+
+  const [generateReport] = diagnosisService.useGenerateReportMutation();
   const steps = [
     {
       title: "Conteo",
@@ -88,7 +91,15 @@ export default function DiagnosisPage() {
       title: "Conteo",
       content: (
         <>
-          <small>Adios</small>
+          <Button
+            onClick={async () => {
+              const generateFile = await generateReport({
+                companyId,
+              }).unwrap();
+
+              downloadBase64File(generateFile.file, "PRUEBA.docx");
+            }}
+          />
         </>
       ),
     },

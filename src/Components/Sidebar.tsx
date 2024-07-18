@@ -1,14 +1,14 @@
-import React, { useState } from "react";
+import React from "react";
 import LogoXs from "../assets/Logo_xs.png";
 import LogoXl from "../assets/Logo_xl.png";
 import MenuSide from "./MenuSide";
 import { Button } from "antd";
 import { PiSignOutThin } from "react-icons/pi";
-import { useAppDispatch, useAppSelector } from "@/stores/hooks";
 import { IoBarChartOutline, IoBusiness } from "react-icons/io5";
 import { MdOutlineBusinessCenter } from "react-icons/md";
-import { BsDiagram3Fill } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
+import { useAppSelector } from "@/stores/hooks";
+
 export default function Sidebar() {
   const sideBarState = useAppSelector((state) => state.sidebarState);
   const navigate = useNavigate();
@@ -47,16 +47,22 @@ export default function Sidebar() {
         />
         <MenuSide
           icon={<MdOutlineBusinessCenter />}
-          label="Consultores"
+          label="Arls"
+          onPress={() => navigate("/app/arls")}
+          urls={["/app/arls"]}
+        />
+        {/* <MenuSide
+          icon={<BsDiagram3Fill />}
+          label="Diagnosticos"
           onPress={() => navigate("/app")}
-          urls={["/app/consultores"]}
+          urls={["/app/companies/diagnosis/"]}
         />
         <MenuSide
           icon={<BsDiagram3Fill />}
           label="Diagnosticos"
           onPress={() => navigate("/app")}
           urls={["/app/companies/diagnosis/"]}
-        />
+        /> */}
       </ul>
       <div className="w-full my-4 flex justify-center items-center">
         <Button size={"large"} icon={<PiSignOutThin />}>

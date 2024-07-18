@@ -1,5 +1,5 @@
 import { setAuthUser } from "@/stores/features/authSlice";
-import { useAppDispatch, useAppSelector } from "@/stores/hooks";
+import { useAppDispatch } from "@/stores/hooks";
 import { authService } from "@/stores/services/authService";
 import { TOAST_TYPE, toastHandler } from "@/utils/useToast";
 import { Button, Input } from "antd";
@@ -17,11 +17,8 @@ export default function LoginForm() {
     email: "" as string,
     password: "" as string,
   });
-  const dispatch = useAppDispatch()
-  const [loginMutation, { isLoading}] =
-    authService.useLoginMutation();
-
-
+  const dispatch = useAppDispatch();
+  const [loginMutation, { isLoading }] = authService.useLoginMutation();
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -30,29 +27,25 @@ export default function LoginForm() {
         email: loginData.email,
         password: loginData.password,
       }).unwrap();
-      dispatch(setAuthUser(userLogged))
-      localStorage.setItem("accesToken", userLogged.tokens.access)
+      dispatch(setAuthUser(userLogged));
+      localStorage.setItem("accesToken", userLogged.tokens.access);
       toastHandler(TOAST_TYPE.SUCCESS_TOAST, "Ingreso Correcto");
-      navigate("/app")
-
+      navigate("/app");
     } catch (error: any) {
       console.log("ERROR", error);
-      if (error.status === 400){
-
+      if (error.status === 400) {
         toastHandler(TOAST_TYPE.ERROR_TOAST, error.data.error);
-      }
-      else if (error.status === 500){
+      } else if (error.status === 500) {
         toastHandler(
           TOAST_TYPE.ERROR_TOAST,
           "Error interno del sistema, comuniquese con un administrador"
         );
-      }else{
+      } else {
         toastHandler(
           TOAST_TYPE.ERROR_TOAST,
           "Error interno del sistema, comuniquese con un administrador"
         );
       }
-        
     }
   };
 

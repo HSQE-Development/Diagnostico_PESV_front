@@ -75,8 +75,10 @@ export default function DiagnosisDataTable({ companyId }: Props) {
       [record.step.toString()]: value,
     });
     const updatedSegments = { ...selectedSegmentsExpanded };
+    // Actualizar compliance y obtained_value en el estado local y en el store de Redux
     record.questions.forEach((question) => {
       updatedSegments[question.id.toString()] = value;
+      // Calcular obtained_value basado en el compliance seleccionado
       // También actualiza el porcentaje aquí
       dispatch(
         setUpdatePercentage({
@@ -158,7 +160,7 @@ export default function DiagnosisDataTable({ companyId }: Props) {
       render: (_, record) => {
         const colors =
           conditionalColors[record.selectedSegment] || defaultColors;
-
+        // console.log(expandedRowKeys);
         return (
           <ConfigProvider
             theme={{

@@ -28,7 +28,6 @@ export const diagnosisSlice = createSlice({
     ) => {
       state.questionsGrouped = action.payload;
       state.totalVariableValue = calculateTotalVariableValue(action.payload);
-      state.totalValueObtained = 0; // Resetear el valor obtenido al actualizar el grupo de preguntas
       state.percentageCompleted = calculatePercentageCompleted(
         state.totalValueObtained,
         state.totalVariableValue
@@ -65,14 +64,15 @@ export const diagnosisSlice = createSlice({
             company: companyId,
             compliance,
             obtained_value: obtainedValue,
-            verify_document: "",
-            observation: "",
+            verify_document: null,
+            observation: null,
           });
         }
 
         state.totalValueObtained = calculateTotalValueObtainedFromDiagnosisData(
           state.diagnosisData
         );
+        // state.totalValueObtained += obtainedValue;
         state.percentageCompleted = calculatePercentageCompleted(
           state.totalValueObtained,
           state.totalVariableValue
@@ -97,7 +97,11 @@ const calculateTotalVariableValue = (
 const calculateTotalValueObtainedFromDiagnosisData = (
   diagnosisData: DiagnosisDTO[]
 ): number => {
-  return diagnosisData.reduce((total, data) => total + data.obtained_value, 0);
+  return diagnosisData.reduce((total, data) => {
+    // console.log("data.obtained_value", data.obtained_value);
+    // console.log("data.compliance", data.compliance);
+    return total + data.obtained_value;
+  }, 0);
 };
 
 const calculateValueObtained = (
@@ -124,7 +128,9 @@ const calculatePercentageCompleted = (
   if (totalVariableValue === 0) {
     return 0;
   }
-  return Math.round((totalValueObtained / totalVariableValue) * 100);
+
+  const percentage = (totalValueObtained / totalVariableValue) * 100;
+  return parseFloat(percentage.toFixed(2));
 };
 
 const findQuestionById = (

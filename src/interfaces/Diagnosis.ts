@@ -1,8 +1,9 @@
+import { Company } from "./Company";
 import { Comun } from "./Comun";
 
 export interface DiagnosisRequirement extends Comun {}
 export interface DiagnosisType extends Comun {}
-
+export interface Compliance extends Comun {}
 export interface DiagnosisQuestions extends Comun {
   cycle: string;
   step: number;
@@ -24,6 +25,19 @@ export interface DiagnosisDTO {
   company: number;
   compliance: number;
   obtained_value: number;
+  verify_document: string | null;
+  observation: string | null;
+}
+
+export interface DiagnosisChecklist {
+  id: number;
+  obtained_value: number;
   verify_document: string;
+  company: number;
+  company_detail: Company;
+  question: number;
+  question_detail: DiagnosisQuestions;
+  compliance: number;
+  compliance_detail: Compliance;
   observation: string;
 }

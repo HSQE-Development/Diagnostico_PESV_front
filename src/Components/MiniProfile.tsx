@@ -1,4 +1,3 @@
-import { useAppSelector } from "@/stores/hooks";
 import { getUservatarUrl } from "@/utils/getUserAvatarImage";
 import { Avatar, Badge, Dropdown, MenuProps } from "antd";
 import React from "react";

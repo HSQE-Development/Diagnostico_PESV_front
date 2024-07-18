@@ -27,10 +27,11 @@ export const companyService = createApi({
   reducerPath: "companyApi",
   baseQuery: axiosBaseQuery,
   endpoints: (builder) => ({
-    findAll: builder.query<Company[], void>({
-      query: () => ({
-        url: "/companies/",
+    findAll: builder.query<Company[], { arlId?: number | null }>({
+      query: ({ arlId }) => ({
+        url: `/companies/`,
         method: "GET",
+        params: { arlId: arlId !== undefined ? arlId : null },
       }),
     }),
     findById: builder.query<Company, { id: number }>({

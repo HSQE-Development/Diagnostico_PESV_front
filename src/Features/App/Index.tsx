@@ -1,8 +1,5 @@
-import React from 'react'
-import AppLayout from '../../Components/AppLayout'
+import React from "react";
 
 export default function MainPage() {
-  return (
-      <div>Index</div>
-  )
+  return <div>Index</div>;
 }

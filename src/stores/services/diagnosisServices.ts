@@ -1,4 +1,6 @@
 import {
+  DiagnosisChecklist,
+  DiagnosisDTO,
   DiagnosisQuestions,
   DiagnosisQuestionsGroup,
 } from "@/interfaces/Diagnosis";
@@ -36,6 +38,22 @@ export const diagnosisService = createApi({
       query: ({ companyId }) => ({
         url: `/diagnosis/findQuestionsByCompanySize?company=${companyId}&group_by_step=true`,
         method: "GET",
+      }),
+    }),
+    saveDiagnosis: builder.mutation<DiagnosisChecklist[], DiagnosisDTO[]>({
+      query: (dataDiagnosis) => ({
+        url: `/diagnosis/saveDiagnosis`,
+        method: "POST",
+        data: {
+          diagnosis_data: dataDiagnosis,
+        },
+      }),
+    }),
+    generateReport: builder.mutation<{ file: string }, { companyId: number }>({
+      query: ({ companyId }) => ({
+        url: `/diagnosis/generateReport`,
+        method: "POST",
+        params: { company: companyId },
       }),
     }),
   }),

@@ -5,19 +5,23 @@ import { companyService } from "@/stores/services/companyService";
 import {
   Badge,
   Button,
+  Input,
+  InputRef,
   message,
   Modal,
   Popconfirm,
   Popover,
+  Space,
   Steps,
   Table,
   TableColumnsType,
+  TableColumnType,
   TablePaginationConfig,
   TableProps,
   Tooltip,
 } from "antd";
-import { SorterResult } from "antd/es/table/interface";
-import React, { useEffect, useState } from "react";
+import { FilterDropdownProps, SorterResult } from "antd/es/table/interface";
+import React, { useEffect, useRef, useState } from "react";
 import { CiEdit } from "react-icons/ci";
 import {
   MdDeleteOutline,
@@ -27,12 +31,14 @@ import {
 import CompanyForm from "./CompanyForm";
 import InfoConsultors from "@/Features/Companies/Components/InfoProfile";
 import { useNavigate } from "react-router-dom";
-import { encryptId } from "@/utils/utilsMethods";
-
+import { decryptId, encryptId } from "@/utils/utilsMethods";
+import { BiSearch } from "react-icons/bi";
+//@ts-ignore
+import Highlighter from "react-highlight-words";
 interface DataType extends Company {
   key: React.Key;
 }
-
+type DataIndex = keyof DataType;
 interface TableParams {
   pagination?: TablePaginationConfig;
   sortField?: SorterResult<DataType>["field"];
@@ -40,22 +46,39 @@ interface TableParams {
   filters?: Record<string, any>;
 }
 
-export default function DataTable() {
-  const navigate = useNavigate();
+interface DataTableProps {
+  arlIdProp?: number;
+  onlyInfo?: boolean;
+}
 
+export default function DataTable({ arlIdProp, onlyInfo }: DataTableProps) {
+  const navigate = useNavigate();
   const [tableParams, setTableParams] = useState<TableParams>({
     pagination: {
       current: 1,
       pageSize: 10,
     },
   });
-  // const [messageApi, contextHolder] = message.useMessage();
-  const {
-    data: fetchCompanies,
-    refetch,
-    isLoading,
-  } = companyService.useFindAllQuery();
   const dispatch = useAppDispatch();
+  const params = new URLSearchParams(window.location.search);
+  const arlIdQueryParam = params.get("idArl");
+  const arlIdFromQueryParam = parseInt(decryptId(arlIdQueryParam ?? ""));
+  const arlIdToUse =
+    arlIdProp !== undefined
+      ? arlIdProp
+      : isNaN(arlIdFromQueryParam)
+      ? undefined
+      : arlIdFromQueryParam;
+  // const [messageApi, contextHolder] = message.useMessage();
+  const { data: fetchCompanies, isLoading } = companyService.useFindAllQuery({
+    arlId: arlIdToUse,
+  });
+  useEffect(() => {
+    if (fetchCompanies) {
+      dispatch(setCompanies(fetchCompanies));
+    }
+  }, [fetchCompanies, dispatch, arlIdToUse]);
+
   const companies = useAppSelector((state) => state.company.companies);
   const [deleteCompany] = companyService.useDeleteCompanyMutation();
   const [editModal, setEditModal] = useState<{
@@ -66,19 +89,115 @@ export default function DataTable() {
     companyId: 0 as number,
   });
 
-  useEffect(() => {
-    /**
-     * Este Useffect se ejecuta cada que se reenderiza el componente, para mantener la data actualizada
-     *
-     */
-    refetch();
-  }, [refetch]);
+  const [searchText, setSearchText] = useState("");
+  const [searchedColumn, setSearchedColumn] = useState("");
+  const searchInput = useRef<InputRef>(null);
+  const handleSearch = (
+    selectedKeys: string[],
+    confirm: FilterDropdownProps["confirm"],
+    dataIndex: DataIndex
+  ) => {
+    confirm();
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
+  };
 
-  useEffect(() => {
-    if (fetchCompanies) {
-      dispatch(setCompanies(fetchCompanies));
-    }
-  }, [fetchCompanies, dispatch]);
+  const handleReset = (clearFilters: () => void) => {
+    clearFilters();
+    setSearchText("");
+  };
+
+  const getColumnSearchProps = (
+    dataIndex: DataIndex
+  ): TableColumnType<DataType> => ({
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters,
+      close,
+    }) => (
+      <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
+        <Input
+          ref={searchInput}
+          placeholder={`Search ${dataIndex}`}
+          value={selectedKeys[0]}
+          onChange={(e) =>
+            setSelectedKeys(e.target.value ? [e.target.value] : [])
+          }
+          onPressEnter={() =>
+            handleSearch(selectedKeys as string[], confirm, dataIndex)
+          }
+          style={{ marginBottom: 8, display: "block" }}
+        />
+        <Space>
+          <Button
+            type="primary"
+            onClick={() =>
+              handleSearch(selectedKeys as string[], confirm, dataIndex)
+            }
+            icon={<BiSearch />}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Search
+          </Button>
+          <Button
+            onClick={() => clearFilters && handleReset(clearFilters)}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Reset
+          </Button>
+          <Button
+            type="link"
+            size="small"
+            onClick={() => {
+              confirm({ closeDropdown: false });
+              setSearchText((selectedKeys as string[])[0]);
+              setSearchedColumn(dataIndex);
+            }}
+          >
+            Filter
+          </Button>
+          <Button
+            type="link"
+            size="small"
+            onClick={() => {
+              close();
+            }}
+          >
+            close
+          </Button>
+        </Space>
+      </div>
+    ),
+    filterIcon: (filtered: boolean) => (
+      <BiSearch style={{ color: filtered ? "#1677ff" : undefined }} />
+    ),
+    onFilter: (value, record): any => {
+      return record[dataIndex]
+        ?.toString()
+        .toLowerCase()
+        .includes((value as string).toLowerCase());
+    },
+    onFilterDropdownOpenChange: (visible) => {
+      if (visible) {
+        setTimeout(() => searchInput.current?.select(), 100);
+      }
+    },
+    render: (text) =>
+      searchedColumn === dataIndex ? (
+        <Highlighter
+          highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+          searchWords={[searchText]}
+          autoEscape
+          textToHighlight={text ? text.toString() : ""}
+        />
+      ) : (
+        text
+      ),
+  });
 
   const confirm = async (key: React.Key) => {
     // Mostrar mensaje de carga
@@ -138,6 +257,7 @@ export default function DataTable() {
     {
       title: "Nit",
       dataIndex: "nit",
+      ...getColumnSearchProps("nit"),
     },
     {
       title: "Misionalidad",
@@ -178,6 +298,12 @@ export default function DataTable() {
     {
       title: "Diagnosticos",
       dataIndex: "diagnosis",
+    },
+    {
+      title: "Arl a la que pertenece",
+      dataIndex: ["arl_detail", "name"],
+      fixed: "right",
+      className: `${onlyInfo ? "relative hidden" : ""}`,
     },
     {
       title: "Consultor Asignado",

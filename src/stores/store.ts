@@ -16,6 +16,8 @@ import driverQuestionSlideReducer from "@/stores/features/driverQuestionSlice";
 import utilsReducer from "@/stores/features/utilsSlice";
 import diagnosisReducer from "@/stores/features/diagnosisSlice";
 import { diagnosisService } from "./services/diagnosisServices";
+import arlReducer from "@/stores/features/arlSlice";
+import { arlService } from "./services/arlService";
 
 const createNoobStorage = () => {
   return {
@@ -45,11 +47,13 @@ const rootReducer = combineReducers({
   driverQuestion: driverQuestionSlideReducer,
   util: utilsReducer,
   diagnosis: diagnosisReducer,
+  arls: arlReducer,
   [authService.reducerPath]: authService.reducer,
   [companyService.reducerPath]: companyService.reducer,
   [segmentService.reducerPath]: segmentService.reducer,
   [userService.reducerPath]: userService.reducer,
   [diagnosisService.reducerPath]: diagnosisService.reducer,
+  [arlService.reducerPath]: arlService.reducer,
 });
 
 const persistConfig = {
@@ -63,7 +67,8 @@ const persistConfig = {
     "vehicleQuestions",
     "driverQuestions",
     "util",
-    "diagnosis",
+    "arls",
+    // "diagnosis",
   ], // Nombre del slice que quieres persistir
 };
 
@@ -79,7 +84,8 @@ export const store = configureStore({
       companyService.middleware,
       segmentService.middleware,
       userService.middleware,
-      diagnosisService.middleware
+      diagnosisService.middleware,
+      arlService.middleware
     ),
 });
 

@@ -7,6 +7,7 @@ import {
 } from "@/stores/features/utilsSlice";
 import { useAppDispatch, useAppSelector } from "@/stores/hooks";
 import { companyService } from "@/stores/services/companyService";
+import { diagnosisService } from "@/stores/services/diagnosisServices";
 import { formatNIT } from "@/utils/utilsMethods";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { Badge, Button, message, Popconfirm, Popover, Statistic } from "antd";
@@ -34,6 +35,8 @@ export default function CompanyInfo({ companyId, onlyInfo }: Props) {
   const [saveAnswerCuestions, { isLoading }] =
     companyService.useSaveAnswerCuestionsMutation();
 
+  const [saveDiagnosis] = diagnosisService.useSaveDiagnosisMutation();
+
   useEffect(() => {
     if (data) setCompany(data);
   }, [data]);
@@ -49,19 +52,32 @@ export default function CompanyInfo({ companyId, onlyInfo }: Props) {
     (state) => state.vehicleQuestion.fleetData
   );
   const driverData = useAppSelector((state) => state.driverQuestion.driverData);
+  const diagnosisData = useAppSelector(
+    (state) => state.diagnosis.diagnosisData
+  );
 
   const totalGeneral = totalDrivers + totalVehicles;
 
   const confirm = async () => {
     try {
       // Intentar eliminar la compañía
-      await saveAnswerCuestions({
-        vehicleData,
-        driverData,
-      }).unwrap();
-      refetch();
-      dispatch(setNextDiagnosisCurrent());
-      message.success("Conteo Actualizado correctamente");
+      switch (current) {
+        case 0:
+          await saveAnswerCuestions({
+            vehicleData,
+            driverData,
+          }).unwrap();
+          refetch();
+          dispatch(setNextDiagnosisCurrent());
+          message.success("Conteo Actualizado correctamente");
+          break;
+        case 1:
+          await saveDiagnosis(diagnosisData).unwrap();
+          refetch();
+          dispatch(setNextDiagnosisCurrent());
+          message.success("Conteo Actualizado correctamente");
+          break;
+      }
     } catch (error: any) {
       // Mostrar mensaje de error
       console.log(error);

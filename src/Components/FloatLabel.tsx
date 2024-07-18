@@ -1,5 +1,5 @@
 import React, { useState, ReactElement, useEffect, ChangeEvent } from "react";
-import { Input, InputProps, Select, SelectProps } from "antd";
+import { InputProps, Select, SelectProps } from "antd";
 import "./index.css";
 
 interface FloatLabelProps {
@@ -9,12 +9,20 @@ interface FloatLabelProps {
   onChange?: (value: string | number, option?: any) => void;
 }
 
-const FloatLabel: React.FC<FloatLabelProps> = ({ label, children, value: propValue, onChange }) => {
+const FloatLabel: React.FC<FloatLabelProps> = ({
+  label,
+  children,
+  value: propValue,
+  onChange,
+}) => {
   const [focus, setFocus] = useState(false);
-//   const [inputValue, setInputValue] = useState<string | number | undefined>(propValue);
-  const initialValue = children.props.value !== undefined ? children.props.value : propValue; //Con esto se trae el valor del input o del hijo que proporcionen
-  const [inputValue, setInputValue] = useState<string | number | undefined>(initialValue);
-//   console.log(children.props.value)
+  //   const [inputValue, setInputValue] = useState<string | number | undefined>(propValue);
+  const initialValue =
+    children.props.value !== undefined ? children.props.value : propValue; //Con esto se trae el valor del input o del hijo que proporcionen
+  const [inputValue, setInputValue] = useState<string | number | undefined>(
+    initialValue
+  );
+  //   console.log(children.props.value)
 
   useEffect(() => {
     setInputValue(initialValue);
@@ -42,7 +50,8 @@ const FloatLabel: React.FC<FloatLabelProps> = ({ label, children, value: propVal
     }
   };
 
-  const isFloating = focus || (inputValue && inputValue.toString().length !== 0);
+  const isFloating =
+    focus || (inputValue && inputValue.toString().length !== 0);
 
   const labelClass = isFloating ? "label label-float" : "label";
 
@@ -51,7 +60,7 @@ const FloatLabel: React.FC<FloatLabelProps> = ({ label, children, value: propVal
     onFocus: handleFocus,
     onBlur: handleBlur,
     onChange: children.type === Select ? handleSelectChange : handleChange,
-    value:inputValue,
+    value: inputValue,
   };
 
   return (

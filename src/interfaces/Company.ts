@@ -1,3 +1,4 @@
+import { Arl } from "./Arl";
 import { Comun } from "./Comun";
 import { CompanySize, Dedication } from "./Dedication";
 import { IUser } from "./IUser";
@@ -21,6 +22,8 @@ export interface Company extends Comun {
   company_size: number;
   company_size_detail: CompanySize | null;
   diagnosis_step: number;
+  arl: number;
+  arl_detail: Arl;
 }
 
 export type CompanyDTO = {
@@ -37,6 +40,7 @@ export type CompanyDTO = {
   diagnosis: string | null;
   dedication: number | null;
   company_size: number | null;
+  arl: number | null;
 };
 
 export interface VehicleQuestion extends Comun {}

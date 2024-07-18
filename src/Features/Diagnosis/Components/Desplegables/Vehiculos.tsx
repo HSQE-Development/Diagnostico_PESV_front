@@ -400,11 +400,7 @@ export default function Vehiculos({ companyId }: Props) {
       showSorterTooltip={{ target: "sorter-icon" }}
       loading={isLoadingFleetByCompany}
       //@ts-ignore
-      pagination={{
-        defaultPageSize: 10,
-        showSizeChanger: true,
-        pageSizeOptions: ["10", "20", "30"],
-      }}
+      pagination={false}
     />
   );
 }

@@ -1,10 +1,12 @@
 import FloatLabel from "@/Components/FloatLabel";
 import useCompany from "@/hooks/companyHooks";
+import { Arl } from "@/interfaces/Arl";
 import { CompanyDTO } from "@/interfaces/Company";
-import { CompanySize, Dedication } from "@/interfaces/Dedication";
+import { Dedication } from "@/interfaces/Dedication";
 import { IUser } from "@/interfaces/IUser";
 import { setSegments } from "@/stores/features/segmentSlice";
 import { useAppDispatch, useAppSelector } from "@/stores/hooks";
+import { arlService } from "@/stores/services/arlService";
 import { companyService } from "@/stores/services/companyService";
 import { segmentService } from "@/stores/services/segmentServices";
 import { userService } from "@/stores/services/userService";
@@ -36,6 +38,7 @@ const initialValues: CompanyDTO = {
   consultor: null,
   company_size: null,
   dedication: null,
+  arl: null,
 };
 
 export default function CompanyForm({ id }: CompanyFormProps) {
@@ -43,6 +46,7 @@ export default function CompanyForm({ id }: CompanyFormProps) {
   const { data: fetchSegments, isLoading } = segmentService.useFindAllQuery();
   const { data: fetchConsultants, isLoading: loadConsultants } =
     userService.useFindAllConsultantsQuery();
+  const { data: fetchArl, isLoading: loadArl } = arlService.useFindAllQuery();
 
   const { data: fetchDedications, isLoading: loadDedications } =
     companyService.useFindAllDedicationsQuery();
@@ -63,10 +67,8 @@ export default function CompanyForm({ id }: CompanyFormProps) {
   const segments = useAppSelector((state) => state.segment.segments);
   const [filteredSegments, setFilteredSegments] = useState(segments || []);
   const [filteredConsultands, setFilteredConsultands] = useState<IUser[]>([]);
+  const [filteredArl, setFilteredArl] = useState<Arl[]>([]);
   const [filteredDedications, setFiltereddedications] = useState<Dedication[]>(
-    []
-  );
-  const [filteredCompanySize, setFilteredCompanySize] = useState<CompanySize[]>(
     []
   );
   // useEffect(() => {
@@ -84,6 +86,11 @@ export default function CompanyForm({ id }: CompanyFormProps) {
     }
   }, [fetchConsultants]);
   useEffect(() => {
+    if (fetchArl) {
+      setFilteredArl(fetchArl);
+    }
+  }, [fetchArl]);
+  useEffect(() => {
     if (fetchDedications) {
       setFiltereddedications(fetchDedications);
     }
@@ -95,6 +102,12 @@ export default function CompanyForm({ id }: CompanyFormProps) {
   //   }
   // }, [fetchCompanySize]);
 
+  const onSearchArl = (value: string) => {
+    const filtered = filteredSegments?.filter((arl) =>
+      arl.name.toLowerCase().includes(value.toLowerCase())
+    );
+    setFilteredSegments(filtered || []);
+  };
   const onSearchSegments = (value: string) => {
     const filtered = segments?.filter((segment) =>
       segment.name.toLowerCase().includes(value.toLowerCase())
@@ -123,6 +136,10 @@ export default function CompanyForm({ id }: CompanyFormProps) {
   //   setFilteredCompanySize(filtered || []);
   // };
 
+  const arloptions = filteredArl.map((segment) => ({
+    value: segment.id,
+    label: segment.name,
+  }));
   const segmentOptions = filteredSegments.map((segment) => ({
     value: segment.id,
     label: segment.name,
@@ -137,10 +154,10 @@ export default function CompanyForm({ id }: CompanyFormProps) {
     value: dedication.id,
     label: dedication.name,
   }));
-  const companySizeOptions = filteredCompanySize.map((companySize) => ({
-    value: companySize.id,
-    label: companySize.name,
-  }));
+  // const companySizeOptions = filteredCompanySize.map((companySize) => ({
+  //   value: companySize.id,
+  //   label: companySize.name,
+  // }));
 
   const validationSchema = Yup.object().shape({
     name: Yup.string().required("Campo Obligatorio"),
@@ -232,6 +249,7 @@ export default function CompanyForm({ id }: CompanyFormProps) {
               consultor: fetchCompany.consultor_detail?.id ?? null,
               company_size: fetchCompany.company_size_detail?.id ?? null,
               dedication: fetchCompany.dedication_detail.id,
+              arl: fetchCompany.arl_detail.id,
             });
           }
           // setDedicationId(fetchCompany?.dedication_detail.id);
@@ -269,7 +287,7 @@ export default function CompanyForm({ id }: CompanyFormProps) {
                   <div className="text-red-600">{props.errors.nit}</div>
                 ) : null}
               </div>
-              <div className="col-span-12 md:col-span-6">
+              <div className="col-span-12 md:col-span-3">
                 <FloatLabel label="Correo Electrónico">
                   <Input
                     id="email"
@@ -277,6 +295,24 @@ export default function CompanyForm({ id }: CompanyFormProps) {
                     onChange={props.handleChange}
                     onBlur={props.handleBlur}
                     value={props.values.email}
+                  />
+                </FloatLabel>
+                {props.touched.email && props.errors.email ? (
+                  <div className="text-red-600">{props.errors.email}</div>
+                ) : null}
+              </div>
+              <div className="col-span-12 md:col-span-3">
+                <FloatLabel label="Arl a la que pertenece">
+                  <Select
+                    showSearch
+                    optionFilterProp="label"
+                    onSearch={onSearchArl}
+                    loading={loadArl}
+                    options={arloptions}
+                    className="w-full"
+                    onChange={(value) => props.setFieldValue("arl", value)}
+                    onBlur={props.handleBlur}
+                    value={props.values.arl}
                   />
                 </FloatLabel>
                 {props.touched.email && props.errors.email ? (
