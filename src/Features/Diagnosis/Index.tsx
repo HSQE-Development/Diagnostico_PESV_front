@@ -7,7 +7,7 @@ import { useParams } from "react-router-dom";
 import QuantityForm from "./Components/Steps/QuantityForm";
 import { useAppDispatch, useAppSelector } from "@/stores/hooks";
 import DiagnosisForm from "./Components/Steps/DiagnosisForm";
-import { FaClipboardCheck } from "react-icons/fa";
+import { FaClipboardCheck, FaFileWord } from "react-icons/fa";
 import {
   setDiagnosisCurrent,
   setStepsLenght,
@@ -66,7 +66,8 @@ export default function DiagnosisPage() {
     }
   }, [driverByCompanyid, isLoadingDriverByCompany, dispatch]);
 
-  const [generateReport] = diagnosisService.useGenerateReportMutation();
+  const [generateReport, { isLoading }] =
+    diagnosisService.useGenerateReportMutation();
   const steps = [
     {
       title: "Conteo",
@@ -92,6 +93,7 @@ export default function DiagnosisPage() {
       content: (
         <>
           <Button
+            loading={isLoading}
             onClick={async () => {
               const generateFile = await generateReport({
                 companyId,
@@ -99,7 +101,12 @@ export default function DiagnosisPage() {
 
               downloadBase64File(generateFile.file, "PRUEBA.docx");
             }}
-          />
+            icon={<FaFileWord />}
+            type="primary"
+            htmlType="button"
+          >
+            Descargar Informe
+          </Button>
         </>
       ),
     },
