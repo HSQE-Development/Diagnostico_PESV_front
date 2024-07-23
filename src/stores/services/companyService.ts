@@ -7,7 +7,7 @@ import {
   SaveQuestionsDTO,
   VehicleQuestion,
 } from "@/interfaces/Company";
-import { CompanySize, Dedication } from "@/interfaces/Dedication";
+import { CompanySize, Mission } from "@/interfaces/Dedication";
 import axiosBaseQuery from "@/utils/axiosBaseQuery";
 import { createApi } from "@reduxjs/toolkit/query/react";
 
@@ -42,7 +42,7 @@ export const companyService = createApi({
     }),
     updateCompany: builder.mutation<Company, Partial<Company>>({
       query: (updatedCompany) => ({
-        url: `/companies/update`,
+        url: `/companies/update/${updatedCompany.id}/`,
         method: "PATCH",
         data: {
           ...updatedCompany,
@@ -57,16 +57,16 @@ export const companyService = createApi({
     }),
     save: builder.mutation<Company, CompanyDTO>({
       query: (companyData) => ({
-        url: `/companies/save/`,
+        url: `/companies/`,
         method: "POST",
         data: {
           ...companyData,
         },
       }),
     }),
-    findAllDedications: builder.query<Dedication[], void>({
+    findAllDedications: builder.query<Mission[], void>({
       query: () => ({
-        url: `/companies/findAllDedications`,
+        url: `/companies/findAllMissions`,
         method: "GET",
       }),
     }),
@@ -75,7 +75,7 @@ export const companyService = createApi({
       { id: number }
     >({
       query: ({ id }) => ({
-        url: `/companies/findcompanySizeByDedicactionId/${id}`,
+        url: `/companies/findCompanySizeByMissionId/${id}`,
         method: "GET",
       }),
     }),
@@ -93,19 +93,25 @@ export const companyService = createApi({
     }),
     findFleetsByCompanyId: builder.query<Fleet[], { companyId: number }>({
       query: ({ companyId }) => ({
-        url: `/companies/findFleetsByCompanyId/${companyId}`,
+        url: `/companies/findFleetsByCompanyId`,
         method: "GET",
+        params: {
+          company: companyId,
+        },
       }),
     }),
     findDriversByCompanyId: builder.query<Driver[], { companyId: number }>({
       query: ({ companyId }) => ({
-        url: `/companies/findDriversByCompanyId/${companyId}`,
+        url: `/companies/findDriversByCompanyId`,
         method: "GET",
+        params: {
+          company: companyId,
+        },
       }),
     }),
     saveAnswerCuestions: builder.mutation<SaveQuestionsDTO, SaveQuestionsDTO>({
       query: (questionsDTO) => ({
-        url: `/companies/saveAnswerCuestions`,
+        url: `/companies/saveAnswerCuestions/`,
         method: "POST",
         data: {
           ...questionsDTO,

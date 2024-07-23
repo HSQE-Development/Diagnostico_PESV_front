@@ -63,13 +63,16 @@ export default function CompanyInfo({ companyId, onlyInfo }: Props) {
       // Intentar eliminar la compañía
       switch (current) {
         case 0:
-          await saveAnswerCuestions({
-            vehicleData,
-            driverData,
-          }).unwrap();
-          refetch();
+          if (!(data?.diagnosis_step !== current)) {
+            await saveAnswerCuestions({
+              company: companyId,
+              vehicleData,
+              driverData,
+            }).unwrap();
+            refetch();
+            message.success("Conteo Actualizado correctamente");
+          }
           dispatch(setNextDiagnosisCurrent());
-          message.success("Conteo Actualizado correctamente");
           break;
         case 1:
           await saveDiagnosis(diagnosisData).unwrap();
@@ -118,7 +121,7 @@ export default function CompanyInfo({ companyId, onlyInfo }: Props) {
             <div className="flex flex-col justify-start items-start">
               <small className="font-bold">Misionalidad</small>
               <span className="text-sm p-2">
-                {company?.dedication_detail.name}
+                {company?.mission_detail.name}
               </span>
             </div>
           </div>
@@ -130,21 +133,21 @@ export default function CompanyInfo({ companyId, onlyInfo }: Props) {
               <Popover
                 placement="topLeft"
                 title={
-                  company?.company_size_detail?.description ?? (
-                    <Badge status="default" count="Por definirse" />
-                  )
+                  company?.misionality_size_criteria?.map(
+                    (cri) => cri.criteria_detail?.name
+                  ) ?? <Badge status="default" count="Por definirse" />
                 }
               >
                 <span className="text-sm  p-2 ">
                   {/* <small className="font-bold">Tamaño: </small> */}
-                  {company?.company_size_detail?.name ?? (
+                  {company?.size_detail?.name ?? (
                     <Badge status="default" count="Por definirse" />
                   )}
                 </span>
               </Popover>
             </div>
           </div>
-          <div className="col-span-1 flex items-center">
+          <div className="col-span-1 flex items-center w-full justify-between">
             <FaPeopleGroup />
             <span className="text-sm p-2">{company?.dependant}</span> -
             <FaVoicemail className="ml-1" />

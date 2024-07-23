@@ -2,7 +2,6 @@ import { Company } from "@/interfaces/Company";
 import axiosBaseQuery from "@/utils/axiosBaseQuery";
 import { createApi } from "@reduxjs/toolkit/query/react";
 
-
 /**
  * IMPORTANTE:
  * Debido a una limitación actual, no se pueden exportar los hooks individualmente sin causar problemas de tipos.
@@ -16,35 +15,35 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 // const { useLoginMutation } = companyService;
 // export { useLoginMutation }; // Esta exportación causa un error de TypeScript
 export const segmentService = createApi({
-    reducerPath: "segmentApi",
-    baseQuery: axiosBaseQuery,
-    endpoints: (builder) => ({
-        findAll: builder.query<Company[], void>({
-            query: () => ({
-                url: "/companies/segments",
-                method: "GET",
-            })
-        }),
-        // findById: builder.query<Company, {id:number}>({
-        //     query: ({id}) => ({
-        //         url: `/companies/${id}`,
-        //         method: "GET",
-        //     })
-        // }),
-        // updateCompany: builder.mutation<Company, Partial<Company>>({
-        //     query: (updatedCompany) => ({
-        //         url: `/companies/update`,
-        //         method: "PATCH",
-        //         data: {
-        //             ...updatedCompany
-        //         }
-        //     })
-        // }),
-        // deleteCompany: builder.query<Company, {id:number}>({
-        //     query: ({id}) => ({
-        //         url: `/companies/delete/${id}`,
-        //         method: "DELETE",
-        //     })
-        // }),
-    })
-})
+  reducerPath: "segmentApi",
+  baseQuery: axiosBaseQuery,
+  endpoints: (builder) => ({
+    findAll: builder.query<Company[], void>({
+      query: () => ({
+        url: "/companies/findAllSegments",
+        method: "GET",
+      }),
+    }),
+    // findById: builder.query<Company, {id:number}>({
+    //     query: ({id}) => ({
+    //         url: `/companies/${id}`,
+    //         method: "GET",
+    //     })
+    // }),
+    // updateCompany: builder.mutation<Company, Partial<Company>>({
+    //     query: (updatedCompany) => ({
+    //         url: `/companies/update`,
+    //         method: "PATCH",
+    //         data: {
+    //             ...updatedCompany
+    //         }
+    //     })
+    // }),
+    // deleteCompany: builder.query<Company, {id:number}>({
+    //     query: ({id}) => ({
+    //         url: `/companies/delete/${id}`,
+    //         method: "DELETE",
+    //     })
+    // }),
+  }),
+});

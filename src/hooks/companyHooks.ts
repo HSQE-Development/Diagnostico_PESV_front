@@ -38,8 +38,8 @@ const useCompany = () => {
         dependant_position: values.dependant_position,
         segment: values.segment,
         consultor: values.consultor ?? undefined,
-        dedication: values.dedication ?? undefined,
-        company_size: values.company_size ?? undefined,
+        mission: values.mission ?? undefined,
+        size: values.size ?? undefined,
       }).unwrap();
       toastHandler(TOAST_TYPE.SUCCESS_TOAST, "Actualizado Correctamente");
       dispatch(setUpdateCompany(updatedCompany));

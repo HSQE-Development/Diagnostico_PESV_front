@@ -2,7 +2,7 @@ import FloatLabel from "@/Components/FloatLabel";
 import useCompany from "@/hooks/companyHooks";
 import { Arl } from "@/interfaces/Arl";
 import { CompanyDTO } from "@/interfaces/Company";
-import { Dedication } from "@/interfaces/Dedication";
+import { Mission } from "@/interfaces/Dedication";
 import { IUser } from "@/interfaces/IUser";
 import { setSegments } from "@/stores/features/segmentSlice";
 import { useAppDispatch, useAppSelector } from "@/stores/hooks";
@@ -36,8 +36,8 @@ const initialValues: CompanyDTO = {
   acquired_certification: "",
   segment: null,
   consultor: null,
-  company_size: null,
-  dedication: null,
+  size: null,
+  mission: null,
   arl: null,
 };
 
@@ -68,9 +68,7 @@ export default function CompanyForm({ id }: CompanyFormProps) {
   const [filteredSegments, setFilteredSegments] = useState(segments || []);
   const [filteredConsultands, setFilteredConsultands] = useState<IUser[]>([]);
   const [filteredArl, setFilteredArl] = useState<Arl[]>([]);
-  const [filteredDedications, setFiltereddedications] = useState<Dedication[]>(
-    []
-  );
+  const [filteredDedications, setFiltereddedications] = useState<Mission[]>([]);
   // useEffect(() => {
   //   if (!isUninitialized) refetch();
   // }, [dedicationId, isUninitialized]);
@@ -247,8 +245,8 @@ export default function CompanyForm({ id }: CompanyFormProps) {
               dependant_position: fetchCompany.dependant_position,
               segment: fetchCompany.segment_detail.id || 0,
               consultor: fetchCompany.consultor_detail?.id ?? null,
-              company_size: fetchCompany.company_size_detail?.id ?? null,
-              dedication: fetchCompany.dedication_detail.id,
+              size: fetchCompany.size_detail?.id ?? null,
+              mission: fetchCompany.mission_detail.id,
               arl: fetchCompany.arl_detail.id,
             });
           }
@@ -414,10 +412,10 @@ export default function CompanyForm({ id }: CompanyFormProps) {
                     className="w-full"
                     onChange={(value) => {
                       // setDedicationId(value);
-                      props.setFieldValue("dedication", value);
+                      props.setFieldValue("mission", value);
                     }}
                     onBlur={props.handleBlur}
-                    value={props.values.dedication}
+                    value={props.values.mission}
                   />
                 </FloatLabel>
                 {props.touched.segment && props.errors.segment ? (

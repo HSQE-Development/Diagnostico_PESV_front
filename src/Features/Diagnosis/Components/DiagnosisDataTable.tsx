@@ -60,6 +60,14 @@ export default function DiagnosisDataTable({ companyId }: Props) {
 
         group.questions.forEach((question) => {
           initialSelectedSegments[question.id.toString()] = 2;
+
+          dispatch(
+            setUpdatePercentage({
+              questionId: question.id,
+              companyId,
+              compliance: 2,
+            })
+          );
         });
       });
 
@@ -151,6 +159,11 @@ export default function DiagnosisDataTable({ companyId }: Props) {
       render: (text: number) => `Paso ${text}`,
     },
     {
+      title: "FASE",
+      dataIndex: "cycle",
+      key: "cycle",
+    },
+    {
       title: "Requerimiento",
       dataIndex: "requirement_name",
       key: "requirement_name",
@@ -184,10 +197,6 @@ export default function DiagnosisDataTable({ companyId }: Props) {
                   value: 2,
                 },
                 {
-                  label: "CP",
-                  value: 3,
-                },
-                {
                   label: "NA",
                   value: 4,
                 },
@@ -209,7 +218,7 @@ export default function DiagnosisDataTable({ companyId }: Props) {
 
   const expandedRowRender = (record: DiagnosisQuestionsGroup) => {
     const data = record.questions
-      .filter((question) => question.step === record.step)
+      .filter((question) => question.requirement_detail.step === record.step)
       .map((question) => ({
         ...question,
         key: question.id.toString(), //
@@ -220,14 +229,11 @@ export default function DiagnosisDataTable({ companyId }: Props) {
 
     const columns: TableColumnsType<ExpandedDataType> = [
       {
-        title: "Ciclo",
-        dataIndex: "cycle",
-      },
-      {
         title: "Criterio de Verificación",
         dataIndex: "name",
         key: "cycle",
       },
+
       {
         title: "Valor de la variable",
         dataIndex: "variable_value",
@@ -238,7 +244,7 @@ export default function DiagnosisDataTable({ companyId }: Props) {
         title: "Nivel de Cumplimiento",
         render: (_, record) => (
           <Segmented
-            key={record.step}
+            key={record.requirement_detail.step}
             size="small"
             options={[
               {
@@ -261,12 +267,45 @@ export default function DiagnosisDataTable({ companyId }: Props) {
             defaultValue={2}
             value={
               selectedSegmentsExpanded[record.id.toString()] ||
-              expandedRowKeys[record.step.toString()] ||
+              expandedRowKeys[record.requirement_detail.step.toString()] ||
               2
             }
             onChange={(value) => handleSegmentQuestion(record, value)}
           />
         ),
+      },
+      {
+        title: "Esta Articulado?",
+        render: (_, record) => {
+          const colors =
+            conditionalColors[record.requirement_detail.step] || defaultColors;
+          return (
+            <ConfigProvider
+              theme={{
+                components: {
+                  Segmented: {
+                    ...colors,
+                  },
+                },
+              }}
+            >
+              <Segmented
+                key={record.id}
+                size="small"
+                options={[
+                  {
+                    label: "SI",
+                    value: 1,
+                  },
+                  {
+                    label: "NO",
+                    value: 2,
+                  },
+                ]}
+              />
+            </ConfigProvider>
+          );
+        },
       },
       // Añade más columnas según sea necesario
     ];

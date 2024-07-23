@@ -29,7 +29,6 @@ export default function MiniProfile({
     },
   ];
   const avatarUrl = getUservatarUrl(avatar ?? undefined);
-
   return (
     <div className="flex justify-evenly items-center gap-x-2">
       <div className="flex flex-col items-end">

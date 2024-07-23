@@ -31,7 +31,7 @@ import {
 import CompanyForm from "./CompanyForm";
 import InfoConsultors from "@/Features/Companies/Components/InfoProfile";
 import { useNavigate } from "react-router-dom";
-import { decryptId, encryptId } from "@/utils/utilsMethods";
+import { decryptId, encryptId, formatNIT } from "@/utils/utilsMethods";
 import { BiSearch } from "react-icons/bi";
 //@ts-ignore
 import Highlighter from "react-highlight-words";
@@ -258,10 +258,11 @@ export default function DataTable({ arlIdProp, onlyInfo }: DataTableProps) {
       title: "Nit",
       dataIndex: "nit",
       ...getColumnSearchProps("nit"),
+      render: (text) => formatNIT(text),
     },
     {
       title: "Misionalidad",
-      dataIndex: ["dedication_detail", "name"],
+      dataIndex: ["mission_detail", "name"],
     },
     {
       title: "Tamaño",
@@ -269,10 +270,12 @@ export default function DataTable({ arlIdProp, onlyInfo }: DataTableProps) {
       render: (_, record) => (
         <Popover
           placement="topLeft"
-          title={record.company_size_detail?.description}
+          title={record.misionality_size_criteria?.map(
+            (cri) => cri.criteria_detail.name
+          )}
         >
           <span>
-            {record.company_size_detail?.name ?? (
+            {record.size_detail?.name ?? (
               <Badge count="Por definirse" status="default" />
             )}
           </span>

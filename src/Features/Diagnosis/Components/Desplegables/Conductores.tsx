@@ -99,7 +99,6 @@ export default function Conductores({ companyId }: Props) {
       const newData: DriverDTO = {
         quantity: value ?? 0,
         driver_question: questionId,
-        company: companyId,
       };
       updateDriverData.push(newData);
     }

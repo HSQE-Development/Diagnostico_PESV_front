@@ -11,7 +11,8 @@
  *
  * Al enviar el nit porfavor usar la funcion:
  * @example
- * removeHyphen(nit, "-")
+ * formatNIT("1234567890")
+ * return -> "123456789-0"
  * @readonly
  * para volverlo al valor absoluto sin el -
  */

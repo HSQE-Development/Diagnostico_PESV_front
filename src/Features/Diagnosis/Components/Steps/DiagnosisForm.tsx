@@ -29,7 +29,7 @@ export default function DiagnosisForm({ companyId }: Props) {
             percent={percentageCompleted}
             type="line"
             strokeColor={conicColors}
-            size={["100%", 20]}
+            size={["100%", 5]}
           />
         </div>
         <DiagnosisDataTable companyId={companyId} />

@@ -24,8 +24,11 @@ export default function Vehiculos({ companyId }: Props) {
   const { data: flotaVehiculosTerrestres, refetch } =
     companyService.useFindAllVehicleQuestionsQuery();
 
-  const { data: fleetByCompany, isLoading: isLoadingFleetByCompany } =
-    companyService.useFindFleetsByCompanyIdQuery({ companyId });
+  const {
+    data: fleetByCompany,
+    isLoading: isLoadingFleetByCompany,
+    refetch: refetchFleet,
+  } = companyService.useFindFleetsByCompanyIdQuery({ companyId });
   const dispatch = useAppDispatch();
   const [inputValues, setInputValues] = useState<{
     [key: number]: {
@@ -48,6 +51,7 @@ export default function Vehiculos({ companyId }: Props) {
 
   useEffect(() => {
     refetch();
+    refetchFleet();
   }, [companyId]);
   useEffect(() => {
     if (flotaVehiculosTerrestres) {
@@ -168,11 +172,10 @@ export default function Vehiculos({ companyId }: Props) {
         quantity_leasing: type === "leasing" ? value : 0,
         quantity_renting: type === "renting" ? value : 0,
         vehicle_question: questionId,
-        company: companyId,
+        // company: companyId,
       };
       updatedFleetData.push(newData);
     }
-    console.log(updatedFleetData);
     // Actualizar el estado con el nuevo arreglo de fleetData
     dispatch(setFleetData(updatedFleetData));
   };

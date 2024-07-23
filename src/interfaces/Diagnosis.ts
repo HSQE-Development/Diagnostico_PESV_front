@@ -1,12 +1,13 @@
 import { Company } from "./Company";
 import { Comun } from "./Comun";
 
-export interface DiagnosisRequirement extends Comun {}
+export interface DiagnosisRequirement extends Comun {
+  cycle: string;
+  step: number;
+}
 export interface DiagnosisType extends Comun {}
 export interface Compliance extends Comun {}
 export interface DiagnosisQuestions extends Comun {
-  cycle: string;
-  step: number;
   variable_value: number;
   requirement: number;
   requirement_detail: DiagnosisRequirement;
