@@ -2,7 +2,11 @@ import { decryptId, downloadBase64File } from "@/utils/utilsMethods";
 import { Breadcrumb, Button, Steps } from "antd";
 import React, { useEffect } from "react";
 import { IoBusiness } from "react-icons/io5";
-import { MdAccountTree, MdOutlineDocumentScanner } from "react-icons/md";
+import {
+  MdAccountTree,
+  MdOutlineCloudDownload,
+  MdOutlineDocumentScanner,
+} from "react-icons/md";
 import { useParams } from "react-router-dom";
 import QuantityForm from "./Components/Steps/QuantityForm";
 import { useAppDispatch, useAppSelector } from "@/stores/hooks";
@@ -89,7 +93,8 @@ export default function DiagnosisPage() {
       icon: <FaClipboardCheck />,
     },
     {
-      title: "Conteo",
+      title: "Informe",
+      icon: <MdOutlineCloudDownload />,
       content: (
         <>
           <Button
@@ -109,6 +114,7 @@ export default function DiagnosisPage() {
           </Button>
         </>
       ),
+      subTitle: "Generar el informe del diagnostico",
     },
   ];
   const items = steps.map((item) => ({

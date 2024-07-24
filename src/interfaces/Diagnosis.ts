@@ -16,8 +16,10 @@ export interface DiagnosisQuestions extends Comun {
 }
 
 export interface DiagnosisQuestionsGroup {
+  id: number;
   step: number;
   requirement_name: string;
+  cycle: string;
   questions: DiagnosisQuestions[];
 }
 
@@ -28,6 +30,7 @@ export interface DiagnosisDTO {
   obtained_value: number;
   verify_document: string | null;
   observation: string | null;
+  is_articuled: boolean;
 }
 
 export interface DiagnosisChecklist {

@@ -1,0 +1,6 @@
+export const COMPLIANCE_LEVEL = {
+  CUMPLE: 1,
+  NO_CUMPLE: 2,
+  CUMPLE_PARCIALMENTE: 3,
+  NO_APLICA: 4,
+};

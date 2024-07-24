@@ -75,9 +75,10 @@ export default function CompanyInfo({ companyId, onlyInfo }: Props) {
           dispatch(setNextDiagnosisCurrent());
           break;
         case 1:
+          console.log(diagnosisData);
           await saveDiagnosis(diagnosisData).unwrap();
           refetch();
-          dispatch(setNextDiagnosisCurrent());
+          // dispatch(setNextDiagnosisCurrent());
           message.success("Conteo Actualizado correctamente");
           break;
       }

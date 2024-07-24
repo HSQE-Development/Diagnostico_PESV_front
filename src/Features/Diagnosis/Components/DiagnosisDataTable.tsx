@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/stores/hooks";
 import {
   setQuestionsGrouped,
+  setUpdateArticulated,
   setUpdatePercentage,
 } from "@/stores/features/diagnosisSlice";
 import { diagnosisService } from "@/stores/services/diagnosisServices";
@@ -9,25 +10,26 @@ import {
   DiagnosisQuestions,
   DiagnosisQuestionsGroup,
 } from "@/interfaces/Diagnosis";
-import { ConfigProvider, Segmented, Table, TableColumnsType } from "antd";
+import {
+  ConfigProvider,
+  Segmented,
+  Table,
+  TableColumnsType,
+  TableProps,
+} from "antd";
+import { COMPLIANCE_LEVEL } from "../utils/constants";
 
 interface Props {
   companyId: number;
 }
 interface DataType extends DiagnosisQuestionsGroup {
   key: React.Key;
-  selectedSegment: number;
-}
-interface ExpandedDataType extends DiagnosisQuestions {
-  key: React.Key;
-  selectedSegment: number;
 }
 
 export default function DiagnosisDataTable({ companyId }: Props) {
   const dispatch = useAppDispatch();
   const { data: diagnosisQuestionsByCompany, refetch } =
     diagnosisService.useFindQuestionsByCompanysizeGroupedQuery({ companyId });
-
   useEffect(() => {
     refetch();
   }, [companyId]);
@@ -42,78 +44,86 @@ export default function DiagnosisDataTable({ companyId }: Props) {
   const questionsGrouped = useAppSelector(
     (state) => state.diagnosis.questionsGrouped
   );
+  const diagnosisData = useAppSelector(
+    (state) => state.diagnosis.diagnosisData
+  );
 
-  const [expandedRowKeys, setExpandedRowKeys] = useState<{
-    [key: string]: number;
+  const [selectedOption, setSelectedOption] = useState<{
+    [step: number]: number;
   }>({});
-  const [selectedSegmentsExpanded, setSelectedSegmentsExpanded] = useState<{
-    [key: string]: number;
+  const [questionOption, setQuestionOption] = useState<{
+    [qId: number]: number;
+  }>({});
+  const [articuledOption, setArticuledOption] = useState<{
+    [qId: number]: boolean;
   }>({});
 
   useEffect(() => {
+    // Reenderizado por defecto
     if (questionsGrouped.length > 0) {
-      const initialExpandedKeys: { [key: string]: number } = {};
-      const initialSelectedSegments: { [key: string]: number } = {};
-
       questionsGrouped.forEach((group) => {
-        initialExpandedKeys[group.step.toString()] = 2;
-
         group.questions.forEach((question) => {
-          initialSelectedSegments[question.id.toString()] = 2;
-
           dispatch(
             setUpdatePercentage({
               questionId: question.id,
               companyId,
-              compliance: 2,
+              compliance: COMPLIANCE_LEVEL.NO_CUMPLE,
             })
           );
+          setQuestionOption((prev) => ({
+            ...prev,
+            [question.id]: COMPLIANCE_LEVEL.NO_CUMPLE,
+          }));
+          setArticuledOption((prev) => ({
+            ...prev,
+            [question.id]: true,
+          }));
         });
+        setSelectedOption((prev) => ({
+          ...prev,
+          [group.step]: COMPLIANCE_LEVEL.NO_CUMPLE,
+        }));
       });
-
-      setExpandedRowKeys(initialExpandedKeys);
-      setSelectedSegmentsExpanded(initialSelectedSegments);
     }
   }, [questionsGrouped]);
 
-  const handleSegmentChange = (record: DataType, value: number) => {
-    // Actualizar el segmento seleccionado en la tabla principal
-    setExpandedRowKeys({
-      ...expandedRowKeys,
-      [record.step.toString()]: value,
-    });
-    const updatedSegments = { ...selectedSegmentsExpanded };
-    // Actualizar compliance y obtained_value en el estado local y en el store de Redux
-    record.questions.forEach((question) => {
-      updatedSegments[question.id.toString()] = value;
-      // Calcular obtained_value basado en el compliance seleccionado
-      // También actualiza el porcentaje aquí
-      dispatch(
-        setUpdatePercentage({
-          questionId: question.id,
-          companyId,
-          compliance: value,
-        })
-      );
-    });
-    setSelectedSegmentsExpanded(updatedSegments);
-    // Actualizar el estado en el store de Redux si es necesario
-  };
-
-  const handleSegmentQuestion = (record: ExpandedDataType, value: number) => {
+  const handleComplianceChange = (value: number, questionId: number) => {
     dispatch(
       setUpdatePercentage({
-        questionId: record.id,
         companyId,
         compliance: value,
+        questionId,
       })
     );
-    setSelectedSegmentsExpanded({
-      ...selectedSegmentsExpanded,
-      [record.id.toString()]: value,
-    });
+    setQuestionOption((prev) => ({ ...prev, [questionId]: value }));
+  };
 
-    // Actualizar el estado en el store de Redux si es necesario
+  const handleArticulatedChange = (value: boolean, questionId: number) => {
+    dispatch(setUpdateArticulated({ questionId, isArticulated: value }));
+    setArticuledOption((prev) => ({
+      ...prev,
+      [questionId]: value,
+    }));
+  };
+
+  const handleGeneralChange = (value: number, step: number) => {
+    if (questionsGrouped.length > 0) {
+      questionsGrouped.forEach((group) => {
+        group.questions.forEach((question) => {
+          if (question.requirement_detail.step === step) {
+            dispatch(
+              setUpdatePercentage({
+                questionId: question.id,
+                companyId,
+                compliance: value,
+              })
+            );
+            setQuestionOption((prev) => ({ ...prev, [question.id]: value }));
+          }
+        });
+        setSelectedOption((prev) => ({ ...prev, [step]: value }));
+      });
+    }
   };
   const defaultColors = {
     itemActiveBg: "#007bff",
@@ -149,14 +159,30 @@ export default function DiagnosisDataTable({ companyId }: Props) {
       itemSelectedBg: "#17a2b8",
       itemSelectedColor: "#fff",
     },
+    true: {
+      itemActiveBg: "#17a2b8",
+      itemColor: "#BABABA",
+      itemSelectedBg: "#17a2b8",
+      itemSelectedColor: "#fff",
+    },
+    false: {
+      itemActiveBg: "#17a2b8",
+      itemColor: "#BABABA",
+      itemSelectedBg: "#000",
+      itemSelectedColor: "#fff",
+    },
   };
 
-  const columns: TableColumnsType<DataType> = [
+  const columns: TableColumnsType<DiagnosisQuestionsGroup> = [
     {
       title: "PASO PESV",
       dataIndex: "step",
       key: "step",
-      render: (text: number) => `Paso ${text}`,
+      render: (text: number) => (
+        <span>
+          <span className="font-extrabold">{text}</span>
+        </span>
+      ),
     },
     {
       title: "FASE",
@@ -172,8 +198,7 @@ export default function DiagnosisDataTable({ companyId }: Props) {
       title: "Nivel de Cumplimiento",
       render: (_, record) => {
         const colors =
-          conditionalColors[record.selectedSegment] || defaultColors;
-        // console.log(expandedRowKeys);
+          conditionalColors[selectedOption[record.step]] || defaultColors;
         return (
           <ConfigProvider
             theme={{
@@ -190,135 +215,159 @@ export default function DiagnosisDataTable({ companyId }: Props) {
               options={[
                 {
                   label: "C",
-                  value: 1,
+                  value: COMPLIANCE_LEVEL.CUMPLE,
                 },
                 {
                   label: "NC",
-                  value: 2,
+                  value: COMPLIANCE_LEVEL.NO_CUMPLE,
                 },
                 {
                   label: "NA",
-                  value: 4,
+                  value: COMPLIANCE_LEVEL.NO_APLICA,
+                },
+                {
+                  label: "CP",
+                  value: COMPLIANCE_LEVEL.CUMPLE_PARCIALMENTE,
+                  disabled: true,
                 },
               ]}
-              defaultValue={2}
-              value={expandedRowKeys[record.key as string] || 2} // Valor seleccionado por defecto o el valor guardado
-              onChange={(value) => handleSegmentChange(record, value)}
+              value={selectedOption[record.step]}
+              defaultValue={COMPLIANCE_LEVEL.NO_CUMPLE}
+              onChange={(value) => handleGeneralChange(value, record.step)}
             />
           </ConfigProvider>
         );
       },
     },
   ];
-  const dataSource: DataType[] = questionsGrouped.map((question) => ({
-    ...question,
-    key: question.step,
-    selectedSegment: expandedRowKeys[question.step.toString()] || 2,
-  }));
 
-  const expandedRowRender = (record: DiagnosisQuestionsGroup) => {
-    const data = record.questions
-      .filter((question) => question.requirement_detail.step === record.step)
-      .map((question) => ({
-        ...question,
-        key: question.id.toString(), //
-        selectedSegment:
-          selectedSegmentsExpanded[record.step.toString()] ||
-          expandedRowKeys[record.step.toString()],
-      }));
+  const expandableConfig: TableProps<DiagnosisQuestionsGroup>["expandable"] = {
+    expandedRowRender: (group) => (
+      <Table<DiagnosisQuestions>
+        columns={[
+          {
+            title: "Criterio de Verificación",
+            dataIndex: "name",
+            key: "name",
+          },
+          {
+            title: "Variable Value",
+            dataIndex: "variable_value",
+            key: "variable_value",
+            render: (text) => `${text}%`,
+          },
+          {
+            title: "Nivel de Cumplimiento",
+            render: (_, question) => {
+              const compliance =
+                diagnosisData.find((d) => d.question === question.id)
+                  ?.compliance || COMPLIANCE_LEVEL.NO_CUMPLE;
 
-    const columns: TableColumnsType<ExpandedDataType> = [
-      {
-        title: "Criterio de Verificación",
-        dataIndex: "name",
-        key: "cycle",
-      },
+              const colors =
+                conditionalColors[questionOption[question.id]] || defaultColors;
+              return (
+                <ConfigProvider
+                  theme={{
+                    components: {
+                      Segmented: {
+                        ...colors,
+                      },
+                    },
+                  }}
+                >
+                  <Segmented
+                    key={question.id}
+                    size="small"
+                    options={[
+                      {
+                        label: "C",
+                        value: COMPLIANCE_LEVEL.CUMPLE,
+                      },
+                      {
+                        label: "NC",
+                        value: COMPLIANCE_LEVEL.NO_CUMPLE,
+                      },
+                      {
+                        label: "CP",
+                        value: COMPLIANCE_LEVEL.CUMPLE_PARCIALMENTE,
+                      },
+                      {
+                        label: "NA",
+                        value: COMPLIANCE_LEVEL.NO_APLICA,
+                      },
+                    ]}
+                    value={compliance}
+                    defaultValue={COMPLIANCE_LEVEL.NO_CUMPLE}
+                    onChange={(value) =>
+                      handleComplianceChange(value, question.id)
+                    }
+                  />
+                </ConfigProvider>
+              );
+            },
+          },
+          {
+            title: "Esta articulado?",
+            render: (_, question, index) => {
+              const articulated = diagnosisData.find(
+                (d) => d.question === question.id
+              )?.is_articuled;
 
-      {
-        title: "Valor de la variable",
-        dataIndex: "variable_value",
-        key: "variable_value",
-        render: (text: number) => `${text}%`,
-      },
-      {
-        title: "Nivel de Cumplimiento",
-        render: (_, record) => (
-          <Segmented
-            key={record.requirement_detail.step}
-            size="small"
-            options={[
-              {
-                label: "C",
-                value: 1,
-              },
-              {
-                label: "NC",
-                value: 2,
-              },
-              {
-                label: "CP",
-                value: 3,
-              },
-              {
-                label: "NA",
-                value: 4,
-              },
-            ]}
-            defaultValue={2}
-            value={
-              selectedSegmentsExpanded[record.id.toString()] ||
-              expandedRowKeys[record.requirement_detail.step.toString()] ||
-              2
-            }
-            onChange={(value) => handleSegmentQuestion(record, value)}
-          />
-        ),
-      },
-      {
-        title: "Esta Articulado?",
-        render: (_, record) => {
-          const colors =
-            conditionalColors[record.requirement_detail.step] || defaultColors;
-          return (
-            <ConfigProvider
-              theme={{
-                components: {
-                  Segmented: {
-                    ...colors,
-                  },
-                },
-              }}
-            >
-              <Segmented
-                key={record.id}
-                size="small"
-                options={[
-                  {
-                    label: "SI",
-                    value: 1,
-                  },
-                  {
-                    label: "NO",
-                    value: 2,
-                  },
-                ]}
-              />
-            </ConfigProvider>
-          );
-        },
-      },
-      // Añade más columnas según sea necesario
-    ];
-
-    return <Table columns={columns} dataSource={data} pagination={false} />;
+              const colors =
+                conditionalColors[articuledOption[question.id] as any] ||
+                defaultColors;
+              return (
+                <ConfigProvider
+                  theme={{
+                    components: {
+                      Segmented: {
+                        ...colors,
+                      },
+                    },
+                  }}
+                >
+                  <Segmented
+                    key={index}
+                    size="small"
+                    options={[
+                      {
+                        label: "SI",
+                        value: true,
+                      },
+                      {
+                        label: "NO",
+                        value: false,
+                      },
+                    ]}
+                    value={articulated}
+                    defaultValue={true}
+                    onChange={(value) =>
+                      handleArticulatedChange(value, question.id)
+                    }
+                  />
+                </ConfigProvider>
+              );
+            },
+          },
+        ]}
+        dataSource={group.questions}
+        pagination={false}
+        rowKey="id"
+      />
+    ),
+    rowExpandable: (record) => record.questions.length > 0,
   };
 
+  const dataSource: DataType[] = questionsGrouped.map((group) => ({
+    ...group,
+    key: group.id,
+  }));
   return (
-    <Table
+    <Table<DiagnosisQuestionsGroup>
       columns={columns}
       dataSource={dataSource}
       pagination={false} // Desactiva la paginación si no la necesitas
-      expandable={{ expandedRowRender, defaultExpandedRowKeys: ["0"] }}
+      expandable={expandableConfig}
     />
   );
 }

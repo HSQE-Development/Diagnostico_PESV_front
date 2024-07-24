@@ -44,21 +44,27 @@ export const diagnosisSlice = createSlice({
       const { questionId, companyId, compliance } = action.payload;
       const question = findQuestionById(state.questionsGrouped, questionId);
       if (question) {
-        const obtainedValue = calculateValueObtained(
-          question.variable_value,
-          compliance
-        );
         const diagnosisIndex = state.diagnosisData.findIndex(
           (data) => data.question === questionId && data.company === companyId
         );
-
+        let obtainedValue = 0;
         if (diagnosisIndex >= 0) {
+          obtainedValue = calculateValueObtained(
+            question.variable_value,
+            compliance,
+            state.diagnosisData[diagnosisIndex].is_articuled
+          );
           state.diagnosisData[diagnosisIndex] = {
             ...state.diagnosisData[diagnosisIndex],
             compliance,
             obtained_value: obtainedValue,
           };
         } else {
+          obtainedValue = calculateValueObtained(
+            question.variable_value,
+            compliance,
+            true // Por defecto isArticulated es true
+          );
           state.diagnosisData.push({
             question: questionId,
             company: companyId,
@@ -66,6 +72,7 @@ export const diagnosisSlice = createSlice({
             obtained_value: obtainedValue,
             verify_document: null,
             observation: null,
+            is_articuled: true,
           });
         }
 
@@ -78,6 +85,40 @@ export const diagnosisSlice = createSlice({
           state.totalVariableValue
         );
       }
+    },
+    setUpdateArticulated: (
+      state,
+      action: PayloadAction<{ questionId: number; isArticulated: boolean }>
+    ) => {
+      const { questionId, isArticulated } = action.payload;
+      const question = findQuestionById(state.questionsGrouped, questionId);
+      if (question) {
+        const diagnosisIndex = state.diagnosisData.findIndex(
+          (data) => data.question === questionId
+        );
+        if (diagnosisIndex >= 0) {
+          state.diagnosisData[diagnosisIndex] = {
+            ...state.diagnosisData[diagnosisIndex],
+            is_articuled: isArticulated,
+            obtained_value: calculateValueObtained(
+              question.variable_value,
+              state.diagnosisData[diagnosisIndex].compliance,
+              isArticulated
+            ),
+          };
+
+          state.totalValueObtained =
+            calculateTotalValueObtainedFromDiagnosisData(state.diagnosisData);
+          // state.totalValueObtained += obtainedValue;
+          state.percentageCompleted = calculatePercentageCompleted(
+            state.totalValueObtained,
+            state.totalVariableValue
+          );
+        }
+      }
+    },
+    resetDiagnosis: (state) => {
+      state.diagnosisData.map((data) => (data.compliance = 2));
     },
   },
 });
@@ -106,8 +147,12 @@ const calculateTotalValueObtainedFromDiagnosisData = (
 
 const calculateValueObtained = (
   variableValue: number,
-  compliance: number
+  compliance: number,
+  isArticulated?: boolean
 ): number => {
+  if (!isArticulated) {
+    return variableValue;
+  }
   switch (compliance) {
     case 1:
     case 4:
@@ -146,7 +191,12 @@ const findQuestionById = (
   return undefined;
 };
 
-export const { setQuestions, setQuestionsGrouped, setUpdatePercentage } =
-  diagnosisSlice.actions;
+export const {
+  setQuestions,
+  setQuestionsGrouped,
+  setUpdatePercentage,
+  setUpdateArticulated,
+  resetDiagnosis,
+} = diagnosisSlice.actions;
 
 export default diagnosisSlice.reducer;
