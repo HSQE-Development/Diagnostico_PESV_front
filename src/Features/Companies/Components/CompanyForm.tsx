@@ -1,7 +1,7 @@
 import FloatLabel from "@/Components/FloatLabel";
 import useCompany from "@/hooks/companyHooks";
 import { Arl } from "@/interfaces/Arl";
-import { CompanyDTO } from "@/interfaces/Company";
+import { Ciiu, CompanyDTO } from "@/interfaces/Company";
 import { Mission } from "@/interfaces/Dedication";
 import { IUser } from "@/interfaces/IUser";
 import { setSegments } from "@/stores/features/segmentSlice";
@@ -11,13 +11,15 @@ import { companyService } from "@/stores/services/companyService";
 import { segmentService } from "@/stores/services/segmentServices";
 import { userService } from "@/stores/services/userService";
 import { TOAST_TYPE, toastHandler } from "@/utils/useToast";
-import { formatNIT } from "@/utils/utilsMethods";
+import { encryptId, formatNIT } from "@/utils/utilsMethods";
 import { skipToken } from "@reduxjs/toolkit/query";
-import { Button, Input, Select } from "antd";
+import { Button, Input, Select, Space } from "antd";
 import { Formik } from "formik";
-import React, { useEffect, useState } from "react";
+import { debounce } from "lodash";
+import React, { useCallback, useEffect, useState } from "react";
 import { CiSaveDown1 } from "react-icons/ci";
 import { MdEdit } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 
 interface CompanyFormProps {
@@ -32,16 +34,17 @@ const initialValues: CompanyDTO = {
   dependant: "",
   dependant_phone: "",
   dependant_position: "",
-  activities_ciiu: "",
   acquired_certification: "",
   segment: null,
   consultor: null,
   size: null,
   mission: null,
   arl: null,
+  ciius: null,
 };
 
 export default function CompanyForm({ id }: CompanyFormProps) {
+  const navigate = useNavigate();
   const { changeCompany, createCompany, isSaving, isUpdating } = useCompany();
   const { data: fetchSegments, isLoading } = segmentService.useFindAllQuery();
   const { data: fetchConsultants, isLoading: loadConsultants } =
@@ -50,28 +53,26 @@ export default function CompanyForm({ id }: CompanyFormProps) {
 
   const { data: fetchDedications, isLoading: loadDedications } =
     companyService.useFindAllDedicationsQuery();
-  // const [dedicationId, setDedicationId] = useState<number | undefined>();
-  // const {
-  //   data: fetchCompanySize,
-  //   isLoading: loadCompanySize,
-  //   refetch,
-  //   isUninitialized,
-  // } = companyService.useFindcompanySizeByDedicactionIdQuery(
-  //   dedicationId ? { id: dedicationId } : skipToken
-  // );
 
   const { data: fetchCompany } = companyService.useFindByIdQuery(
     id ? { id } : skipToken
   );
+
   const dispatch = useAppDispatch();
   const segments = useAppSelector((state) => state.segment.segments);
   const [filteredSegments, setFilteredSegments] = useState(segments || []);
   const [filteredConsultands, setFilteredConsultands] = useState<IUser[]>([]);
   const [filteredArl, setFilteredArl] = useState<Arl[]>([]);
   const [filteredDedications, setFiltereddedications] = useState<Mission[]>([]);
-  // useEffect(() => {
-  //   if (!isUninitialized) refetch();
-  // }, [dedicationId, isUninitialized]);
+  const [filteredCiiu, setFilteredCiiu] = useState<Ciiu[]>([]);
+  const [searchValue, setSearchValue] = useState<string>("");
+  const [codeCiiu, setCodeCiiu] = useState<string>("");
+
+  const { data: fetchCiiu, isLoading: loadCiiu } =
+    companyService.useFindCiiuByCodeQuery({
+      codeCiiu,
+    });
+
   useEffect(() => {
     if (fetchSegments) {
       dispatch(setSegments(fetchSegments));
@@ -93,12 +94,20 @@ export default function CompanyForm({ id }: CompanyFormProps) {
       setFiltereddedications(fetchDedications);
     }
   }, [fetchDedications]);
+  useEffect(() => {
+    if (!loadCiiu && fetchCiiu && Array.isArray(fetchCiiu)) {
+      setFilteredCiiu(fetchCiiu);
+    }
+  }, [fetchCiiu, loadCiiu]);
 
-  // useEffect(() => {
-  //   if (fetchCompanySize) {
-  //     setFilteredCompanySize(fetchCompanySize);
-  //   }
-  // }, [fetchCompanySize]);
+  // Función de búsqueda con debounce
+  const debouncedSearch = debounce((value: string) => {
+    setCodeCiiu(value); // Actualiza el parámetro de búsqueda para hacer la consulta
+  }, 300);
+
+  useEffect(() => {
+    debouncedSearch(searchValue);
+  }, [searchValue, debouncedSearch]);
 
   const onSearchArl = (value: string) => {
     const filtered = filteredSegments?.filter((arl) =>
@@ -126,13 +135,9 @@ export default function CompanyForm({ id }: CompanyFormProps) {
     });
     setFiltereddedications(filtered || []);
   };
-  // const onSearchCompanySize = (value: string) => {
-  //   const filtered = filteredCompanySize?.filter((companySize) => {
-  //     if (companySize.name)
-  //       companySize.name.toLowerCase().includes(value.toLowerCase());
-  //   });
-  //   setFilteredCompanySize(filtered || []);
-  // };
+  const onSearchChangeCiiu = (value: string) => {
+    setSearchValue(value);
+  };
 
   const arloptions = filteredArl.map((segment) => ({
     value: segment.id,
@@ -152,10 +157,11 @@ export default function CompanyForm({ id }: CompanyFormProps) {
     value: dedication.id,
     label: dedication.name,
   }));
-  // const companySizeOptions = filteredCompanySize.map((companySize) => ({
-  //   value: companySize.id,
-  //   label: companySize.name,
-  // }));
+  const ciiuOptions = filteredCiiu.map((ciiu) => ({
+    value: ciiu.id,
+    label: `${ciiu.code} - ${ciiu.name}`,
+    emoji: ciiu.code,
+  }));
 
   const validationSchema = Yup.object().shape({
     name: Yup.string().required("Campo Obligatorio"),
@@ -165,45 +171,9 @@ export default function CompanyForm({ id }: CompanyFormProps) {
     // diagnosis: Yup.string().required("Campo Obligatorio"),
     // dependant: Yup.string().required("Campo Obligatorio"),
     // dependant_phone: Yup.string().required("Campo Obligatorio"),
-    // activities_ciiu: Yup.string().required("Campo Obligatorio"),
     // acquired_certification: Yup.string().required("Campo ObligatoriformatNIT(e.target.value)o"),
     segment: Yup.number().required("Campo Obligatorio"),
   });
-
-  // const changeCompany = async (values: CompanyDTO) => {
-  //   const updatedCompany = await updateCompany({
-  //     id, //Id de la maquina que se quiere editar
-  //     name: values.name,
-  //     email: values.email,
-  //     acquired_certification: values.acquired_certification,
-  //     activities_ciiu: values.activities_ciiu,
-  //     nit: removeHyphen(values.nit, "-"),
-  //     diagnosis: values.diagnosis,
-  //     dependant: values.dependant,
-  //     dependant_phone: values.dependant_phone,
-  //     dependant_position: values.dependant_position,
-  //     segment: values.segment,
-  //     consultor: values.consultor ?? undefined,
-  //     dedication: values.dedication ?? undefined,
-  //     company_size: values.company_size ?? undefined,
-  //   }).unwrap();
-  //   toastHandler(TOAST_TYPE.SUCCESS_TOAST, "Actualizado Correctamente");
-  //   dispatch(setUpdateCompany(updatedCompany));
-  // };
-
-  // const createCompany = async (values: CompanyDTO) => {
-  //   values.nit = removeHyphen(values.nit, "-");
-  //   values.acquired_certification =
-  //     values.acquired_certification == ""
-  //       ? null
-  //       : values.acquired_certification;
-  //   values.activities_ciiu =
-  //     values.activities_ciiu == "" ? null : values.activities_ciiu;
-  //   values.diagnosis = values.diagnosis == "" ? null : values.diagnosis;
-  //   const savedCompany = await save(values).unwrap(); //Metodo que guarda
-  //   toastHandler(TOAST_TYPE.SUCCESS_TOAST, "Registrado Correctamente");
-  //   dispatch(setCompany(savedCompany));
-  // };
 
   const handleSubmit = async (values: CompanyDTO) => {
     try {
@@ -212,7 +182,12 @@ export default function CompanyForm({ id }: CompanyFormProps) {
         await changeCompany(id, values);
       } else {
         // Aqui se registra
-        await createCompany(values);
+        const saveCompany = await createCompany(values);
+        navigate(
+          `/app/companies/diagnosis/${encryptId(
+            saveCompany?.id.toString() ?? ""
+          )}`
+        );
       }
     } catch (error: any) {
       console.log("ERROR", error);
@@ -237,7 +212,6 @@ export default function CompanyForm({ id }: CompanyFormProps) {
               name: fetchCompany.name,
               email: fetchCompany.email ?? "",
               acquired_certification: fetchCompany.acquired_certification,
-              activities_ciiu: fetchCompany.activities_ciiu,
               nit: formatNIT(fetchCompany.nit),
               diagnosis: fetchCompany.diagnosis,
               dependant: fetchCompany.dependant,
@@ -248,6 +222,7 @@ export default function CompanyForm({ id }: CompanyFormProps) {
               size: fetchCompany.size_detail?.id ?? null,
               mission: fetchCompany.mission_detail.id,
               arl: fetchCompany.arl_detail.id,
+              ciius: fetchCompany.ciius_detail?.map((ciiu) => ciiu.id) ?? null,
             });
           }
           // setDedicationId(fetchCompany?.dedication_detail.id);
@@ -279,6 +254,9 @@ export default function CompanyForm({ id }: CompanyFormProps) {
                     }}
                     onBlur={props.handleBlur}
                     value={props.values.nit}
+                    status={
+                      props.touched.nit && props.errors.nit ? "error" : ""
+                    }
                   />
                 </FloatLabel>
                 {props.touched.nit && props.errors.nit ? (
@@ -318,21 +296,38 @@ export default function CompanyForm({ id }: CompanyFormProps) {
                 ) : null}
               </div>
               <div className="col-span-12 md:col-span-6">
-                <FloatLabel label="Actividad CIIU">
-                  <Input
-                    id="activities_ciiu"
-                    name="activities_ciiu"
-                    onChange={props.handleChange}
-                    onBlur={props.handleBlur}
-                    value={props.values.activities_ciiu ?? ""}
+                <FloatLabel label="Codigos ciiu">
+                  <Select
+                    showSearch
+                    value={props.values.ciius}
+                    mode="multiple"
+                    style={{ width: "100%" }}
+                    filterOption={(input, option) =>
+                      (option?.label ?? "")
+                        .toLowerCase()
+                        .includes(input.toLowerCase()) ||
+                      (option?.emoji ?? "").includes(input)
+                    }
+                    options={ciiuOptions}
+                    virtual
+                    loading={loadCiiu}
+                    allowClear
+                    optionRender={(option) => (
+                      <Space>
+                        <span className="text-xs font-bold">
+                          {option.data.emoji}
+                        </span>
+                        <span>{option.data.label}</span>
+                      </Space>
+                    )}
+                    labelRender={(option) => (
+                      <>
+                        <span>{option.label}</span>
+                      </>
+                    )}
+                    onChange={(value) => props.setFieldValue("ciius", value)}
                   />
                 </FloatLabel>
-                {props.touched.activities_ciiu &&
-                props.errors.activities_ciiu ? (
-                  <div className="text-red-600">
-                    {props.errors.activities_ciiu}
-                  </div>
-                ) : null}
               </div>
 
               <div className="col-span-12 md:col-span-3">

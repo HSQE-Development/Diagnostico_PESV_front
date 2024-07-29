@@ -1,4 +1,5 @@
 import {
+  Ciiu,
   Company,
   CompanyDTO,
   Driver,
@@ -115,6 +116,15 @@ export const companyService = createApi({
         method: "POST",
         data: {
           ...questionsDTO,
+        },
+      }),
+    }),
+    findCiiuByCode: builder.query<Ciiu[], { codeCiiu: string }>({
+      query: ({ codeCiiu }) => ({
+        url: `/companies/findCiiuByCode`,
+        method: "GET",
+        params: {
+          ciiu_code: codeCiiu,
         },
       }),
     }),

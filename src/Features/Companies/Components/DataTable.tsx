@@ -18,6 +18,7 @@ import {
   TableColumnType,
   TablePaginationConfig,
   TableProps,
+  Tag,
   Tooltip,
 } from "antd";
 import { FilterDropdownProps, SorterResult } from "antd/es/table/interface";
@@ -296,7 +297,44 @@ export default function DataTable({ arlIdProp, onlyInfo }: DataTableProps) {
     },
     {
       title: "Actividades CIIU",
-      dataIndex: "activities_ciiu",
+      render: (_, record) => {
+        const ciiusDetail = record.ciius_detail || [];
+        const maxVisible = 1; // Número máximo de elementos visibles
+        const visibleCiius = ciiusDetail.slice(0, maxVisible);
+        const hiddenCiius = ciiusDetail.slice(maxVisible);
+        return (
+          <div className="flex flex-col gap-1">
+            {visibleCiius.map((ciiu) => (
+              <Tag
+                key={ciiu.id}
+                className="w-[60%] whitespace-normal inline-block"
+              >
+                {ciiu.name}
+              </Tag>
+            ))}
+            {hiddenCiius.length > 0 && (
+              <Popover
+                content={() => (
+                  <>
+                    {hiddenCiius.map((ciiu) => (
+                      <Tag
+                        key={ciiu.id}
+                        className="whitespace-normal inline-block"
+                      >
+                        {ciiu.name}
+                      </Tag>
+                    ))}
+                  </>
+                )}
+                title="Más detalles"
+                trigger="click"
+              >
+                <Button type="link">Ver más ({hiddenCiius.length})</Button>
+              </Popover>
+            )}
+          </div>
+        );
+      },
     },
     {
       title: "Diagnosticos",

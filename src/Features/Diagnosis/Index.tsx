@@ -22,6 +22,7 @@ import { setFleetData } from "@/stores/features/vehicleQuestionsSlice";
 import { setDriverData } from "@/stores/features/driverQuestionSlice";
 import { DriverDTO, FleetDTO } from "@/interfaces/Company";
 import { diagnosisService } from "@/stores/services/diagnosisServices";
+import ReportDiagnosis from "./Components/Report/ReportDiagnosis";
 
 export default function DiagnosisPage() {
   const dispatch = useAppDispatch();
@@ -97,21 +98,29 @@ export default function DiagnosisPage() {
       icon: <MdOutlineCloudDownload />,
       content: (
         <>
-          <Button
-            loading={isLoading}
-            onClick={async () => {
-              const generateFile = await generateReport({
-                companyId,
-              }).unwrap();
+          <div className="flex items-center justify-end mr-4">
+            <Button
+              loading={isLoading}
+              onClick={async () => {
+                const generateFile = await generateReport({
+                  companyId,
+                }).unwrap();
 
-              downloadBase64File(generateFile.file, "PRUEBA.docx");
-            }}
-            icon={<FaFileWord />}
-            type="primary"
-            htmlType="button"
-          >
-            Descargar Informe
-          </Button>
+                downloadBase64File(
+                  generateFile.file,
+                  `Diagnostico_PESV_${new Date()}.docx`
+                );
+              }}
+              icon={<FaFileWord />}
+              type="primary"
+              htmlType="button"
+            >
+              Descargar Informe
+            </Button>
+          </div>
+          <div className="grid w-full h-full grid-cols-2">
+            <ReportDiagnosis companyId={companyId} />
+          </div>
         </>
       ),
       subTitle: "Generar el informe del diagnostico",

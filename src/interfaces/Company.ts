@@ -4,6 +4,9 @@ import { CompanySize, MisionalitySizeCriteria, Mission } from "./Dedication";
 import { IUser } from "./IUser";
 import { Segment } from "./Segment";
 
+export interface Ciiu extends Comun {
+  code: string;
+}
 export interface Company extends Comun {
   nit: string;
   segment: number | null;
@@ -11,7 +14,6 @@ export interface Company extends Comun {
   dependant: string | null;
   dependant_phone: string | null;
   dependant_position: string | null;
-  activities_ciiu: string | null;
   email: string | null;
   acquired_certification: string | null;
   diagnosis: string | null;
@@ -25,6 +27,8 @@ export interface Company extends Comun {
   size: number;
   size_detail: CompanySize | null;
   misionality_size_criteria: MisionalitySizeCriteria[];
+  ciius: number[] | null;
+  ciius_detail: Ciiu[] | null;
 }
 
 export type CompanyDTO = {
@@ -35,13 +39,13 @@ export type CompanyDTO = {
   dependant: string | null;
   dependant_phone: string | null;
   dependant_position: string | null;
-  activities_ciiu: string | null;
   email: string;
   acquired_certification: string | null;
   diagnosis: string | null;
   mission: number | null;
   size: number | null;
   arl: number | null;
+  ciius: number[] | null;
 };
 
 export interface VehicleQuestion extends Comun {}

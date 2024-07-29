@@ -30,7 +30,6 @@ const useCompany = () => {
         name: values.name,
         email: values.email,
         acquired_certification: values.acquired_certification,
-        activities_ciiu: values.activities_ciiu,
         nit: removeHyphen(values.nit, "-"),
         diagnosis: values.diagnosis,
         dependant: values.dependant,
@@ -40,12 +39,15 @@ const useCompany = () => {
         consultor: values.consultor ?? undefined,
         mission: values.mission ?? undefined,
         size: values.size ?? undefined,
+        ciius: values.ciius ?? null,
       }).unwrap();
       toastHandler(TOAST_TYPE.SUCCESS_TOAST, "Actualizado Correctamente");
       dispatch(setUpdateCompany(updatedCompany));
+      return updatedCompany;
     } catch (error) {
       toastHandler(TOAST_TYPE.ERROR_TOAST, "Error al actualizar");
       console.error("Error updating company:", error);
+      return null;
     }
   };
 
@@ -62,15 +64,15 @@ const useCompany = () => {
         values.acquired_certification == ""
           ? null
           : values.acquired_certification;
-      values.activities_ciiu =
-        values.activities_ciiu == "" ? null : values.activities_ciiu;
       values.diagnosis = values.diagnosis == "" ? null : values.diagnosis;
       const savedCompany = await save(values).unwrap(); //Metodo que guarda
       toastHandler(TOAST_TYPE.SUCCESS_TOAST, "Registrado Correctamente");
       dispatch(setCompany(savedCompany));
+      return savedCompany;
     } catch (error: any) {
       toastHandler(TOAST_TYPE.ERROR_TOAST, error.data.error);
       console.error("Error creating company:", error);
+      return null;
     }
   };
 

@@ -306,53 +306,57 @@ export default function DiagnosisDataTable({ companyId }: Props) {
               );
             },
           },
-          {
-            title: "Esta articulado?",
-            render: (_, question, index) => {
-              const articulated = diagnosisData.find(
-                (d) => d.question === question.id
-              )?.is_articuled;
+          // {
+          //   title: "Esta articulado?",
+          //   render: (_, question, index) => {
+          //     const articulated = diagnosisData.find(
+          //       (d) => d.question === question.id
+          //     )?.is_articuled;
 
-              const colors =
-                conditionalColors[articuledOption[question.id] as any] ||
-                defaultColors;
-              return (
-                <ConfigProvider
-                  theme={{
-                    components: {
-                      Segmented: {
-                        ...colors,
-                      },
-                    },
-                  }}
-                >
-                  <Segmented
-                    key={index}
-                    size="small"
-                    options={[
-                      {
-                        label: "SI",
-                        value: true,
-                      },
-                      {
-                        label: "NO",
-                        value: false,
-                      },
-                    ]}
-                    value={articulated}
-                    defaultValue={true}
-                    onChange={(value) =>
-                      handleArticulatedChange(value, question.id)
-                    }
-                  />
-                </ConfigProvider>
-              );
-            },
-          },
+          //     const colors =
+          //       conditionalColors[articuledOption[question.id] as any] ||
+          //       defaultColors;
+          //     return index === group.questions.length - 1 ? (
+          //       <ConfigProvider
+          //         theme={{
+          //           components: {
+          //             Segmented: {
+          //               ...colors,
+          //             },
+          //           },
+          //         }}
+          //       >
+          //         <Segmented
+          //           key={index}
+          //           size="small"
+          //           options={[
+          //             {
+          //               label: "SI",
+          //               value: true,
+          //             },
+          //             {
+          //               label: "NO",
+          //               value: false,
+          //             },
+          //           ]}
+          //           value={articulated}
+          //           defaultValue={true}
+          //           onChange={(value) =>
+          //             handleArticulatedChange(value, question.id)
+          //           }
+          //         />
+          //       </ConfigProvider>
+          //     ) : null;
+          //   },
+          // },
         ]}
         dataSource={group.questions}
         pagination={false}
         rowKey="id"
+        rowClassName={(_, index) =>
+          index === group.questions.length - 1 ? "font-bold" : ""
+        }
+        rowHoverable={false}
       />
     ),
     rowExpandable: (record) => record.questions.length > 0,
@@ -368,6 +372,7 @@ export default function DiagnosisDataTable({ companyId }: Props) {
       dataSource={dataSource}
       pagination={false} // Desactiva la paginación si no la necesitas
       expandable={expandableConfig}
+      rowClassName={() => "bg-slate-100"}
     />
   );
 }
