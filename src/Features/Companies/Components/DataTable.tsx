@@ -303,13 +303,13 @@ export default function DataTable({ arlIdProp, onlyInfo }: DataTableProps) {
         const visibleCiius = ciiusDetail.slice(0, maxVisible);
         const hiddenCiius = ciiusDetail.slice(maxVisible);
         return (
-          <div className="flex flex-col gap-1">
+          <div className="flex w-[60%]">
             {visibleCiius.map((ciiu) => (
               <Tag
                 key={ciiu.id}
-                className="w-[60%] whitespace-normal inline-block"
+                className="w-auto whitespace-normal inline-block"
               >
-                {ciiu.name}
+                <span className="font-bold">{ciiu.code}</span>-{ciiu.name}
               </Tag>
             ))}
             {hiddenCiius.length > 0 && (
@@ -321,7 +321,7 @@ export default function DataTable({ arlIdProp, onlyInfo }: DataTableProps) {
                         key={ciiu.id}
                         className="whitespace-normal inline-block"
                       >
-                        {ciiu.name}
+                        {ciiu.code}-{ciiu.name}
                       </Tag>
                     ))}
                   </>

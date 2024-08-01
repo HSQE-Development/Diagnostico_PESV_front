@@ -1,5 +1,9 @@
-import { decryptId, downloadBase64File } from "@/utils/utilsMethods";
-import { Breadcrumb, Button, Steps } from "antd";
+import {
+  decryptId,
+  downloadBase64FileToDocx,
+  downloadBase64Pdf,
+} from "@/utils/utilsMethods";
+import { Breadcrumb, Button, Popover, Steps } from "antd";
 import React, { useEffect } from "react";
 import { IoBusiness } from "react-icons/io5";
 import {
@@ -11,7 +15,7 @@ import { useParams } from "react-router-dom";
 import QuantityForm from "./Components/Steps/QuantityForm";
 import { useAppDispatch, useAppSelector } from "@/stores/hooks";
 import DiagnosisForm from "./Components/Steps/DiagnosisForm";
-import { FaClipboardCheck, FaFileWord } from "react-icons/fa";
+import { FaClipboardCheck, FaFileWord, FaRegFilePdf } from "react-icons/fa";
 import {
   setDiagnosisCurrent,
   setStepsLenght,
@@ -23,6 +27,9 @@ import { setDriverData } from "@/stores/features/driverQuestionSlice";
 import { DriverDTO, FleetDTO } from "@/interfaces/Company";
 import { diagnosisService } from "@/stores/services/diagnosisServices";
 import ReportDiagnosis from "./Components/Report/ReportDiagnosis";
+import ReportTable from "./Components/Report/ReportTable";
+import TotalTable from "./Components/Report/TotalTable";
+import { IoIosCloudDownload } from "react-icons/io";
 
 export default function DiagnosisPage() {
   const dispatch = useAppDispatch();
@@ -33,10 +40,10 @@ export default function DiagnosisPage() {
     companyId ? { id: companyId } : skipToken
   );
   const { data: driverByCompanyid, isLoading: isLoadingDriverByCompany } =
-    companyService.useFindDriversByCompanyIdQuery({ companyId });
+    diagnosisService.useFindDriversByCompanyIdQuery({ companyId });
 
   const { data: fleetByCompany, isLoading: isLoadingFleetByCompany } =
-    companyService.useFindFleetsByCompanyIdQuery({ companyId });
+    diagnosisService.useFindFleetsByCompanyIdQuery({ companyId });
 
   useEffect(() => {
     if (companyById) {
@@ -47,7 +54,7 @@ export default function DiagnosisPage() {
   useEffect(() => {
     if (fleetByCompany && !isLoadingFleetByCompany) {
       const fleetData: FleetDTO[] = fleetByCompany.map((item) => ({
-        company: item.company_detail.id,
+        diagnosis: item.diagnosis_detail.id,
         quantity_arrended: item.quantity_arrended,
         quantity_leasing: item.quantity_leasing,
         quantity_contractors: item.quantity_contractors,
@@ -63,7 +70,7 @@ export default function DiagnosisPage() {
   useEffect(() => {
     if (driverByCompanyid && !isLoadingDriverByCompany) {
       const driverData: DriverDTO[] = driverByCompanyid.map((item) => ({
-        company: item.company_detail.id,
+        diagnosis: item.diagnosis_detail.id,
         driver_question: item.driver_question_detail.id,
         quantity: item.quantity,
       }));
@@ -73,6 +80,51 @@ export default function DiagnosisPage() {
 
   const [generateReport, { isLoading }] =
     diagnosisService.useGenerateReportMutation();
+
+  const content = (
+    <>
+      <div className="flex items-center justify-center gap-4">
+        <Button
+          loading={isLoading}
+          onClick={async () => {
+            const generateFile = await generateReport({
+              companyId,
+              format_to_save: "word",
+            }).unwrap();
+
+            downloadBase64FileToDocx(
+              generateFile.file,
+              `Diagnostico_PESV_${new Date()}.docx`
+            );
+          }}
+          icon={<FaFileWord />}
+          type="primary"
+          htmlType="button"
+        >
+          Word
+        </Button>
+        <Button
+          loading={isLoading}
+          icon={<FaRegFilePdf />}
+          className="bg-red-500 text-white border-red-500 active:bg-red-700 hover:bg-red-400"
+          htmlType="button"
+          onClick={async () => {
+            const generateFile = await generateReport({
+              companyId,
+              format_to_save: "pdf",
+            }).unwrap();
+
+            downloadBase64Pdf(
+              generateFile.file,
+              `Diagnostico_PESV_${new Date()}.pdf`
+            );
+          }}
+        >
+          PDF
+        </Button>
+      </div>
+    </>
+  );
   const steps = [
     {
       title: "Conteo",
@@ -98,28 +150,25 @@ export default function DiagnosisPage() {
       icon: <MdOutlineCloudDownload />,
       content: (
         <>
-          <div className="flex items-center justify-end mr-4">
-            <Button
-              loading={isLoading}
-              onClick={async () => {
-                const generateFile = await generateReport({
-                  companyId,
-                }).unwrap();
-
-                downloadBase64File(
-                  generateFile.file,
-                  `Diagnostico_PESV_${new Date()}.docx`
-                );
-              }}
-              icon={<FaFileWord />}
-              type="primary"
-              htmlType="button"
-            >
-              Descargar Informe
-            </Button>
+          <div className="flex items-center justify-between mx-4 mb-4">
+            <Button>Atras</Button>
+            <Popover content={content} trigger="click" placement="bottom">
+              <Button
+                className="bg-orange-400 text-white border-orange-400 active:bg-orange-700 hover:bg-orange-300"
+                icon={<IoIosCloudDownload />}
+              >
+                Descargar Informe
+              </Button>
+            </Popover>
           </div>
-          <div className="grid w-full h-full grid-cols-2">
-            <ReportDiagnosis companyId={companyId} />
+          <div className="flex flex-1 justify-between items-start gap-4">
+            <div className="w-2/4">
+              <ReportTable companyid={companyId} />
+            </div>
+            <div className="flex w-2/4 h-full flex-col items-center sticky top-20 gap-2">
+              <TotalTable companyId={companyId} />
+              <ReportDiagnosis companyId={companyId} />
+            </div>
           </div>
         </>
       ),

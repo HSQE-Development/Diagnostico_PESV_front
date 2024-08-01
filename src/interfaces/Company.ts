@@ -4,6 +4,12 @@ import { CompanySize, MisionalitySizeCriteria, Mission } from "./Dedication";
 import { IUser } from "./IUser";
 import { Segment } from "./Segment";
 
+export interface Diagnosis {
+  id: number;
+  company: number;
+  company_detail: Company;
+  date_elabored: Date;
+}
 export interface Ciiu extends Comun {
   code: string;
 }
@@ -41,7 +47,6 @@ export type CompanyDTO = {
   dependant_position: string | null;
   email: string;
   acquired_certification: string | null;
-  diagnosis: string | null;
   mission: number | null;
   size: number | null;
   arl: number | null;
@@ -61,8 +66,8 @@ export interface Fleet {
   quantity_renting: number;
   vehicle_question: number;
   vehicle_question_detail: VehicleQuestion;
-  company: number;
-  company_detail: Company;
+  diagnosis: number;
+  diagnosis_detail: Diagnosis;
 }
 
 export type FleetDTO = {
@@ -82,8 +87,8 @@ export interface Driver extends Comun {
   quantity: number;
   driver_question: number;
   driver_question_detail: DriverQuestion;
-  company: number;
-  company_detail: Company;
+  diagnosis: number;
+  diagnosis_detail: Diagnosis;
 }
 
 export type DriverDTO = {

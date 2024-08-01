@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/stores/hooks";
 import {
   setQuestionsGrouped,
   setUpdateArticulated,
+  setUpdateObservation,
   setUpdatePercentage,
+  setUpdateRequirement,
 } from "@/stores/features/diagnosisSlice";
 import { diagnosisService } from "@/stores/services/diagnosisServices";
 import {
@@ -12,6 +14,7 @@ import {
 } from "@/interfaces/Diagnosis";
 import {
   ConfigProvider,
+  Input,
   Segmented,
   Table,
   TableColumnsType,
@@ -58,6 +61,27 @@ export default function DiagnosisDataTable({ companyId }: Props) {
     [qId: number]: boolean;
   }>({});
 
+  const [observation, setObservation] = useState<{
+    [reqId: number]: string | null;
+  }>({});
+
+  const handleObservationChange = (
+    e: ChangeEvent<HTMLTextAreaElement>,
+    req_id: number
+  ) => {
+    setObservation((prev) => ({
+      ...prev,
+      [req_id]: e.target.value,
+    }));
+    dispatch(
+      setUpdateObservation({
+        reqId: req_id,
+        observation: observation[req_id],
+      })
+    );
+    // Aquí podrías manejar la actualización del record.observation en el estado global o realizar otras acciones
+  };
+
   useEffect(() => {
     // Reenderizado por defecto
     if (questionsGrouped.length > 0) {
@@ -66,7 +90,6 @@ export default function DiagnosisDataTable({ companyId }: Props) {
           dispatch(
             setUpdatePercentage({
               questionId: question.id,
-              companyId,
               compliance: COMPLIANCE_LEVEL.NO_CUMPLE,
             })
           );
@@ -81,21 +104,67 @@ export default function DiagnosisDataTable({ companyId }: Props) {
         });
         setSelectedOption((prev) => ({
           ...prev,
-          [group.step]: COMPLIANCE_LEVEL.NO_CUMPLE,
+          [group.step]: group.compliance.id,
+        }));
+        setObservation((prev) => ({
+          ...prev,
+          [group.id]: group.observation,
         }));
       });
     }
   }, [questionsGrouped]);
 
-  const handleComplianceChange = (value: number, questionId: number) => {
+  const handleComplianceChange = (
+    value: number,
+    questionId: number,
+    step: number
+  ) => {
     dispatch(
       setUpdatePercentage({
-        companyId,
         compliance: value,
         questionId,
       })
     );
-    setQuestionOption((prev) => ({ ...prev, [questionId]: value }));
+    // Actualiza el estado local para la opción seleccionada
+    setQuestionOption((prev) => {
+      const newQuestionOptions = { ...prev, [questionId]: value };
+
+      // Agrupa las preguntas por paso
+      const grouped = questionsGrouped.filter((group) => group.step === step);
+
+      // Obtén todas las respuestas para el paso específico
+      const allQuestionValues = grouped.flatMap((group) =>
+        group.questions.map((question) => newQuestionOptions[question.id])
+      );
+
+      // Determina el valor que se debe establecer en selectedOption
+      const newSelectedOption = allQuestionValues.includes(3)
+        ? COMPLIANCE_LEVEL.CUMPLE_PARCIALMENTE // Si hay al menos un valor 3
+        : allQuestionValues.every((val) => val === COMPLIANCE_LEVEL.NO_CUMPLE)
+        ? COMPLIANCE_LEVEL.NO_CUMPLE // Si todos los valores son 2
+        : allQuestionValues.every(
+            (val) => val === COMPLIANCE_LEVEL.CUMPLE || val == 4
+          )
+        ? COMPLIANCE_LEVEL.CUMPLE // Si todos los valores son 1
+        : allQuestionValues.every(
+            (val) =>
+              val === COMPLIANCE_LEVEL.CUMPLE ||
+              val === COMPLIANCE_LEVEL.NO_CUMPLE ||
+              val === COMPLIANCE_LEVEL.CUMPLE_PARCIALMENTE
+          )
+        ? COMPLIANCE_LEVEL.CUMPLE_PARCIALMENTE
+        : allQuestionValues.every((val) => val === COMPLIANCE_LEVEL.NO_APLICA)
+        ? COMPLIANCE_LEVEL.NO_APLICA
+        : 3;
+
+      // Actualiza selectedOption basado en la verificación
+      setSelectedOption((prev) => ({
+        ...prev,
+        [step]: newSelectedOption,
+      }));
+
+      return newQuestionOptions;
+    });
   };
 
   const handleArticulatedChange = (value: boolean, questionId: number) => {
@@ -106,15 +175,21 @@ export default function DiagnosisDataTable({ companyId }: Props) {
     }));
   };
 
-  const handleGeneralChange = (value: number, step: number) => {
+  const handleGeneralChange = (value: number, step: number, req_id: number) => {
     if (questionsGrouped.length > 0) {
+      dispatch(
+        setUpdateRequirement({
+          compliance: value,
+          observation: observation[req_id],
+          requirementId: req_id,
+        })
+      );
       questionsGrouped.forEach((group) => {
         group.questions.forEach((question) => {
           if (question.requirement_detail.step === step) {
             dispatch(
               setUpdatePercentage({
                 questionId: question.id,
-                companyId,
                 compliance: value,
               })
             );
@@ -233,9 +308,31 @@ export default function DiagnosisDataTable({ companyId }: Props) {
               ]}
               value={selectedOption[record.step]}
               defaultValue={COMPLIANCE_LEVEL.NO_CUMPLE}
-              onChange={(value) => handleGeneralChange(value, record.step)}
+              onChange={(value) =>
+                handleGeneralChange(value, record.step, record.id)
+              }
             />
           </ConfigProvider>
+        );
+      },
+    },
+    {
+      title: "Observacion",
+      render: (_, record) => {
+        return (
+          <Input.TextArea
+            value={observation[record.id] ?? ""}
+            rows={1}
+            className={
+              selectedOption[record.step] !== 4
+                ? "hidden transition-all"
+                : "w-60 transition-all"
+            }
+            placeholder="En caso de que no aplique este paso"
+            disabled={selectedOption[record.step] !== 4}
+            autoSize={{ minRows: 1, maxRows: 6 }}
+            onChange={(e) => handleObservationChange(e, record.id)}
+          />
         );
       },
     },
@@ -299,7 +396,11 @@ export default function DiagnosisDataTable({ companyId }: Props) {
                     value={compliance}
                     defaultValue={COMPLIANCE_LEVEL.NO_CUMPLE}
                     onChange={(value) =>
-                      handleComplianceChange(value, question.id)
+                      handleComplianceChange(
+                        value,
+                        question.id,
+                        question.requirement_detail.step
+                      )
                     }
                   />
                 </ConfigProvider>

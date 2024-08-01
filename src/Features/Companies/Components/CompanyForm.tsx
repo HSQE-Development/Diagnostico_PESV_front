@@ -16,7 +16,7 @@ import { skipToken } from "@reduxjs/toolkit/query";
 import { Button, Input, Select, Space } from "antd";
 import { Formik } from "formik";
 import { debounce } from "lodash";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { CiSaveDown1 } from "react-icons/ci";
 import { MdEdit } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
@@ -30,7 +30,6 @@ const initialValues: CompanyDTO = {
   name: "",
   email: "",
   nit: "",
-  diagnosis: "",
   dependant: "",
   dependant_phone: "",
   dependant_position: "",
@@ -213,7 +212,6 @@ export default function CompanyForm({ id }: CompanyFormProps) {
               email: fetchCompany.email ?? "",
               acquired_certification: fetchCompany.acquired_certification,
               nit: formatNIT(fetchCompany.nit),
-              diagnosis: fetchCompany.diagnosis,
               dependant: fetchCompany.dependant,
               dependant_phone: fetchCompany.dependant_phone,
               dependant_position: fetchCompany.dependant_position,

@@ -19,18 +19,30 @@ export interface DiagnosisQuestionsGroup {
   id: number;
   step: number;
   requirement_name: string;
+  observation: string;
   cycle: string;
+  compliance: Compliance;
   questions: DiagnosisQuestions[];
 }
 
+export interface CheckListDTO {
+  company: number;
+  diagnosisDto: DiagnosisDTO[];
+  diagnosisRequirementDto: DiagnosisRequirementDTO[];
+}
 export interface DiagnosisDTO {
   question: number;
-  company: number;
   compliance: number;
   obtained_value: number;
   verify_document: string | null;
   observation: string | null;
   is_articuled: boolean;
+}
+
+export interface DiagnosisRequirementDTO {
+  requirement: number;
+  compliance: number;
+  observation: string | null;
 }
 
 export interface DiagnosisChecklist {
@@ -44,4 +56,19 @@ export interface DiagnosisChecklist {
   compliance: number;
   compliance_detail: Compliance;
   observation: string;
+}
+
+export interface RadarData {
+  cycle: string;
+  cycle_percentage: number;
+}
+
+interface CountComun {
+  compliance_id: number;
+  count: number;
+}
+
+export interface TotalReport {
+  counts: CountComun[];
+  general: number;
 }

@@ -6,6 +6,7 @@ import {
 } from "@/stores/features/driverQuestionSlice";
 import { useAppDispatch, useAppSelector } from "@/stores/hooks";
 import { companyService } from "@/stores/services/companyService";
+import { diagnosisService } from "@/stores/services/diagnosisServices";
 import { Input, Table, TableColumnsType, TableProps } from "antd";
 import React, { useEffect, useState } from "react";
 
@@ -26,7 +27,7 @@ export default function Conductores({ companyId }: Props) {
     companyService.useFindAllDriverQuestionsQuery();
 
   const { data: driverByCompanyid, isLoading: isLoadingDriverByCompany } =
-    companyService.useFindDriversByCompanyIdQuery({ companyId });
+    diagnosisService.useFindDriversByCompanyIdQuery({ companyId });
   const [inputValues, setInputValues] = useState<{
     [key: number]: {
       quantity: number;

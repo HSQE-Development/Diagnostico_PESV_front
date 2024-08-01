@@ -2,6 +2,7 @@ import {
   DiagnosisDTO,
   DiagnosisQuestions,
   DiagnosisQuestionsGroup,
+  DiagnosisRequirementDTO,
 } from "@/interfaces/Diagnosis";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
@@ -13,6 +14,10 @@ const initialState = {
   totalValueObtained: 0 as number,
   percentageCompleted: 0 as number,
   diagnosisData: [] as DiagnosisDTO[],
+  diagnosisRequirementData: [] as DiagnosisRequirementDTO[],
+  observation: {} as {
+    [req_id: number]: string | null;
+  },
 };
 
 export const diagnosisSlice = createSlice({
@@ -33,19 +38,72 @@ export const diagnosisSlice = createSlice({
         state.totalVariableValue
       );
     },
+    setUpdateObservation: (
+      state,
+      action: PayloadAction<{ reqId: number; observation: string | null }>
+    ) => {
+      const { reqId, observation } = action.payload;
+      const requirement = findRequirementById(state.questionsGrouped, reqId);
+      if (requirement) {
+        const requirementIndex = state.diagnosisRequirementData.findIndex(
+          (data) => data.requirement == reqId
+        );
+
+        if (requirementIndex >= 0) {
+          state.diagnosisRequirementData[requirementIndex] = {
+            ...state.diagnosisRequirementData[requirementIndex],
+            observation,
+          };
+        }
+      }
+    },
+    setUpdateRequirement: (
+      state,
+      action: PayloadAction<{
+        requirementId: number;
+        compliance: number;
+        observation: string | null;
+      }>
+    ) => {
+      const { requirementId, compliance, observation } = action.payload;
+      const requirement = findRequirementById(
+        state.questionsGrouped,
+        requirementId
+      );
+
+      if (requirement) {
+        const requirementIndex = state.diagnosisRequirementData.findIndex(
+          (data) => data.requirement == requirementId
+        );
+
+        if (requirementIndex >= 0) {
+          state.diagnosisRequirementData[requirementIndex] = {
+            ...state.diagnosisRequirementData[requirementIndex],
+            compliance,
+            observation,
+          };
+        } else {
+          state.diagnosisRequirementData.push({
+            compliance,
+            observation,
+            requirement: requirement.id,
+          });
+        }
+      }
+    },
     setUpdatePercentage: (
       state,
       action: PayloadAction<{
         questionId: number;
-        companyId: number;
         compliance: number;
       }>
     ) => {
-      const { questionId, companyId, compliance } = action.payload;
+      const { questionId, compliance } = action.payload;
       const question = findQuestionById(state.questionsGrouped, questionId);
       if (question) {
         const diagnosisIndex = state.diagnosisData.findIndex(
-          (data) => data.question === questionId && data.company === companyId
+          (data) => data.question === questionId
+          //  && data.company === companyId
         );
         let obtainedValue = 0;
         if (diagnosisIndex >= 0) {
@@ -67,7 +125,6 @@ export const diagnosisSlice = createSlice({
           );
           state.diagnosisData.push({
             question: questionId,
-            company: companyId,
             compliance,
             obtained_value: obtainedValue,
             verify_document: null,
@@ -191,12 +248,25 @@ const findQuestionById = (
   return undefined;
 };
 
+const findRequirementById = (
+  questionsGrouped: DiagnosisQuestionsGroup[],
+  id: number
+): DiagnosisQuestionsGroup | undefined => {
+  const requirement = questionsGrouped.find((qG) => qG.id === id);
+  if (requirement) {
+    return requirement;
+  }
+  return undefined;
+};
+
 export const {
   setQuestions,
   setQuestionsGrouped,
   setUpdatePercentage,
   setUpdateArticulated,
   resetDiagnosis,
+  setUpdateRequirement,
+  setUpdateObservation,
 } = diagnosisSlice.actions;
 
 export default diagnosisSlice.reducer;

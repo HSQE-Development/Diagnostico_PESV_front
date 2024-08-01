@@ -33,7 +33,7 @@ export default function CompanyInfo({ companyId, onlyInfo }: Props) {
   );
   const [company, setCompany] = useState<Company | null>(null);
   const [saveAnswerCuestions, { isLoading }] =
-    companyService.useSaveAnswerCuestionsMutation();
+    diagnosisService.useSaveAnswerCuestionsMutation();
 
   const [saveDiagnosis] = diagnosisService.useSaveDiagnosisMutation();
 
@@ -55,6 +55,9 @@ export default function CompanyInfo({ companyId, onlyInfo }: Props) {
   const diagnosisData = useAppSelector(
     (state) => state.diagnosis.diagnosisData
   );
+  const diagnosisRequirementData = useAppSelector(
+    (state) => state.diagnosis.diagnosisRequirementData
+  );
 
   const totalGeneral = totalDrivers + totalVehicles;
 
@@ -75,8 +78,11 @@ export default function CompanyInfo({ companyId, onlyInfo }: Props) {
           dispatch(setNextDiagnosisCurrent());
           break;
         case 1:
-          console.log(diagnosisData);
-          await saveDiagnosis(diagnosisData).unwrap();
+          await saveDiagnosis({
+            company: companyId,
+            diagnosisDto: diagnosisData,
+            diagnosisRequirementDto: diagnosisRequirementData,
+          }).unwrap();
           refetch();
           // dispatch(setNextDiagnosisCurrent());
           message.success("Conteo Actualizado correctamente");

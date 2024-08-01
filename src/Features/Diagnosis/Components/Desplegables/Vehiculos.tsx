@@ -6,6 +6,7 @@ import {
 } from "@/stores/features/vehicleQuestionsSlice";
 import { useAppDispatch, useAppSelector } from "@/stores/hooks";
 import { companyService } from "@/stores/services/companyService";
+import { diagnosisService } from "@/stores/services/diagnosisServices";
 import { Input, Table, TableColumnsType, TableProps } from "antd";
 import React, { useEffect, useState } from "react";
 
@@ -28,7 +29,7 @@ export default function Vehiculos({ companyId }: Props) {
     data: fleetByCompany,
     isLoading: isLoadingFleetByCompany,
     refetch: refetchFleet,
-  } = companyService.useFindFleetsByCompanyIdQuery({ companyId });
+  } = diagnosisService.useFindFleetsByCompanyIdQuery({ companyId });
   const dispatch = useAppDispatch();
   const [inputValues, setInputValues] = useState<{
     [key: number]: {

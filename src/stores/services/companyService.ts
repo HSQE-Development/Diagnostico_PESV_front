@@ -2,9 +2,7 @@ import {
   Ciiu,
   Company,
   CompanyDTO,
-  Driver,
   DriverQuestion,
-  Fleet,
   SaveQuestionsDTO,
   VehicleQuestion,
 } from "@/interfaces/Company";
@@ -90,33 +88,6 @@ export const companyService = createApi({
       query: () => ({
         url: `/companies/findAllDriverQuestions`,
         method: "GET",
-      }),
-    }),
-    findFleetsByCompanyId: builder.query<Fleet[], { companyId: number }>({
-      query: ({ companyId }) => ({
-        url: `/companies/findFleetsByCompanyId`,
-        method: "GET",
-        params: {
-          company: companyId,
-        },
-      }),
-    }),
-    findDriversByCompanyId: builder.query<Driver[], { companyId: number }>({
-      query: ({ companyId }) => ({
-        url: `/companies/findDriversByCompanyId`,
-        method: "GET",
-        params: {
-          company: companyId,
-        },
-      }),
-    }),
-    saveAnswerCuestions: builder.mutation<SaveQuestionsDTO, SaveQuestionsDTO>({
-      query: (questionsDTO) => ({
-        url: `/companies/saveAnswerCuestions/`,
-        method: "POST",
-        data: {
-          ...questionsDTO,
-        },
       }),
     }),
     findCiiuByCode: builder.query<Ciiu[], { codeCiiu: string }>({

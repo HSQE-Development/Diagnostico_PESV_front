@@ -106,7 +106,10 @@ export const addItemToArray = <T>(array: T[], newItem: T): T[] => {
   return [...array, newItem];
 };
 
-export function downloadBase64File(base64String: string, fileName: string) {
+export function downloadBase64FileToDocx(
+  base64String: string,
+  fileName: string
+) {
   // Crear un enlace <a> dinámico
   const link = document.createElement("a");
 
@@ -123,6 +126,31 @@ export function downloadBase64File(base64String: string, fileName: string) {
   link.click();
 
   // Eliminar el enlace del DOM
+  document.body.removeChild(link);
+}
+
+/**
+ * Descarga un archivo PDF a partir de una cadena Base64.
+ * @param base64String - La cadena Base64 que representa el archivo PDF.
+ * @param fileName - El nombre con el que se descargará el archivo PDF.
+ */
+export function downloadBase64Pdf(
+  base64String: string,
+  fileName: string
+): void {
+  // Agregar el prefijo 'data:application/pdf;base64,' al Base64
+  const dataUri = `data:application/pdf;base64,${base64String}`;
+
+  // Crear un enlace de descarga
+  const link = document.createElement("a");
+  link.href = dataUri;
+  link.download = fileName;
+
+  // Simular el clic en el enlace para iniciar la descarga
+  document.body.appendChild(link);
+  link.click();
+
+  // Limpiar el DOM eliminando el enlace
   document.body.removeChild(link);
 }
 

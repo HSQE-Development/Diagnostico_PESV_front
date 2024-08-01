@@ -1,8 +1,12 @@
+import { Driver, Fleet, SaveQuestionsDTO } from "@/interfaces/Company";
 import {
+  CheckListDTO,
   DiagnosisChecklist,
   DiagnosisDTO,
   DiagnosisQuestions,
   DiagnosisQuestionsGroup,
+  RadarData,
+  TotalReport,
 } from "@/interfaces/Diagnosis";
 import axiosBaseQuery from "@/utils/axiosBaseQuery";
 import { createApi } from "@reduxjs/toolkit/query/react";
@@ -40,20 +44,68 @@ export const diagnosisService = createApi({
         method: "GET",
       }),
     }),
-    saveDiagnosis: builder.mutation<DiagnosisChecklist[], DiagnosisDTO[]>({
+    radarChart: builder.query<RadarData[], { companyId: number }>({
+      query: ({ companyId }) => ({
+        url: `/diagnosis/radarChart?company_id=${companyId}`,
+        method: "GET",
+      }),
+    }),
+    tableReportTotal: builder.query<TotalReport, { companyId: number }>({
+      query: ({ companyId }) => ({
+        url: `/diagnosis/tableReportTotal?company_id=${companyId}`,
+        method: "GET",
+      }),
+    }),
+    tableReport: builder.query<any, { companyId: number }>({
+      query: ({ companyId }) => ({
+        url: `/diagnosis/tableReport?company_id=${companyId}`,
+        method: "GET",
+      }),
+    }),
+    saveDiagnosis: builder.mutation<DiagnosisChecklist[], CheckListDTO>({
       query: (dataDiagnosis) => ({
-        url: `/diagnosis/saveDiagnosis`,
+        url: `/diagnosis/saveDiagnosis/`,
         method: "POST",
         data: {
           diagnosis_data: dataDiagnosis,
         },
       }),
     }),
-    generateReport: builder.mutation<{ file: string }, { companyId: number }>({
-      query: ({ companyId }) => ({
-        url: `/diagnosis/generateReport`,
+    generateReport: builder.mutation<
+      { file: string },
+      { companyId: number; format_to_save: string }
+    >({
+      query: ({ companyId, format_to_save }) => ({
+        url: `/diagnosis/generateReport/`,
         method: "POST",
-        params: { company: companyId },
+        params: { company: companyId, format_to_save: format_to_save },
+      }),
+    }),
+    findFleetsByCompanyId: builder.query<Fleet[], { companyId: number }>({
+      query: ({ companyId }) => ({
+        url: `/diagnosis/findFleetsByCompanyId`,
+        method: "GET",
+        params: {
+          company: companyId,
+        },
+      }),
+    }),
+    findDriversByCompanyId: builder.query<Driver[], { companyId: number }>({
+      query: ({ companyId }) => ({
+        url: `/diagnosis/findDriversByCompanyId`,
+        method: "GET",
+        params: {
+          company: companyId,
+        },
+      }),
+    }),
+    saveAnswerCuestions: builder.mutation<SaveQuestionsDTO, SaveQuestionsDTO>({
+      query: (questionsDTO) => ({
+        url: `/diagnosis/saveAnswerCuestions/`,
+        method: "POST",
+        data: {
+          ...questionsDTO,
+        },
       }),
     }),
   }),
