@@ -1,4 +1,4 @@
-import { Company } from "@/interfaces/Company";
+import { Company, Diagnosis } from "@/interfaces/Company";
 import { setCompanies, setDeleteCompany } from "@/stores/features/companySlice";
 import { useAppDispatch, useAppSelector } from "@/stores/hooks";
 import { companyService } from "@/stores/services/companyService";
@@ -36,6 +36,8 @@ import { decryptId, encryptId, formatNIT } from "@/utils/utilsMethods";
 import { BiSearch } from "react-icons/bi";
 //@ts-ignore
 import Highlighter from "react-highlight-words";
+import { IoDocumentAttach } from "react-icons/io5";
+import CompanyDiagnosis from "./CompanyDiagnosis";
 interface DataType extends Company {
   key: React.Key;
 }
@@ -74,6 +76,8 @@ export default function DataTable({ arlIdProp, onlyInfo }: DataTableProps) {
   const { data: fetchCompanies, isLoading } = companyService.useFindAllQuery({
     arlId: arlIdToUse,
   });
+  const [openPopupDiagnosis, setOpenPopupDiagnosis] = useState<boolean>(false);
+
   useEffect(() => {
     if (fetchCompanies) {
       dispatch(setCompanies(fetchCompanies));
@@ -297,13 +301,14 @@ export default function DataTable({ arlIdProp, onlyInfo }: DataTableProps) {
     },
     {
       title: "Actividades CIIU",
+      width: 410,
       render: (_, record) => {
         const ciiusDetail = record.ciius_detail || [];
         const maxVisible = 1; // Número máximo de elementos visibles
         const visibleCiius = ciiusDetail.slice(0, maxVisible);
         const hiddenCiius = ciiusDetail.slice(maxVisible);
         return (
-          <div className="flex w-[60%]">
+          <div className="flex flex-wrap w-[100%]">
             {visibleCiius.map((ciiu) => (
               <Tag
                 key={ciiu.id}
@@ -337,14 +342,34 @@ export default function DataTable({ arlIdProp, onlyInfo }: DataTableProps) {
       },
     },
     {
-      title: "Diagnosticos",
-      dataIndex: "diagnosis",
-    },
-    {
       title: "Arl a la que pertenece",
       dataIndex: ["arl_detail", "name"],
-      fixed: "right",
+      // fixed: "right",
       className: `${onlyInfo ? "relative hidden" : ""}`,
+    },
+    {
+      title: "Diagnosticos",
+      fixed: "right",
+      render: (_, record) => {
+        return (
+          <>
+            <div className="flex items-center justify-center">
+              <Popover
+                content={
+                  <CompanyDiagnosis diagnosis={record.company_diagnosis} />
+                }
+                title="Diagnosticos realizados"
+                trigger="click"
+              >
+                <Button
+                  disabled={record.company_diagnosis.length <= 0}
+                  icon={<IoDocumentAttach />}
+                ></Button>
+              </Popover>
+            </div>
+          </>
+        );
+      },
     },
     {
       title: "Consultor Asignado",
@@ -357,15 +382,15 @@ export default function DataTable({ arlIdProp, onlyInfo }: DataTableProps) {
         ),
       fixed: "right",
     },
-    {
-      title: "Diagnostico",
-      fixed: "right",
-      render: (_, record) => {
-        return (
-          <Steps type="inline" current={record.diagnosis_step} items={items} />
-        );
-      },
-    },
+    // {
+    //   title: "Diagnostico",
+    //   fixed: "right",
+    //   render: (_, record) => {
+    //     return (
+    //       <Steps type="inline" current={record.diagnosis_step} items={items} />
+    //     );
+    //   },
+    // },
     {
       title: "Acciones",
       key: "Operation",

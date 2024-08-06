@@ -40,6 +40,7 @@ export default function Vehiculos({ companyId }: Props) {
       intermediation: number;
       leasing: number;
       renting: number;
+      employees: number;
     };
   }>({});
 
@@ -71,6 +72,7 @@ export default function Vehiculos({ companyId }: Props) {
           intermediation: number;
           leasing: number;
           renting: number;
+          employees: number;
         };
       } = {};
       fleetByCompany.forEach((fleet) => {
@@ -82,6 +84,7 @@ export default function Vehiculos({ companyId }: Props) {
           intermediation: fleet.quantity_intermediation,
           leasing: fleet.quantity_leasing,
           renting: fleet.quantity_renting,
+          employees: fleet.quantity_employees,
         };
       });
       setInputValues(initialInputValues);
@@ -105,9 +108,8 @@ export default function Vehiculos({ companyId }: Props) {
       | "intermediation"
       | "leasing"
       | "renting"
+      | "employees"
   ) => {
-    console.log("value", value);
-    console.log("questionId", questionId);
     const updatedInputValues = {
       ...inputValues,
       [questionId]: {
@@ -158,6 +160,10 @@ export default function Vehiculos({ companyId }: Props) {
           type === "renting"
             ? value
             : updatedFleetData[existingIndex].quantity_renting,
+        quantity_employees:
+          type === "employees"
+            ? value
+            : updatedFleetData[existingIndex].quantity_employees,
       };
 
       // Reemplazar el objeto existente en el arreglo con el objeto actualizado
@@ -173,6 +179,7 @@ export default function Vehiculos({ companyId }: Props) {
         quantity_leasing: type === "leasing" ? value : 0,
         quantity_renting: type === "renting" ? value : 0,
         vehicle_question: questionId,
+        quantity_employees: type === "employees" ? value : 0,
         // company: companyId,
       };
       updatedFleetData.push(newData);
@@ -368,6 +375,32 @@ export default function Vehiculos({ companyId }: Props) {
                   parseInt(e.target.value) ?? 0,
                   record.id,
                   "renting"
+                )
+              }
+            />
+          </>
+        );
+      },
+    },
+    {
+      title: "Cantidad Vehiculos propios",
+      width: 1,
+      render: (_, record) => {
+        const fleetInfo = inputValues[record.id] || {
+          renting: 0,
+        };
+        // console.log(fleetInfo);
+        return (
+          <>
+            <Input
+              key={record.id}
+              min={0}
+              value={fleetInfo.employees ?? 0}
+              onChange={(e) =>
+                handleFleetChange(
+                  parseInt(e.target.value) ?? 0,
+                  record.id,
+                  "employees"
                 )
               }
             />

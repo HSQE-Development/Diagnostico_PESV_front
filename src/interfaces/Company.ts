@@ -35,6 +35,7 @@ export interface Company extends Comun {
   misionality_size_criteria: MisionalitySizeCriteria[];
   ciius: number[] | null;
   ciius_detail: Ciiu[] | null;
+  company_diagnosis: Diagnosis[];
 }
 
 export type CompanyDTO = {
@@ -64,6 +65,7 @@ export interface Fleet {
   quantity_intermediation: number;
   quantity_leasing: number;
   quantity_renting: number;
+  quantity_employees: number;
   vehicle_question: number;
   vehicle_question_detail: VehicleQuestion;
   diagnosis: number;
@@ -79,6 +81,7 @@ export type FleetDTO = {
   quantity_leasing: number;
   quantity_renting: number;
   vehicle_question: number;
+  quantity_employees: number;
 };
 
 export interface DriverQuestion extends Comun {}

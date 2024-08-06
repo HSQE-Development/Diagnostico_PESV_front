@@ -72,3 +72,9 @@ export interface TotalReport {
   counts: CountComun[];
   general: number;
 }
+
+export interface Diagnosis {
+  id: number;
+  company: number;
+  date_elabored: string;
+}

@@ -76,6 +76,10 @@ const calculateTotals = (state: typeof initialState) => {
     (total, item) => total + item.quantity_renting,
     0
   );
+  state.totalRenting = state.fleetData.reduce(
+    (total, item) => total + item.quantity_employees,
+    0
+  );
   state.totalQuantity = state.fleetData.reduce(
     (total, item) =>
       total +
@@ -85,6 +89,7 @@ const calculateTotals = (state: typeof initialState) => {
       item.quantity_contractors +
       item.quantity_intermediation +
       item.quantity_leasing +
+      item.quantity_employees +
       item.quantity_renting,
     0
   );

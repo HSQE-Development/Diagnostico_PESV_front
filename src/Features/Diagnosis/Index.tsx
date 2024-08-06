@@ -63,6 +63,7 @@ export default function DiagnosisPage() {
         quantity_renting: item.quantity_renting,
         quantity_third_party: item.quantity_third_party,
         vehicle_question: item.vehicle_question_detail.id,
+        quantity_employees: item.quantity_employees,
       }));
       dispatch(setFleetData(fleetData));
     }
