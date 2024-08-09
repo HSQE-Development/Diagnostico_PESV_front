@@ -1,12 +1,20 @@
 import { diagnosisService } from "@/stores/services/diagnosisServices";
+import { decryptId } from "@/utils/utilsMethods";
 import { Table, TableColumnsType } from "antd";
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useSearchParams } from "react-router-dom";
 interface ReportTableProps {
   companyid: number;
 }
 export default function ReportTable({ companyid }: ReportTableProps) {
+  const [searchParams] = useSearchParams();
+  const diagnosisParam = searchParams.get("diagnosis");
+  const diagnosisId = diagnosisParam
+    ? parseInt(decryptId(diagnosisParam))
+    : undefined;
   const { data } = diagnosisService.useTableReportQuery({
     companyId: companyid,
+    diagnosisId: diagnosisId ?? 0,
   });
 
   const columns: TableColumnsType = [

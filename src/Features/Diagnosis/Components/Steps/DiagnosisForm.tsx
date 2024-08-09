@@ -23,7 +23,7 @@ export default function DiagnosisForm({ companyId }: Props) {
     <div className="flex flex-1 justify-between items-start gap-4">
       <CompanyInfo companyId={companyId} />
       <div className="flex flex-col flex-1 w-2/4 relative">
-        <div className="w-full sticky top-20 mb-4 z-50 bg-white p-4 ">
+        <div className="w-full sticky top-0 mb-4 z-50 bg-white p-4 ">
           <span>Conteo General</span>
           <Progress
             percent={percentageCompleted}

@@ -1,7 +1,7 @@
 import React from "react";
 import LogoXs from "../assets/Logo_xs.png";
 import LogoXl from "../assets/Logo_xl.png";
-import MenuSide from "./MenuSide";
+import MenuSide, { MenuSideProps } from "./MenuSide";
 import { Button } from "antd";
 import { PiSignOutThin } from "react-icons/pi";
 import { IoBarChartOutline, IoBusiness } from "react-icons/io5";
@@ -13,45 +13,55 @@ export default function Sidebar() {
   const sideBarState = useAppSelector((state) => state.sidebarState);
   const navigate = useNavigate();
 
+  const menuitems: MenuSideProps[] = [
+    {
+      icon: <IoBarChartOutline />,
+      label: "Dashboard",
+      urls: ["/app"],
+      onPress: () => navigate("/app"),
+    },
+    {
+      icon: <IoBusiness />,
+      label: "Empresas",
+      urls: ["/app/companies"],
+      onPress: () => navigate("/app/companies"),
+    },
+    {
+      icon: <MdOutlineBusinessCenter />,
+      label: "Arls",
+      urls: ["/app/arls"],
+      onPress: () => navigate("/app/arls"),
+    },
+  ];
   return (
     <div
-      className={`hidden md:flex flex-col justify-between h-full shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] bg-white  ${
-        sideBarState.isCollapsed ? "md:w-56 lg:w-72" : "md:w-20"
+      className={`hidden md:flex flex-col justify-between h-full ${
+        sideBarState.isCollapsed ? "md:w-56 lg:w-52" : "md:w-20"
       } transition-all`}
     >
       <div className="flex flex-col overflow-y-auto">
-        <div className="w-full flex justify-center items-center h-28">
+        <div className="w-full flex justify-center items-center h-20 border-b">
           {sideBarState.isCollapsed ? (
-            <img src={LogoXl} alt="" className="w-36" />
+            <img src={LogoXl} alt="" className="w-36 pointer-events-none" />
           ) : (
-            <img src={LogoXs} alt="" className="w-12" />
+            <img src={LogoXs} alt="" className="w-10 pointer-events-none" />
           )}
         </div>
-      </div>
-      <ul
-        className={`my-4 flex flex-col ${
-          sideBarState.isCollapsed ? "items-start" : "items-center"
-        } justify-between p-4 gap-y-8 overflow-x-auto `}
-      >
-        <MenuSide
-          icon={<IoBarChartOutline />}
-          label="Dashboard"
-          onPress={() => navigate("/app")}
-          urls={["/app"]}
-        />
-        <MenuSide
-          icon={<IoBusiness />}
-          label="Empresas"
-          onPress={() => navigate("/app/companies")}
-          urls={["/app/companies"]}
-        />
-        <MenuSide
-          icon={<MdOutlineBusinessCenter />}
-          label="Arls"
-          onPress={() => navigate("/app/arls")}
-          urls={["/app/arls"]}
-        />
-        {/* <MenuSide
+        <ul
+          className={`my-4 flex flex-col ${
+            sideBarState.isCollapsed ? "items-start" : "items-center"
+          } justify-between p-4 gap-y-4 overflow-x-auto `}
+        >
+          {menuitems.map((items, i) => (
+            <MenuSide
+              key={i}
+              icon={items.icon}
+              label={items.label}
+              onPress={items.onPress}
+              urls={items.urls}
+            />
+          ))}
+          {/* <MenuSide
           icon={<BsDiagram3Fill />}
           label="Diagnosticos"
           onPress={() => navigate("/app")}
@@ -63,7 +73,8 @@ export default function Sidebar() {
           onPress={() => navigate("/app")}
           urls={["/app/companies/diagnosis/"]}
         /> */}
-      </ul>
+        </ul>
+      </div>
       <div className="w-full my-4 flex justify-center items-center">
         <Button size={"large"} icon={<PiSignOutThin />}>
           {sideBarState.isCollapsed ? "Cerrar Sesión" : ""}

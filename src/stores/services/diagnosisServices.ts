@@ -1,4 +1,10 @@
-import { Driver, Fleet, SaveQuestionsDTO } from "@/interfaces/Company";
+import {
+  Diagnosis,
+  Driver,
+  Fleet,
+  ResponseSaveQuestions,
+  SaveQuestionsDTO,
+} from "@/interfaces/Company";
 import {
   CheckListDTO,
   DiagnosisChecklist,
@@ -26,6 +32,12 @@ export const diagnosisService = createApi({
   reducerPath: "diagnosisApi",
   baseQuery: axiosBaseQuery,
   endpoints: (builder) => ({
+    findById: builder.query<Diagnosis, { diagnosisId: number }>({
+      query: ({ diagnosisId }) => ({
+        url: `/diagnosis/${diagnosisId}`,
+        method: "GET",
+      }),
+    }),
     findQuestionsByCompanySize: builder.query<
       DiagnosisQuestions[],
       { companyId: number }
@@ -37,28 +49,37 @@ export const diagnosisService = createApi({
     }),
     findQuestionsByCompanysizeGrouped: builder.query<
       DiagnosisQuestionsGroup[],
-      { companyId: number }
+      { companyId: number; diagnosisId?: number }
     >({
-      query: ({ companyId }) => ({
-        url: `/diagnosis/findQuestionsByCompanySize?company=${companyId}&group_by_step=true`,
+      query: ({ companyId, diagnosisId }) => ({
+        url: `/diagnosis/findQuestionsByCompanySize?company=${companyId}&diagnosis=${diagnosisId}&group_by_step=true`,
         method: "GET",
       }),
     }),
-    radarChart: builder.query<RadarData[], { companyId: number }>({
-      query: ({ companyId }) => ({
-        url: `/diagnosis/radarChart?company_id=${companyId}`,
+    radarChart: builder.query<
+      RadarData[],
+      { companyId: number; diagnosisId?: number }
+    >({
+      query: ({ companyId, diagnosisId }) => ({
+        url: `/diagnosis/radarChart?company_id=${companyId}&diagnosis=${diagnosisId}`,
         method: "GET",
       }),
     }),
-    tableReportTotal: builder.query<TotalReport, { companyId: number }>({
-      query: ({ companyId }) => ({
-        url: `/diagnosis/tableReportTotal?company_id=${companyId}`,
+    tableReportTotal: builder.query<
+      TotalReport,
+      { companyId: number; diagnosisId?: number }
+    >({
+      query: ({ companyId, diagnosisId }) => ({
+        url: `/diagnosis/tableReportTotal?company_id=${companyId}&diagnosis=${diagnosisId}`,
         method: "GET",
       }),
     }),
-    tableReport: builder.query<any, { companyId: number }>({
-      query: ({ companyId }) => ({
-        url: `/diagnosis/tableReport?company_id=${companyId}`,
+    tableReport: builder.query<
+      any,
+      { companyId: number; diagnosisId?: number }
+    >({
+      query: ({ companyId, diagnosisId }) => ({
+        url: `/diagnosis/tableReport?company_id=${companyId}&diagnosis=${diagnosisId}`,
         method: "GET",
       }),
     }),
@@ -73,33 +94,48 @@ export const diagnosisService = createApi({
     }),
     generateReport: builder.mutation<
       { file: string },
-      { companyId: number; format_to_save: string }
+      { companyId: number; format_to_save: string; diagnosisId?: number }
     >({
-      query: ({ companyId, format_to_save }) => ({
+      query: ({ companyId, format_to_save, diagnosisId }) => ({
         url: `/diagnosis/generateReport/`,
         method: "POST",
-        params: { company: companyId, format_to_save: format_to_save },
+        params: {
+          company: companyId,
+          format_to_save: format_to_save,
+          diagnosis: diagnosisId,
+        },
       }),
     }),
-    findFleetsByCompanyId: builder.query<Fleet[], { companyId: number }>({
-      query: ({ companyId }) => ({
+    findFleetsByCompanyId: builder.query<
+      Fleet[],
+      { companyId: number; diagnosisId?: number }
+    >({
+      query: ({ companyId, diagnosisId }) => ({
         url: `/diagnosis/findFleetsByCompanyId`,
         method: "GET",
         params: {
           company: companyId,
+          diagnosis: diagnosisId,
         },
       }),
     }),
-    findDriversByCompanyId: builder.query<Driver[], { companyId: number }>({
-      query: ({ companyId }) => ({
+    findDriversByCompanyId: builder.query<
+      Driver[],
+      { companyId: number; diagnosisId?: number }
+    >({
+      query: ({ companyId, diagnosisId }) => ({
         url: `/diagnosis/findDriversByCompanyId`,
         method: "GET",
         params: {
           company: companyId,
+          diagnosis: diagnosisId,
         },
       }),
     }),
-    saveAnswerCuestions: builder.mutation<SaveQuestionsDTO, SaveQuestionsDTO>({
+    saveAnswerCuestions: builder.mutation<
+      ResponseSaveQuestions,
+      SaveQuestionsDTO
+    >({
       query: (questionsDTO) => ({
         url: `/diagnosis/saveAnswerCuestions/`,
         method: "POST",

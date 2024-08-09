@@ -18,14 +18,25 @@ export default function CompanyPage() {
           subTitle="Añade, actualiza, elimina y gestiona toda la información de las
           empresas"
         />
-        <Button className="mt-8 mb-4 md:mt-0 md:mb-0" type="primary" icon={<IoMdAdd />} onClick={() => setOpen(true)}>
+        <Button
+          className="mt-8 mb-4 md:mt-0 md:mb-0"
+          type="primary"
+          icon={<IoMdAdd />}
+          onClick={() => setOpen(true)}
+        >
           Agregar Empresa
         </Button>
       </div>
       <DataTable />
 
       <Modal
-        title={<span className="flex items-center justify-start"> <CiSaveDown1 className="mr-2" />Agregar Empresa</span>}
+        title={
+          <span className="flex items-center justify-start">
+            {" "}
+            <CiSaveDown1 className="mr-2" />
+            Agregar Empresa
+          </span>
+        }
         centered
         open={open}
         onOk={() => setOpen(false)}
@@ -33,7 +44,7 @@ export default function CompanyPage() {
         width={1000}
         footer={<></>}
       >
-        <CompanyForm/>
+        <CompanyForm />
       </Modal>
     </div>
   );

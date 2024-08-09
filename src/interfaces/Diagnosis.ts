@@ -13,6 +13,7 @@ export interface DiagnosisQuestions extends Comun {
   requirement_detail: DiagnosisRequirement;
   diagnosis_type: number;
   diagnosis_type_detail: DiagnosisType;
+  compliance_detail?: Compliance;
 }
 
 export interface DiagnosisQuestionsGroup {
@@ -27,6 +28,7 @@ export interface DiagnosisQuestionsGroup {
 
 export interface CheckListDTO {
   company: number;
+  consultor: number;
   diagnosisDto: DiagnosisDTO[];
   diagnosisRequirementDto: DiagnosisRequirementDTO[];
 }

@@ -9,6 +9,7 @@ import { companyService } from "@/stores/services/companyService";
 import { diagnosisService } from "@/stores/services/diagnosisServices";
 import { Input, Table, TableColumnsType, TableProps } from "antd";
 import React, { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 interface Props {
   companyId: number;
@@ -25,6 +26,9 @@ export default function Vehiculos({ companyId }: Props) {
   const { data: flotaVehiculosTerrestres, refetch } =
     companyService.useFindAllVehicleQuestionsQuery();
 
+  const [searchParams] = useSearchParams();
+
+  const isNewDiagnosis = Boolean(searchParams.get("newDiagnosis") ?? "false");
   const {
     data: fleetByCompany,
     isLoading: isLoadingFleetByCompany,
@@ -62,7 +66,7 @@ export default function Vehiculos({ companyId }: Props) {
   }, [flotaVehiculosTerrestres, dispatch]);
 
   useEffect(() => {
-    if (fleetByCompany && !isLoadingFleetByCompany) {
+    if (fleetByCompany && !isLoadingFleetByCompany && !isNewDiagnosis) {
       const initialInputValues: {
         [key: number]: {
           owned: number;

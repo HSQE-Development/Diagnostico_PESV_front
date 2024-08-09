@@ -1,9 +1,5 @@
-import {
-  decryptId,
-  downloadBase64FileToDocx,
-  downloadBase64Pdf,
-} from "@/utils/utilsMethods";
-import { Breadcrumb, Button, Popover, Steps } from "antd";
+import { decryptId } from "@/utils/utilsMethods";
+import { Breadcrumb, Steps } from "antd";
 import React, { useEffect } from "react";
 import { IoBusiness } from "react-icons/io5";
 import {
@@ -11,11 +7,11 @@ import {
   MdOutlineCloudDownload,
   MdOutlineDocumentScanner,
 } from "react-icons/md";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import QuantityForm from "./Components/Steps/QuantityForm";
 import { useAppDispatch, useAppSelector } from "@/stores/hooks";
 import DiagnosisForm from "./Components/Steps/DiagnosisForm";
-import { FaClipboardCheck, FaFileWord, FaRegFilePdf } from "react-icons/fa";
+import { FaClipboardCheck } from "react-icons/fa";
 import {
   setDiagnosisCurrent,
   setStepsLenght,
@@ -26,33 +22,49 @@ import { setFleetData } from "@/stores/features/vehicleQuestionsSlice";
 import { setDriverData } from "@/stores/features/driverQuestionSlice";
 import { DriverDTO, FleetDTO } from "@/interfaces/Company";
 import { diagnosisService } from "@/stores/services/diagnosisServices";
-import ReportDiagnosis from "./Components/Report/ReportDiagnosis";
-import ReportTable from "./Components/Report/ReportTable";
-import TotalTable from "./Components/Report/TotalTable";
-import { IoIosCloudDownload } from "react-icons/io";
+import DownLoadReport from "./Components/Steps/DownLoadReport";
 
 export default function DiagnosisPage() {
   const dispatch = useAppDispatch();
   const { idCompany } = useParams();
+  const [searchParams] = useSearchParams();
+  const diagnosisParam = searchParams.get("diagnosis");
+  const diagnosisId = diagnosisParam
+    ? parseInt(decryptId(diagnosisParam))
+    : undefined;
   const companyId = parseInt(decryptId(idCompany ?? ""));
-  const current = useAppSelector((state) => state.util.diagnosisCurrent);
   const { data: companyById } = companyService.useFindByIdQuery(
     companyId ? { id: companyId } : skipToken
   );
   const { data: driverByCompanyid, isLoading: isLoadingDriverByCompany } =
-    diagnosisService.useFindDriversByCompanyIdQuery({ companyId });
+    diagnosisService.useFindDriversByCompanyIdQuery({
+      companyId,
+      diagnosisId: diagnosisId ?? 0,
+    });
 
   const { data: fleetByCompany, isLoading: isLoadingFleetByCompany } =
-    diagnosisService.useFindFleetsByCompanyIdQuery({ companyId });
+    diagnosisService.useFindFleetsByCompanyIdQuery({
+      companyId,
+      diagnosisId: diagnosisId ?? 0,
+    });
+
+  const { data: diagnosisData } = diagnosisService.useFindByIdQuery(
+    diagnosisId ? { diagnosisId } : skipToken
+  );
 
   useEffect(() => {
     if (companyById) {
-      dispatch(setDiagnosisCurrent(companyById.diagnosis_step));
+      dispatch(setDiagnosisCurrent(diagnosisData?.diagnosis_step ?? 0));
     }
   }, [companyById, dispatch]);
+  const current = useAppSelector((state) => state.util.diagnosisCurrent);
 
   useEffect(() => {
-    if (fleetByCompany && !isLoadingFleetByCompany) {
+    if (
+      fleetByCompany &&
+      !isLoadingFleetByCompany &&
+      diagnosisId != undefined
+    ) {
       const fleetData: FleetDTO[] = fleetByCompany.map((item) => ({
         diagnosis: item.diagnosis_detail.id,
         quantity_arrended: item.quantity_arrended,
@@ -68,8 +80,13 @@ export default function DiagnosisPage() {
       dispatch(setFleetData(fleetData));
     }
   }, [fleetByCompany, isLoadingFleetByCompany, dispatch]);
+
   useEffect(() => {
-    if (driverByCompanyid && !isLoadingDriverByCompany) {
+    if (
+      driverByCompanyid &&
+      !isLoadingDriverByCompany &&
+      diagnosisId != undefined
+    ) {
       const driverData: DriverDTO[] = driverByCompanyid.map((item) => ({
         diagnosis: item.diagnosis_detail.id,
         driver_question: item.driver_question_detail.id,
@@ -79,53 +96,6 @@ export default function DiagnosisPage() {
     }
   }, [driverByCompanyid, isLoadingDriverByCompany, dispatch]);
 
-  const [generateReport, { isLoading }] =
-    diagnosisService.useGenerateReportMutation();
-
-  const content = (
-    <>
-      <div className="flex items-center justify-center gap-4">
-        <Button
-          loading={isLoading}
-          onClick={async () => {
-            const generateFile = await generateReport({
-              companyId,
-              format_to_save: "word",
-            }).unwrap();
-
-            downloadBase64FileToDocx(
-              generateFile.file,
-              `Diagnostico_PESV_${new Date()}.docx`
-            );
-          }}
-          icon={<FaFileWord />}
-          type="primary"
-          htmlType="button"
-        >
-          Word
-        </Button>
-        <Button
-          loading={isLoading}
-          icon={<FaRegFilePdf />}
-          className="bg-red-500 text-white border-red-500 active:bg-red-700 hover:bg-red-400"
-          htmlType="button"
-          onClick={async () => {
-            const generateFile = await generateReport({
-              companyId,
-              format_to_save: "pdf",
-            }).unwrap();
-
-            downloadBase64Pdf(
-              generateFile.file,
-              `Diagnostico_PESV_${new Date()}.pdf`
-            );
-          }}
-        >
-          PDF
-        </Button>
-      </div>
-    </>
-  );
   const steps = [
     {
       title: "Conteo",
@@ -149,30 +119,7 @@ export default function DiagnosisPage() {
     {
       title: "Informe",
       icon: <MdOutlineCloudDownload />,
-      content: (
-        <>
-          <div className="flex items-center justify-between mx-4 mb-4">
-            <Button>Atras</Button>
-            <Popover content={content} trigger="click" placement="bottom">
-              <Button
-                className="bg-orange-400 text-white border-orange-400 active:bg-orange-700 hover:bg-orange-300"
-                icon={<IoIosCloudDownload />}
-              >
-                Descargar Informe
-              </Button>
-            </Popover>
-          </div>
-          <div className="flex flex-1 justify-between items-start gap-4">
-            <div className="w-2/4">
-              <ReportTable companyid={companyId} />
-            </div>
-            <div className="flex w-2/4 h-full flex-col items-center sticky top-20 gap-2">
-              <TotalTable companyId={companyId} />
-              <ReportDiagnosis companyId={companyId} />
-            </div>
-          </div>
-        </>
-      ),
+      content: <DownLoadReport companyId={companyId} />,
       subTitle: "Generar el informe del diagnostico",
     },
   ];

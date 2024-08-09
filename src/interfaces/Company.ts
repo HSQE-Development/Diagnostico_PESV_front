@@ -1,6 +1,7 @@
 import { Arl } from "./Arl";
 import { Comun } from "./Comun";
 import { CompanySize, MisionalitySizeCriteria, Mission } from "./Dedication";
+import { Compliance } from "./Diagnosis";
 import { IUser } from "./IUser";
 import { Segment } from "./Segment";
 
@@ -9,6 +10,11 @@ export interface Diagnosis {
   company: number;
   company_detail: Company;
   date_elabored: Date;
+  is_finalized: boolean;
+  diagnosis_step: number;
+  type: Compliance;
+  consultor: number;
+  consultor_detail: IUser | null;
 }
 export interface Ciiu extends Comun {
   code: string;
@@ -23,11 +29,8 @@ export interface Company extends Comun {
   email: string | null;
   acquired_certification: string | null;
   diagnosis: string | null;
-  consultor: number;
-  consultor_detail: IUser | null;
   mission: number;
   mission_detail: Mission;
-  diagnosis_step: number;
   arl: number;
   arl_detail: Arl;
   size: number;
@@ -42,7 +45,6 @@ export type CompanyDTO = {
   name: string;
   nit: string;
   segment: number | null;
-  consultor: number | null;
   dependant: string | null;
   dependant_phone: string | null;
   dependant_position: string | null;
@@ -101,6 +103,12 @@ export type DriverDTO = {
 
 export type SaveQuestionsDTO = {
   company: number;
+  vehicleData: FleetDTO[];
+  driverData: DriverDTO[];
+};
+
+export type ResponseSaveQuestions = {
+  diagnosis: number;
   vehicleData: FleetDTO[];
   driverData: DriverDTO[];
 };

@@ -3,10 +3,13 @@ import {
   Company,
   CompanyDTO,
   DriverQuestion,
-  SaveQuestionsDTO,
   VehicleQuestion,
 } from "@/interfaces/Company";
-import { CompanySize, Mission } from "@/interfaces/Dedication";
+import {
+  CompanySize,
+  MisionalitySizeCriteria,
+  Mission,
+} from "@/interfaces/Dedication";
 import axiosBaseQuery from "@/utils/axiosBaseQuery";
 import { createApi } from "@reduxjs/toolkit/query/react";
 
@@ -70,11 +73,11 @@ export const companyService = createApi({
       }),
     }),
     findcompanySizeByDedicactionId: builder.query<
-      CompanySize[],
+      MisionalitySizeCriteria[],
       { id: number }
     >({
       query: ({ id }) => ({
-        url: `/companies/findCompanySizeByMissionId/${id}`,
+        url: `/companies/findCompanySizeByMissionId?mission=${id}`,
         method: "GET",
       }),
     }),

@@ -35,7 +35,6 @@ const initialValues: CompanyDTO = {
   dependant_position: "",
   acquired_certification: "",
   segment: null,
-  consultor: null,
   size: null,
   mission: null,
   arl: null,
@@ -216,7 +215,6 @@ export default function CompanyForm({ id }: CompanyFormProps) {
               dependant_phone: fetchCompany.dependant_phone,
               dependant_position: fetchCompany.dependant_position,
               segment: fetchCompany.segment_detail.id || 0,
-              consultor: fetchCompany.consultor_detail?.id ?? null,
               size: fetchCompany.size_detail?.id ?? null,
               mission: fetchCompany.mission_detail.id,
               arl: fetchCompany.arl_detail.id,
@@ -346,7 +344,7 @@ export default function CompanyForm({ id }: CompanyFormProps) {
                   <div className="text-red-600">{props.errors.segment}</div>
                 ) : null}
               </div>
-              <div className="col-span-12 md:col-span-3">
+              {/* <div className="col-span-12 md:col-span-3">
                 <FloatLabel label="Consultor a cargo">
                   <Select
                     showSearch
@@ -365,7 +363,7 @@ export default function CompanyForm({ id }: CompanyFormProps) {
                 {props.touched.segment && props.errors.segment ? (
                   <div className="text-red-600">{props.errors.segment}</div>
                 ) : null}
-              </div>
+              </div> */}
               <div className="col-span-12 md:col-span-3">
                 <FloatLabel label="Persona de contacto">
                   <Input

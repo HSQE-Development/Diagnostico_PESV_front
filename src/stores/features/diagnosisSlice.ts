@@ -72,10 +72,10 @@ export const diagnosisSlice = createSlice({
       );
 
       if (requirement) {
+        console.log(requirementId, compliance);
         const requirementIndex = state.diagnosisRequirementData.findIndex(
           (data) => data.requirement == requirementId
         );
-
         if (requirementIndex >= 0) {
           state.diagnosisRequirementData[requirementIndex] = {
             ...state.diagnosisRequirementData[requirementIndex],

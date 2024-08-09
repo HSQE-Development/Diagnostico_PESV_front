@@ -1,12 +1,22 @@
 import { diagnosisService } from "@/stores/services/diagnosisServices";
-import { Descriptions, DescriptionsProps, Table } from "antd";
+import { decryptId } from "@/utils/utilsMethods";
+import { Table } from "antd";
 import React from "react";
+import { useSearchParams } from "react-router-dom";
 
 interface TotalTableProps {
   companyId: number;
 }
 export default function TotalTable({ companyId }: TotalTableProps) {
-  const { data } = diagnosisService.useTableReportTotalQuery({ companyId });
+  const [searchParams] = useSearchParams();
+  const diagnosisParam = searchParams.get("diagnosis");
+  const diagnosisId = diagnosisParam
+    ? parseInt(decryptId(diagnosisParam))
+    : undefined;
+  const { data } = diagnosisService.useTableReportTotalQuery({
+    companyId,
+    diagnosisId: diagnosisId ?? 0,
+  });
   const columns = [
     {
       title: "Total Items",

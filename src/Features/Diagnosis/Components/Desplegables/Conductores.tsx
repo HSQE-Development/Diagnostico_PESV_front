@@ -9,6 +9,7 @@ import { companyService } from "@/stores/services/companyService";
 import { diagnosisService } from "@/stores/services/diagnosisServices";
 import { Input, Table, TableColumnsType, TableProps } from "antd";
 import React, { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 interface Props {
   companyId: number;
@@ -25,6 +26,9 @@ export default function Conductores({ companyId }: Props) {
   const dispatch = useAppDispatch();
   const { data: conductoresPreguntas, refetch } =
     companyService.useFindAllDriverQuestionsQuery();
+  const [searchParams] = useSearchParams();
+
+  const isNewDiagnosis = Boolean(searchParams.get("newDiagnosis") ?? "false");
 
   const { data: driverByCompanyid, isLoading: isLoadingDriverByCompany } =
     diagnosisService.useFindDriversByCompanyIdQuery({ companyId });
@@ -48,7 +52,7 @@ export default function Conductores({ companyId }: Props) {
     }
   }, [conductoresPreguntas, dispatch]);
   useEffect(() => {
-    if (driverByCompanyid && !isLoadingDriverByCompany) {
+    if (driverByCompanyid && !isLoadingDriverByCompany && !isNewDiagnosis) {
       const initialInputValues: {
         [key: number]: {
           quantity: number;

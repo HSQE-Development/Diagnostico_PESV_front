@@ -5,6 +5,7 @@ import { companyService } from "@/stores/services/companyService";
 import {
   Badge,
   Button,
+  ConfigProvider,
   Input,
   InputRef,
   message,
@@ -319,15 +320,20 @@ export default function DataTable({ arlIdProp, onlyInfo }: DataTableProps) {
             ))}
             {hiddenCiius.length > 0 && (
               <Popover
+                className="!max-w-28"
                 content={() => (
                   <>
                     {hiddenCiius.map((ciiu) => (
-                      <Tag
-                        key={ciiu.id}
-                        className="whitespace-normal inline-block"
-                      >
-                        {ciiu.code}-{ciiu.name}
-                      </Tag>
+                      <>
+                        <div className="flex flex-wrap">
+                          <Tag
+                            key={ciiu.id}
+                            className="whitespace-normal inline-block"
+                          >
+                            {ciiu.code}-{ciiu.name}
+                          </Tag>
+                        </div>
+                      </>
                     ))}
                   </>
                 )}
@@ -350,18 +356,23 @@ export default function DataTable({ arlIdProp, onlyInfo }: DataTableProps) {
     {
       title: "Diagnosticos",
       fixed: "right",
-      render: (_, record) => {
+      render: (_, record, i) => {
         return (
           <>
             <div className="flex items-center justify-center">
               <Popover
                 content={
-                  <CompanyDiagnosis diagnosis={record.company_diagnosis} />
+                  <CompanyDiagnosis
+                    diagnosis={record.company_diagnosis}
+                    companyid={record.id}
+                  />
                 }
                 title="Diagnosticos realizados"
                 trigger="click"
+                placement="left"
               >
                 <Button
+                  key={i}
                   disabled={record.company_diagnosis.length <= 0}
                   icon={<IoDocumentAttach />}
                 ></Button>
@@ -371,17 +382,17 @@ export default function DataTable({ arlIdProp, onlyInfo }: DataTableProps) {
         );
       },
     },
-    {
-      title: "Consultor Asignado",
-      dataIndex: ["consultor_detail", "username"],
-      render: (_, record) =>
-        record.consultor_detail != null ? (
-          <InfoConsultors consultand={record.consultor_detail} />
-        ) : (
-          <span>SIN CONSULTOR ASIGNADO</span>
-        ),
-      fixed: "right",
-    },
+    // {
+    //   title: "Consultor Asignado",
+    //   dataIndex: ["consultor_detail", "username"],
+    //   render: (_, record) =>
+    //     record.consultor_detail != null ? (
+    //       <InfoConsultors consultand={record.consultor_detail} />
+    //     ) : (
+    //       <span>SIN CONSULTOR ASIGNADO</span>
+    //     ),
+    //   fixed: "right",
+    // },
     // {
     //   title: "Diagnostico",
     //   fixed: "right",
@@ -405,7 +416,7 @@ export default function DataTable({ arlIdProp, onlyInfo }: DataTableProps) {
                   navigate(
                     `/app/companies/diagnosis/${encryptId(
                       record.id.toString()
-                    )}`
+                    )}?newDiagnosis=true`
                   )
                 }
               />
@@ -450,22 +461,34 @@ export default function DataTable({ arlIdProp, onlyInfo }: DataTableProps) {
 
   return (
     <>
-      <Table
-        size="small"
-        columns={columns}
-        dataSource={dataSource}
-        pagination={tableParams.pagination}
-        onChange={handleTableChange}
-        scroll={{ x: "max-content" }}
-        showSorterTooltip={{ target: "sorter-icon" }}
-        loading={isLoading}
-        //@ts-ignore
-        pagination={{
-          defaultPageSize: 10,
-          showSizeChanger: true,
-          pageSizeOptions: ["10", "20", "30"],
+      <ConfigProvider
+        theme={{
+          components: {
+            Table: {
+              /* here is your component tokens */
+              headerBg: "#F6F8FA",
+              headerBorderRadius: 12,
+            },
+          },
         }}
-      />
+      >
+        <Table
+          size="small"
+          columns={columns}
+          dataSource={dataSource}
+          pagination={tableParams.pagination}
+          onChange={handleTableChange}
+          scroll={{ x: "max-content" }}
+          showSorterTooltip={{ target: "sorter-icon" }}
+          loading={isLoading}
+          //@ts-ignore
+          pagination={{
+            defaultPageSize: 10,
+            showSizeChanger: true,
+            pageSizeOptions: ["10", "20", "30"],
+          }}
+        />
+      </ConfigProvider>
       <Modal
         title={
           <span className="flex items-center justify-start">

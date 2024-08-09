@@ -20,7 +20,7 @@ export default function InfoConsultors({ consultand }: InfoConsultorsProps) {
     : "";
   return (
     <Popover
-      placement="topLeft"
+      placement="left"
       content={<DetailInfoConsultors consultand={consultand} />}
       title="Información detallada"
     >

@@ -1,3 +1,4 @@
+import { Group } from "@/interfaces/Group";
 import { getUservatarUrl } from "@/utils/getUserAvatarImage";
 import { Avatar, Badge, Dropdown, MenuProps } from "antd";
 import React from "react";
@@ -5,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 interface MiniProfileProps {
   username: string;
-  cargo: string;
+  cargo: Group[];
   avatar?: string;
 }
 
@@ -33,7 +34,11 @@ export default function MiniProfile({
     <div className="flex justify-evenly items-center gap-x-2">
       <div className="flex flex-col items-end">
         <span className="font-bold text-sm">{username}</span>
-        <Badge text={cargo} showZero color="#faad14" />
+        <div className="flex items-center justify-evenly gap-2">
+          {cargo.map((role) => (
+            <Badge key={role.id} count={role.name} showZero color="#faad14" />
+          ))}
+        </div>
       </div>
       {/* <Avatar src={<img src={url} alt="avatar" />} /> */}
       <Dropdown

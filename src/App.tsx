@@ -6,6 +6,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import CompanyPage from "./Features/Companies/Index";
 import DiagnosisPage from "./Features/Diagnosis/Index";
 import ArlPage from "./Features/Arls/Index";
+import DiagnosisTimeLinePage from "./Features/DiagnosisTimeLine/Index";
 
 function App() {
   const router = createBrowserRouter([
@@ -54,6 +55,14 @@ function App() {
       element: (
         <AppLayout>
           <ArlPage />
+        </AppLayout>
+      ),
+    },
+    {
+      path: "/app/companies/diagnosis/history/:idCompany",
+      element: (
+        <AppLayout>
+          <DiagnosisTimeLinePage />
         </AppLayout>
       ),
     },

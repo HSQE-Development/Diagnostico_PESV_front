@@ -21,6 +21,8 @@ import {
   TableProps,
 } from "antd";
 import { COMPLIANCE_LEVEL } from "../utils/constants";
+import { useSearchParams } from "react-router-dom";
+import { decryptId } from "@/utils/utilsMethods";
 
 interface Props {
   companyId: number;
@@ -31,8 +33,18 @@ interface DataType extends DiagnosisQuestionsGroup {
 
 export default function DiagnosisDataTable({ companyId }: Props) {
   const dispatch = useAppDispatch();
+  const stepsLenght = useAppSelector((state) => state.util.stepLenght);
+  const [searchParams] = useSearchParams();
+  const diagnosisParam = searchParams.get("diagnosis");
+  const diagnosisId = diagnosisParam
+    ? parseInt(decryptId(diagnosisParam))
+    : undefined;
+
   const { data: diagnosisQuestionsByCompany, refetch } =
-    diagnosisService.useFindQuestionsByCompanysizeGroupedQuery({ companyId });
+    diagnosisService.useFindQuestionsByCompanysizeGroupedQuery({
+      companyId,
+      diagnosisId: diagnosisId ?? 0,
+    });
   useEffect(() => {
     refetch();
   }, [companyId]);
@@ -90,12 +102,16 @@ export default function DiagnosisDataTable({ companyId }: Props) {
           dispatch(
             setUpdatePercentage({
               questionId: question.id,
-              compliance: COMPLIANCE_LEVEL.NO_CUMPLE,
+              compliance: diagnosisId
+                ? question.compliance_detail?.id ?? COMPLIANCE_LEVEL.NO_CUMPLE
+                : COMPLIANCE_LEVEL.NO_CUMPLE,
             })
           );
           setQuestionOption((prev) => ({
             ...prev,
-            [question.id]: COMPLIANCE_LEVEL.NO_CUMPLE,
+            [question.id]: diagnosisId
+              ? question.compliance_detail?.id ?? COMPLIANCE_LEVEL.NO_CUMPLE
+              : COMPLIANCE_LEVEL.NO_CUMPLE,
           }));
           setArticuledOption((prev) => ({
             ...prev,
@@ -117,7 +133,8 @@ export default function DiagnosisDataTable({ companyId }: Props) {
   const handleComplianceChange = (
     value: number,
     questionId: number,
-    step: number
+    step: number,
+    reqId: number
   ) => {
     dispatch(
       setUpdatePercentage({
@@ -143,7 +160,9 @@ export default function DiagnosisDataTable({ companyId }: Props) {
         : allQuestionValues.every((val) => val === COMPLIANCE_LEVEL.NO_CUMPLE)
         ? COMPLIANCE_LEVEL.NO_CUMPLE // Si todos los valores son 2
         : allQuestionValues.every(
-            (val) => val === COMPLIANCE_LEVEL.CUMPLE || val == 4
+            (val) =>
+              val === COMPLIANCE_LEVEL.CUMPLE ||
+              val == COMPLIANCE_LEVEL.NO_APLICA
           )
         ? COMPLIANCE_LEVEL.CUMPLE // Si todos los valores son 1
         : allQuestionValues.every(
@@ -155,13 +174,20 @@ export default function DiagnosisDataTable({ companyId }: Props) {
         ? COMPLIANCE_LEVEL.CUMPLE_PARCIALMENTE
         : allQuestionValues.every((val) => val === COMPLIANCE_LEVEL.NO_APLICA)
         ? COMPLIANCE_LEVEL.NO_APLICA
-        : 3;
+        : COMPLIANCE_LEVEL.CUMPLE_PARCIALMENTE;
 
       // Actualiza selectedOption basado en la verificación
       setSelectedOption((prev) => ({
         ...prev,
         [step]: newSelectedOption,
       }));
+      dispatch(
+        setUpdateRequirement({
+          compliance: newSelectedOption,
+          observation: observation[reqId] ?? null,
+          requirementId: reqId,
+        })
+      );
 
       return newQuestionOptions;
     });
@@ -399,7 +425,8 @@ export default function DiagnosisDataTable({ companyId }: Props) {
                       handleComplianceChange(
                         value,
                         question.id,
-                        question.requirement_detail.step
+                        question.requirement_detail.step,
+                        group.id
                       )
                     }
                   />

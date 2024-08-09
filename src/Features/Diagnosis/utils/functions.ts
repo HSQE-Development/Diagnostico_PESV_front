@@ -1,0 +1,28 @@
+import { MisionalitySizeCriteria } from "@/interfaces/Dedication";
+
+export const determineCompanySize = (
+  missionCriteria: MisionalitySizeCriteria[],
+  totalVehicles: number,
+  totalDrivers: number
+) => {
+  for (const criteria of missionCriteria) {
+    const sizeCriteria = criteria.criteria_detail;
+
+    // Handle undefined and null values for max properties
+    const vehicleMax = sizeCriteria.vehicle_max ?? Infinity;
+    const driverMax = sizeCriteria.driver_max ?? Infinity;
+
+    // Check if the vehicle and driver counts are within the criteria ranges
+    const vehicleInRange =
+      sizeCriteria.vehicle_min <= totalVehicles && totalVehicles <= vehicleMax;
+    const driverInRange =
+      sizeCriteria.driver_min <= totalDrivers && totalDrivers <= driverMax;
+
+    // Return the size ID if the criteria are met
+    console.log(totalDrivers);
+    if (vehicleInRange && driverInRange) {
+      return criteria.size_detail.id;
+    }
+    return null;
+  }
+};
