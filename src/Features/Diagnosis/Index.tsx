@@ -1,6 +1,6 @@
 import { decryptId } from "@/utils/utilsMethods";
 import { Breadcrumb, Steps } from "antd";
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { IoBusiness } from "react-icons/io5";
 import {
   MdAccountTree,
@@ -33,6 +33,7 @@ export default function DiagnosisPage() {
     ? parseInt(decryptId(diagnosisParam))
     : undefined;
   const companyId = parseInt(decryptId(idCompany ?? ""));
+
   const { data: companyById } = companyService.useFindByIdQuery(
     companyId ? { id: companyId } : skipToken
   );
@@ -56,7 +57,8 @@ export default function DiagnosisPage() {
     if (companyById) {
       dispatch(setDiagnosisCurrent(diagnosisData?.diagnosis_step ?? 0));
     }
-  }, [companyById, dispatch]);
+  }, [companyById, dispatch, diagnosisData?.diagnosis_step]);
+
   const current = useAppSelector((state) => state.util.diagnosisCurrent);
 
   useEffect(() => {
@@ -79,7 +81,7 @@ export default function DiagnosisPage() {
       }));
       dispatch(setFleetData(fleetData));
     }
-  }, [fleetByCompany, isLoadingFleetByCompany, dispatch]);
+  }, [fleetByCompany, isLoadingFleetByCompany, dispatch, diagnosisId]);
 
   useEffect(() => {
     if (
@@ -94,44 +96,45 @@ export default function DiagnosisPage() {
       }));
       dispatch(setDriverData(driverData));
     }
-  }, [driverByCompanyid, isLoadingDriverByCompany, dispatch]);
+  }, [driverByCompanyid, isLoadingDriverByCompany, dispatch, diagnosisId]);
 
-  const steps = [
-    {
-      title: "Conteo",
-      content: (
-        <>
-          <QuantityForm companyId={companyId} />
-        </>
-      ),
-      icon: <MdAccountTree className="text-black" />,
-      subTitle: "Aqui se define el nivel de complejidad",
-    },
-    {
-      title: "Lista de Verificación",
-      content: (
-        <>
-          <DiagnosisForm companyId={companyId} />
-        </>
-      ),
-      icon: <FaClipboardCheck />,
-    },
-    {
-      title: "Informe",
-      icon: <MdOutlineCloudDownload />,
-      content: <DownLoadReport companyId={companyId} />,
-      subTitle: "Generar el informe del diagnostico",
-    },
-  ];
-  const items = steps.map((item) => ({
-    key: item.title,
-    title: item.title,
-    icon: item.icon,
-    subTitle: item.subTitle,
-  }));
+  const steps = useMemo(
+    () => [
+      {
+        title: "Conteo",
+        content: <QuantityForm companyId={companyId} />,
+        icon: <MdAccountTree className="text-black" />,
+        subTitle: "Aqui se define el nivel de complejidad",
+      },
+      {
+        title: "Lista de Verificación",
+        content: <DiagnosisForm companyId={companyId} />,
+        icon: <FaClipboardCheck />,
+      },
+      {
+        title: "Informe",
+        icon: <MdOutlineCloudDownload />,
+        content: <DownLoadReport companyId={companyId} />,
+        subTitle: "Generar el informe del diagnostico",
+      },
+    ],
+    [companyId]
+  );
+
+  const items = useMemo(
+    () =>
+      steps.map((item) => ({
+        key: item.title,
+        title: item.title,
+        icon: item.icon,
+        subTitle: item.subTitle,
+      })),
+    [steps]
+  );
+
   const validCurrent = current >= 0 && current < steps.length;
-  const contentToRender = validCurrent ? steps[current].content : null;
   dispatch(setStepsLenght(steps.length));
+  const contentToRender = validCurrent ? steps[current].content : null;
 
   return (
     <div className="w-full flex flex-col">

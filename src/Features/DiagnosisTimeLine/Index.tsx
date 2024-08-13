@@ -6,18 +6,12 @@ import { Breadcrumb } from "antd";
 import React from "react";
 import { IoBusiness } from "react-icons/io5";
 import { MdUpdate } from "react-icons/md";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import HistoryTimeLine from "./Components/HistoryTimeLine";
 
 export default function DiagnosisTimeLinePage() {
   const { idCompany } = useParams();
   const companyId = parseInt(decryptId(idCompany ?? ""));
-
-  const [searchParams] = useSearchParams();
-  const diagnosisParam = searchParams.get("diagnosis");
-  const diagnosisId = diagnosisParam
-    ? parseInt(decryptId(diagnosisParam))
-    : undefined;
 
   const { data: companyById } = companyService.useFindByIdQuery(
     companyId ? { id: companyId } : skipToken

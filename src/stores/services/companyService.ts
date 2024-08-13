@@ -5,11 +5,7 @@ import {
   DriverQuestion,
   VehicleQuestion,
 } from "@/interfaces/Company";
-import {
-  CompanySize,
-  MisionalitySizeCriteria,
-  Mission,
-} from "@/interfaces/Dedication";
+import { MisionalitySizeCriteria, Mission } from "@/interfaces/Dedication";
 import axiosBaseQuery from "@/utils/axiosBaseQuery";
 import { createApi } from "@reduxjs/toolkit/query/react";
 

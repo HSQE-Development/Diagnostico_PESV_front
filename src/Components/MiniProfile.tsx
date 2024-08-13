@@ -33,7 +33,7 @@ export default function MiniProfile({
   return (
     <div className="flex justify-evenly items-center gap-x-2">
       <div className="flex flex-col items-end">
-        <span className="font-bold text-sm">{username}</span>
+        <span className="text-sm">{username}</span>
         <div className="flex items-center justify-evenly gap-2">
           {cargo.map((role) => (
             <Badge key={role.id} count={role.name} showZero color="#faad14" />

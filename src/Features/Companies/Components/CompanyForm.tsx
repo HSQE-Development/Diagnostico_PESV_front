@@ -3,13 +3,11 @@ import useCompany from "@/hooks/companyHooks";
 import { Arl } from "@/interfaces/Arl";
 import { Ciiu, CompanyDTO } from "@/interfaces/Company";
 import { Mission } from "@/interfaces/Dedication";
-import { IUser } from "@/interfaces/IUser";
 import { setSegments } from "@/stores/features/segmentSlice";
 import { useAppDispatch, useAppSelector } from "@/stores/hooks";
 import { arlService } from "@/stores/services/arlService";
 import { companyService } from "@/stores/services/companyService";
 import { segmentService } from "@/stores/services/segmentServices";
-import { userService } from "@/stores/services/userService";
 import { TOAST_TYPE, toastHandler } from "@/utils/useToast";
 import { encryptId, formatNIT } from "@/utils/utilsMethods";
 import { skipToken } from "@reduxjs/toolkit/query";
@@ -45,8 +43,6 @@ export default function CompanyForm({ id }: CompanyFormProps) {
   const navigate = useNavigate();
   const { changeCompany, createCompany, isSaving, isUpdating } = useCompany();
   const { data: fetchSegments, isLoading } = segmentService.useFindAllQuery();
-  const { data: fetchConsultants, isLoading: loadConsultants } =
-    userService.useFindAllConsultantsQuery();
   const { data: fetchArl, isLoading: loadArl } = arlService.useFindAllQuery();
 
   const { data: fetchDedications, isLoading: loadDedications } =
@@ -59,11 +55,10 @@ export default function CompanyForm({ id }: CompanyFormProps) {
   const dispatch = useAppDispatch();
   const segments = useAppSelector((state) => state.segment.segments);
   const [filteredSegments, setFilteredSegments] = useState(segments || []);
-  const [filteredConsultands, setFilteredConsultands] = useState<IUser[]>([]);
   const [filteredArl, setFilteredArl] = useState<Arl[]>([]);
   const [filteredDedications, setFiltereddedications] = useState<Mission[]>([]);
   const [filteredCiiu, setFilteredCiiu] = useState<Ciiu[]>([]);
-  const [searchValue, setSearchValue] = useState<string>("");
+  const [searchValue] = useState<string>("");
   const [codeCiiu, setCodeCiiu] = useState<string>("");
 
   const { data: fetchCiiu, isLoading: loadCiiu } =
@@ -77,11 +72,6 @@ export default function CompanyForm({ id }: CompanyFormProps) {
       setFilteredSegments(fetchSegments);
     }
   }, [fetchSegments]);
-  useEffect(() => {
-    if (fetchConsultants) {
-      setFilteredConsultands(fetchConsultants);
-    }
-  }, [fetchConsultants]);
   useEffect(() => {
     if (fetchArl) {
       setFilteredArl(fetchArl);
@@ -119,13 +109,6 @@ export default function CompanyForm({ id }: CompanyFormProps) {
     );
     setFilteredSegments(filtered || []);
   };
-  const onSearchConsultands = (value: string) => {
-    const filtered = filteredConsultands?.filter((consultand) => {
-      if (consultand.first_name)
-        consultand.first_name.toLowerCase().includes(value.toLowerCase());
-    });
-    setFilteredConsultands(filtered || []);
-  };
   const onSearchDedications = (value: string) => {
     const filtered = filteredDedications?.filter((dedication) => {
       if (dedication.name)
@@ -133,9 +116,9 @@ export default function CompanyForm({ id }: CompanyFormProps) {
     });
     setFiltereddedications(filtered || []);
   };
-  const onSearchChangeCiiu = (value: string) => {
-    setSearchValue(value);
-  };
+  // const onSearchChangeCiiu = (value: string) => {
+  //   setSearchValue(value);
+  // };
 
   const arloptions = filteredArl.map((segment) => ({
     value: segment.id,
@@ -144,11 +127,6 @@ export default function CompanyForm({ id }: CompanyFormProps) {
   const segmentOptions = filteredSegments.map((segment) => ({
     value: segment.id,
     label: segment.name,
-  }));
-
-  const consultandOptions = filteredConsultands.map((consultand) => ({
-    value: consultand.id,
-    label: consultand.first_name + " " + consultand.last_name,
   }));
 
   const dedicationOptions = filteredDedications.map((dedication) => ({

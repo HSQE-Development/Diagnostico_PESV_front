@@ -31,15 +31,15 @@ const useCompany = () => {
         email: values.email,
         acquired_certification: values.acquired_certification,
         nit: removeHyphen(values.nit, "-"),
-        diagnosis: values.diagnosis,
         dependant: values.dependant,
         dependant_phone: values.dependant_phone,
         dependant_position: values.dependant_position,
         segment: values.segment,
-        consultor: values.consultor ?? undefined,
         mission: values.mission ?? undefined,
         size: values.size ?? undefined,
         ciius: values.ciius ?? null,
+        arl: values.arl ?? undefined,
+        
       }).unwrap();
       toastHandler(TOAST_TYPE.SUCCESS_TOAST, "Actualizado Correctamente");
       dispatch(setUpdateCompany(updatedCompany));
@@ -64,7 +64,6 @@ const useCompany = () => {
         values.acquired_certification == ""
           ? null
           : values.acquired_certification;
-      values.diagnosis = values.diagnosis == "" ? null : values.diagnosis;
       const savedCompany = await save(values).unwrap(); //Metodo que guarda
       toastHandler(TOAST_TYPE.SUCCESS_TOAST, "Registrado Correctamente");
       dispatch(setCompany(savedCompany));

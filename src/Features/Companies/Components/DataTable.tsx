@@ -1,4 +1,4 @@
-import { Company, Diagnosis } from "@/interfaces/Company";
+import { Company } from "@/interfaces/Company";
 import { setCompanies, setDeleteCompany } from "@/stores/features/companySlice";
 import { useAppDispatch, useAppSelector } from "@/stores/hooks";
 import { companyService } from "@/stores/services/companyService";
@@ -13,7 +13,6 @@ import {
   Popconfirm,
   Popover,
   Space,
-  Steps,
   Table,
   TableColumnsType,
   TableColumnType,
@@ -31,7 +30,6 @@ import {
   MdOutlineDocumentScanner,
 } from "react-icons/md";
 import CompanyForm from "./CompanyForm";
-import InfoConsultors from "@/Features/Companies/Components/InfoProfile";
 import { useNavigate } from "react-router-dom";
 import { decryptId, encryptId, formatNIT } from "@/utils/utilsMethods";
 import { BiSearch } from "react-icons/bi";
@@ -77,7 +75,6 @@ export default function DataTable({ arlIdProp, onlyInfo }: DataTableProps) {
   const { data: fetchCompanies, isLoading } = companyService.useFindAllQuery({
     arlId: arlIdToUse,
   });
-  const [openPopupDiagnosis, setOpenPopupDiagnosis] = useState<boolean>(false);
 
   useEffect(() => {
     if (fetchCompanies) {
@@ -234,22 +231,6 @@ export default function DataTable({ arlIdProp, onlyInfo }: DataTableProps) {
       companyId: parseInt(key.toString()),
     });
   };
-
-  const items = [
-    {
-      title: "Paso 1",
-      description: "Conteo",
-      icon: <MdOutlineDocumentScanner />,
-    },
-    {
-      title: "Paso 2",
-      description: "Lista de Verificación",
-    },
-    {
-      title: "Paso 3",
-      description: "Plan de Trabajo",
-    },
-  ];
 
   const columns: TableColumnsType<DataType> = [
     {

@@ -25,7 +25,6 @@ import { default as CompanyDataTable } from "@/Features/Companies/Components/Dat
 interface DataType extends Arl {
   key: React.Key;
 }
-type DataIndex = keyof DataType;
 interface TableParams {
   pagination?: TablePaginationConfig;
   sortField?: SorterResult<DataType>["field"];
@@ -34,7 +33,7 @@ interface TableParams {
 }
 export default function DataTable() {
   const navigate = useNavigate();
-  const [tableParams, setTableParams] = useState<TableParams>({
+  const [tableParams] = useState<TableParams>({
     pagination: {
       current: 1,
       pageSize: 10,

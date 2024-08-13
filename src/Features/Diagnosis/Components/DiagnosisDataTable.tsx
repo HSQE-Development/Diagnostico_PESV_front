@@ -2,7 +2,7 @@ import { ChangeEvent, useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/stores/hooks";
 import {
   setQuestionsGrouped,
-  setUpdateArticulated,
+  // setUpdateArticulated,
   setUpdateObservation,
   setUpdatePercentage,
   setUpdateRequirement,
@@ -33,7 +33,7 @@ interface DataType extends DiagnosisQuestionsGroup {
 
 export default function DiagnosisDataTable({ companyId }: Props) {
   const dispatch = useAppDispatch();
-  const stepsLenght = useAppSelector((state) => state.util.stepLenght);
+  // const stepsLenght = useAppSelector((state) => state.util.stepLenght);
   const [searchParams] = useSearchParams();
   const diagnosisParam = searchParams.get("diagnosis");
   const diagnosisId = diagnosisParam
@@ -69,9 +69,12 @@ export default function DiagnosisDataTable({ companyId }: Props) {
   const [questionOption, setQuestionOption] = useState<{
     [qId: number]: number;
   }>({});
-  const [articuledOption, setArticuledOption] = useState<{
+  const [_, setArticuledOption] = useState<{
     [qId: number]: boolean;
   }>({});
+  // const [articuledOption, setArticuledOption] = useState<{
+  //   [qId: number]: boolean;
+  // }>({});
 
   const [observation, setObservation] = useState<{
     [reqId: number]: string | null;
@@ -193,13 +196,13 @@ export default function DiagnosisDataTable({ companyId }: Props) {
     });
   };
 
-  const handleArticulatedChange = (value: boolean, questionId: number) => {
-    dispatch(setUpdateArticulated({ questionId, isArticulated: value }));
-    setArticuledOption((prev) => ({
-      ...prev,
-      [questionId]: value,
-    }));
-  };
+  // const handleArticulatedChange = (value: boolean, questionId: number) => {
+  //   dispatch(setUpdateArticulated({ questionId, isArticulated: value }));
+  //   setArticuledOption((prev) => ({
+  //     ...prev,
+  //     [questionId]: value,
+  //   }));
+  // };
 
   const handleGeneralChange = (value: number, step: number, req_id: number) => {
     if (questionsGrouped.length > 0) {

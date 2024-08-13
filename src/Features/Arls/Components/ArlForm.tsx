@@ -1,7 +1,6 @@
 import FloatLabel from "@/Components/FloatLabel";
 import useArl from "@/hooks/arlHooks";
 import { ArlDTO } from "@/interfaces/Arl";
-import { useAppDispatch } from "@/stores/hooks";
 import { arlService } from "@/stores/services/arlService";
 import { TOAST_TYPE, toastHandler } from "@/utils/useToast";
 import { skipToken } from "@reduxjs/toolkit/query";
@@ -21,8 +20,7 @@ interface ArlFormProps {
 }
 
 export default function ArlForm({ id }: ArlFormProps) {
-  const { changeArl, createArl, isSaving, isUpdating, isDeleting } = useArl();
-  const dispatch = useAppDispatch();
+  const { changeArl, createArl, isSaving, isUpdating } = useArl();
   const { data: fetchArl } = arlService.useFindByIdQuery(
     id ? { id } : skipToken
   );

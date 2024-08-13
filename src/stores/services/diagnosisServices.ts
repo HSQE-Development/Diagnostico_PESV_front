@@ -8,7 +8,6 @@ import {
 import {
   CheckListDTO,
   DiagnosisChecklist,
-  DiagnosisDTO,
   DiagnosisQuestions,
   DiagnosisQuestionsGroup,
   RadarData,
