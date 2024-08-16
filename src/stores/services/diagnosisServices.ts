@@ -30,12 +30,14 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 export const diagnosisService = createApi({
   reducerPath: "diagnosisApi",
   baseQuery: axiosBaseQuery,
+  tagTypes: ["DiagnosisQuestions", "DiagnosisGeneralData"],
   endpoints: (builder) => ({
     findById: builder.query<Diagnosis, { diagnosisId: number }>({
       query: ({ diagnosisId }) => ({
         url: `/diagnosis/${diagnosisId}`,
         method: "GET",
       }),
+      providesTags: ["DiagnosisGeneralData"],
     }),
     findQuestionsByCompanySize: builder.query<
       DiagnosisQuestions[],
@@ -54,6 +56,7 @@ export const diagnosisService = createApi({
         url: `/diagnosis/findQuestionsByCompanySize?company=${companyId}&diagnosis=${diagnosisId}&group_by_step=true`,
         method: "GET",
       }),
+      providesTags: ["DiagnosisQuestions"],
     }),
     radarChart: builder.query<
       RadarData[],
@@ -93,15 +96,29 @@ export const diagnosisService = createApi({
     }),
     generateReport: builder.mutation<
       { file: string },
-      { companyId: number; format_to_save: string; diagnosisId?: number }
+      {
+        companyId: number;
+        format_to_save: string;
+        diagnosisId?: number;
+        sequence: string;
+        schedule: string;
+      }
     >({
-      query: ({ companyId, format_to_save, diagnosisId }) => ({
+      query: ({
+        companyId,
+        format_to_save,
+        diagnosisId,
+        sequence,
+        schedule,
+      }) => ({
         url: `/diagnosis/generateReport/`,
         method: "POST",
         params: {
           company: companyId,
           format_to_save: format_to_save,
           diagnosis: diagnosisId,
+          sequence: sequence,
+          schedule: schedule,
         },
       }),
     }),
@@ -142,6 +159,16 @@ export const diagnosisService = createApi({
           ...questionsDTO,
         },
       }),
+    }),
+    updateDiagnosis: builder.mutation<Diagnosis, Partial<Diagnosis>>({
+      query: (questionsDTO) => ({
+        url: `/diagnosis/update_diagnosis/?diagnosis=${questionsDTO.id}`,
+        method: "PATCH",
+        data: {
+          ...questionsDTO,
+        },
+      }),
+      invalidatesTags: ["DiagnosisQuestions", "DiagnosisGeneralData"],
     }),
   }),
 });

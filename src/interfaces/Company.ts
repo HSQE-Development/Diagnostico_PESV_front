@@ -12,9 +12,14 @@ export interface Diagnosis {
   date_elabored: Date;
   is_finalized: boolean;
   diagnosis_step: number;
-  type: Compliance;
+  type: number;
+  type_detail: Compliance;
   consultor: number;
   consultor_detail: IUser | null;
+  mode_ejecution: string | null;
+  schedule: string | null;
+  sequence: string | null;
+  observation: string | null;
 }
 export interface Ciiu extends Comun {
   code: string;
@@ -103,6 +108,7 @@ export type DriverDTO = {
 
 export type SaveQuestionsDTO = {
   company: number;
+  consultor: number;
   vehicleData: FleetDTO[];
   driverData: DriverDTO[];
 };

@@ -40,11 +40,14 @@ export default function DiagnosisDataTable({ companyId }: Props) {
     ? parseInt(decryptId(diagnosisParam))
     : undefined;
 
-  const { data: diagnosisQuestionsByCompany, refetch } =
-    diagnosisService.useFindQuestionsByCompanysizeGroupedQuery({
-      companyId,
-      diagnosisId: diagnosisId ?? 0,
-    });
+  const {
+    data: diagnosisQuestionsByCompany,
+    refetch,
+    isLoading,
+  } = diagnosisService.useFindQuestionsByCompanysizeGroupedQuery({
+    companyId,
+    diagnosisId: diagnosisId ?? 0,
+  });
   useEffect(() => {
     refetch();
   }, [companyId]);
@@ -54,7 +57,11 @@ export default function DiagnosisDataTable({ companyId }: Props) {
       // Agrupar preguntas por step
       dispatch(setQuestionsGrouped(diagnosisQuestionsByCompany));
     }
-  }, [diagnosisQuestionsByCompany]);
+  }, [diagnosisQuestionsByCompany, dispatch]);
+
+  useEffect(() => {
+    refetch();
+  }, [dispatch]);
 
   const questionsGrouped = useAppSelector(
     (state) => state.diagnosis.questionsGrouped
@@ -500,6 +507,7 @@ export default function DiagnosisDataTable({ companyId }: Props) {
   return (
     <Table<DiagnosisQuestionsGroup>
       columns={columns}
+      loading={isLoading}
       dataSource={dataSource}
       pagination={false} // Desactiva la paginación si no la necesitas
       expandable={expandableConfig}

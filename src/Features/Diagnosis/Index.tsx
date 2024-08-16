@@ -114,7 +114,13 @@ export default function DiagnosisPage() {
       {
         title: "Informe",
         icon: <MdOutlineCloudDownload />,
-        content: <DownLoadReport companyId={companyId} />,
+        content: (
+          <DownLoadReport
+            companyId={companyId}
+            secuence={diagnosisData?.sequence ?? ""}
+            schedule={diagnosisData?.schedule ?? ""}
+          />
+        ),
         subTitle: "Generar el informe del diagnostico",
       },
     ],

@@ -4,7 +4,7 @@ export const determineCompanySize = (
   missionCriteria: MisionalitySizeCriteria[],
   totalVehicles: number,
   totalDrivers: number
-) => {
+): number | null => {
   for (const criteria of missionCriteria) {
     const sizeCriteria = criteria.criteria_detail;
 
@@ -19,10 +19,11 @@ export const determineCompanySize = (
       sizeCriteria.driver_min <= totalDrivers && totalDrivers <= driverMax;
 
     // Return the size ID if the criteria are met
-    console.log(totalDrivers);
-    if (vehicleInRange && driverInRange) {
+    if (vehicleInRange || driverInRange) {
       return criteria.size_detail.id;
     }
-    return null;
   }
+
+  // If no criteria are met, return null
+  return null;
 };

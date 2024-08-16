@@ -251,24 +251,24 @@ export default function DataTable({ arlIdProp, onlyInfo }: DataTableProps) {
       title: "Misionalidad",
       dataIndex: ["mission_detail", "name"],
     },
-    {
-      title: "Tamaño",
-      dataIndex: ["company_size_detail", "name"],
-      render: (_, record) => (
-        <Popover
-          placement="topLeft"
-          title={record.misionality_size_criteria?.map(
-            (cri) => cri.criteria_detail.name
-          )}
-        >
-          <span>
-            {record.size_detail?.name ?? (
-              <Badge count="Por definirse" status="default" />
-            )}
-          </span>
-        </Popover>
-      ),
-    },
+    // {
+    //   title: "Tamaño",
+    //   dataIndex: ["company_size_detail", "name"],
+    //   render: (_, record) => (
+    //     <Popover
+    //       placement="topLeft"
+    //       title={record.misionality_size_criteria?.map(
+    //         (cri) => cri.criteria_detail.name
+    //       )}
+    //     >
+    //       <span>
+    //         {record.size_detail?.name ?? (
+    //           <Badge count="Por definirse" status="default" />
+    //         )}
+    //       </span>
+    //     </Popover>
+    //   ),
+    // },
     {
       title: "Segmento",
       dataIndex: ["segment_detail", "name"], // Utilizando acceso profundo

@@ -2,27 +2,34 @@ import FloatLabel from "@/Components/FloatLabel";
 import { Company } from "@/interfaces/Company";
 import { MisionalitySizeCriteria } from "@/interfaces/Dedication";
 import { IUser } from "@/interfaces/IUser";
-import {
-  setNextDiagnosisCurrent,
-  setPrevDiagnosisCurrent,
-} from "@/stores/features/utilsSlice";
+import { setNextDiagnosisCurrent } from "@/stores/features/utilsSlice";
 import { useAppDispatch, useAppSelector } from "@/stores/hooks";
 import { companyService } from "@/stores/services/companyService";
 import { diagnosisService } from "@/stores/services/diagnosisServices";
 import { userService } from "@/stores/services/userService";
-import { decryptId } from "@/utils/utilsMethods";
+import { decryptId, encryptId } from "@/utils/utilsMethods";
 import { skipToken } from "@reduxjs/toolkit/query";
-import { Button, Input, message, Popconfirm, Segmented, Select } from "antd";
+import {
+  Button,
+  ConfigProvider,
+  Input,
+  message,
+  Popconfirm,
+  Segmented,
+  Select,
+} from "antd";
 import React, { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { determineCompanySize } from "../utils/functions";
 import CompanyHeaderInfo from "./CompanyHeaderInfo";
+import { LiaLongArrowAltRightSolid } from "react-icons/lia";
 
 interface Props {
   companyId: number;
   onlyInfo?: boolean;
 }
 export default function CompanyInfo({ companyId, onlyInfo }: Props) {
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const current = useAppSelector((state) => state.util.diagnosisCurrent);
   const stepsLenght = useAppSelector((state) => state.util.stepLenght);
@@ -49,8 +56,19 @@ export default function CompanyInfo({ companyId, onlyInfo }: Props) {
     diagnosisService.useSaveAnswerCuestionsMutation();
 
   const [saveDiagnosis] = diagnosisService.useSaveDiagnosisMutation();
+  const [updateDiagnosis, { isLoading: updateDiagnosisLoading }] =
+    diagnosisService.useUpdateDiagnosisMutation();
   const [consultorSelect, setConsultorSelect] = useState<number | null>(null);
+  const [size, setSize] = useState<number>(0);
+  const [userChanged, setUserChanged] = useState<boolean>(false);
+  const [observationChanged, setObservationChanged] = useState<string | null>(
+    diagnosisDataById?.observation ?? null
+  );
 
+  useEffect(() => {
+    refetchDiagnosis();
+    refetch();
+  }, [dispatch]);
   useEffect(() => {
     if (data) setCompany(data);
   }, [data]);
@@ -100,33 +118,42 @@ export default function CompanyInfo({ companyId, onlyInfo }: Props) {
 
   useEffect(() => {
     if (sizeCompany) {
-      determineCompanySize(sizeCompany, totalVehicles, totalDrivers);
+      setSize(
+        determineCompanySize(sizeCompany, totalVehicles, totalDrivers) ?? 0
+      );
+      setUserChanged(false);
     }
-  }, [totalVehicles, totalVehicles]);
+  }, [totalVehicles, totalDrivers]);
+  useEffect(() => {
+    if (diagnosisDataById) {
+      setSize(diagnosisDataById.type_detail.id);
+      setObservationChanged(diagnosisDataById.observation);
+    }
+  }, [diagnosisDataById]);
+
+  const handleSegmentChange = (newSize: number) => {
+    setSize(newSize);
+    setUserChanged(true); // Mark that the user has manually changed the segment
+  };
 
   const totalGeneral = totalDrivers + totalVehicles;
 
   const confirm = async () => {
     try {
-      // Intentar eliminar la compañía
       switch (current) {
         case 0:
-          // if (
-          //   !(diagnosisDataById?.diagnosis_step !== current) &&
-          //   !isNewDiagnosis &&
-          //   diagnosisDataById?.diagnosis_step
-          // ) {
-          // }
-          await saveAnswerCuestions({
+          const data = await saveAnswerCuestions({
             company: companyId,
             vehicleData,
             driverData,
+            consultor: consultorSelect ?? 0,
           }).unwrap();
-          refetch();
           message.success("Conteo Actualizado correctamente");
-          refetchDiagnosis();
-
-          dispatch(setNextDiagnosisCurrent());
+          navigate(
+            `/app/companies/diagnosis/${encryptId(
+              companyId.toString()
+            )}?diagnosis=${encryptId(data.diagnosis.toString())}`
+          );
           break;
         case 1:
           await saveDiagnosis({
@@ -138,12 +165,33 @@ export default function CompanyInfo({ companyId, onlyInfo }: Props) {
           refetch();
           refetchDiagnosis();
           dispatch(setNextDiagnosisCurrent());
-          message.success("Conteo Actualizado correctamente");
+          message.success("Diagnostico realizado correctamente");
           break;
       }
     } catch (error: any) {
       // Mostrar mensaje de error
       console.log(error);
+      message.error(
+        "Error interno del sistema, comuniquese con un Administrador"
+      );
+    }
+  };
+
+  const handleUpdateDataOfDiagnosis = async () => {
+    try {
+      await updateDiagnosis({
+        id: diagnosisDataById?.id ?? 0,
+        type: size,
+        observation: observationChanged,
+      }).unwrap();
+
+      // ejecutará después de que updateDiagnosis termine
+      refetchDiagnosis();
+      setUserChanged(false);
+    } catch (error) {
+      message.error(
+        "Error interno del sistema, comuníquese con un Administrador"
+      );
     }
   };
 
@@ -160,6 +208,36 @@ export default function CompanyInfo({ companyId, onlyInfo }: Props) {
     label: consultand.first_name + " " + consultand.last_name,
   }));
 
+  const defaultColors = {
+    itemActiveBg: "#007bff",
+    itemColor: "#000",
+    itemHoverBg: "#f0f0f0",
+    itemHoverColor: "#333333",
+    itemSelectedBg: "#ffffff",
+    itemSelectedColor: "#fff",
+    trackBg: "#f5f5f5",
+  };
+  const conditionalColors: any = {
+    1: {
+      itemActiveBg: "#28a745",
+      itemColor: "#BABABA",
+      itemSelectedBg: "#6cffc3",
+      itemSelectedColor: "#fff",
+    },
+    2: {
+      itemActiveBg: "#6c91ff",
+      itemColor: "#BABABA",
+      itemSelectedBg: "#6c91ff",
+      itemSelectedColor: "#fff",
+    },
+    3: {
+      itemActiveBg: "#ffc107",
+      itemColor: "#BABABA",
+      itemSelectedBg: "#ff6c6c",
+      itemSelectedColor: "#fff",
+    },
+  };
+  const colors = conditionalColors[size] || defaultColors;
   return (
     <div className="grid grid-cols-6 gap-2 sticky top-2  w-[30%] ml-8">
       <CompanyHeaderInfo company={company} />
@@ -185,51 +263,72 @@ export default function CompanyInfo({ companyId, onlyInfo }: Props) {
                 <span className="font-bold mr-1">Nota:</span>
                 <small>
                   El nivel del PESV es auto calculado, sin embargo si se desea
-                  cambiar seleccionar una opción y debe dejar la observacion del
+                  cambiar debe seleccionar una opción y dejar la observacion del
                   por que lo cambia
                 </small>
-                <Segmented
-                  className="mb-2"
-                  options={segmentedOptions || []}
-                  block
-                />
-                <Input.TextArea
-                  rows={1}
-                  placeholder="En caso de que se cambie el nivel sel PESV"
-                  autoSize={{ minRows: 1, maxRows: 6 }}
-                />
-              </div>
-              <Popconfirm
-                title="Empezar el diagnostico"
-                description="Confirma todos los datos"
-                onConfirm={async () => await confirm()}
-                onCancel={() => null}
-                okText="Continuar"
-                cancelText="Cancelar"
-              >
-                {/* <Button danger icon={<MdDeleteOutline />} /> */}
-                <Button
-                  type="primary"
-                  className="col-span-6"
-                  disabled={totalGeneral == 0 || consultorSelect == null}
-                  loading={isLoading}
+                <ConfigProvider
+                  theme={{
+                    components: {
+                      Segmented: {
+                        ...colors,
+                      },
+                    },
+                  }}
                 >
-                  Continuar
+                  <Segmented
+                    className="mb-2"
+                    options={segmentedOptions || []}
+                    block
+                    value={size}
+                    onChange={handleSegmentChange}
+                  />
+                </ConfigProvider>
+                {/* Conditionally render the TextArea if the user manually changed the segment */}
+                {userChanged && (
+                  <Input.TextArea
+                    rows={1}
+                    placeholder="En caso de que se cambie el nivel del PESV"
+                    autoSize={{ minRows: 1, maxRows: 6 }}
+                    value={observationChanged ?? ""}
+                    onChange={(e) =>
+                      setObservationChanged(
+                        e.target.value == "" ? null : e.target.value
+                      )
+                    }
+                  />
+                )}
+              </div>
+              {!userChanged ? (
+                <Popconfirm
+                  title="Empezar el diagnostico"
+                  description="Confirma todos los datos"
+                  onConfirm={async () => await confirm()}
+                  onCancel={() => null}
+                  okText="Continuar"
+                  cancelText="Cancelar"
+                >
+                  {/* <Button danger icon={<MdDeleteOutline />} /> */}
+                  <Button
+                    type="primary"
+                    className="col-span-6"
+                    disabled={totalGeneral == 0 || consultorSelect == null}
+                    loading={isLoading}
+                    icon={<LiaLongArrowAltRightSolid />}
+                    iconPosition="end"
+                  >
+                    Continuar
+                  </Button>
+                </Popconfirm>
+              ) : (
+                <Button
+                  onClick={async () => await handleUpdateDataOfDiagnosis()}
+                  className="col-span-6 bg-orange-400 text-white border-orange-400 active:bg-orange-700 hover:bg-orange-300"
+                  loading={updateDiagnosisLoading}
+                >
+                  Guardar Cambios
                 </Button>
-              </Popconfirm>
+              )}
             </>
-          )}
-          {current > 0 && (
-            <Button
-              type="primary"
-              className="col-span-6"
-              loading={isLoading}
-              onClick={() => {
-                dispatch(setPrevDiagnosisCurrent());
-              }}
-            >
-              Anterior
-            </Button>
           )}
         </>
       )}
