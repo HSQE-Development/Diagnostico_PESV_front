@@ -13,6 +13,7 @@ import { segmentService } from "./services/segmentServices";
 import { userService } from "./services/userService";
 import vehicleQuestionSlideReducer from "@/stores/features/vehicleQuestionsSlice";
 import driverQuestionSlideReducer from "@/stores/features/driverQuestionSlice";
+import corporateGroupReducer from "@/stores/features/corporateGroupSlice";
 import utilsReducer from "@/stores/features/utilsSlice";
 import diagnosisReducer from "@/stores/features/diagnosisSlice";
 import { diagnosisService } from "./services/diagnosisServices";
@@ -48,6 +49,7 @@ const rootReducer = combineReducers({
   util: utilsReducer,
   diagnosis: diagnosisReducer,
   arls: arlReducer,
+  corporateGroups: corporateGroupReducer,
   [authService.reducerPath]: authService.reducer,
   [companyService.reducerPath]: companyService.reducer,
   [segmentService.reducerPath]: segmentService.reducer,
@@ -68,6 +70,7 @@ const persistConfig = {
     "driverQuestions",
     "util",
     "arls",
+    "corporateGroups",
     // "diagnosis",
   ], // Nombre del slice que quieres persistir
 };

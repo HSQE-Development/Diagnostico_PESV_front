@@ -31,6 +31,7 @@ export interface CheckListDTO {
   consultor: number;
   diagnosisDto: DiagnosisDTO[];
   diagnosisRequirementDto: DiagnosisRequirementDTO[];
+  diagnosis: number;
 }
 export interface DiagnosisDTO {
   question: number;

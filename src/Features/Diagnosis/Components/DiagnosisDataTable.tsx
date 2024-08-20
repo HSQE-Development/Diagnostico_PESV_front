@@ -108,6 +108,13 @@ export default function DiagnosisDataTable({ companyId }: Props) {
     // Reenderizado por defecto
     if (questionsGrouped.length > 0) {
       questionsGrouped.forEach((group) => {
+        dispatch(
+          setUpdateRequirement({
+            compliance: group.compliance.id,
+            observation: observation[group.id] ?? null,
+            requirementId: group.id,
+          })
+        );
         group.questions.forEach((question) => {
           dispatch(
             setUpdatePercentage({
@@ -138,7 +145,7 @@ export default function DiagnosisDataTable({ companyId }: Props) {
         }));
       });
     }
-  }, [questionsGrouped]);
+  }, [questionsGrouped, dispatch]);
 
   const handleComplianceChange = (
     value: number,

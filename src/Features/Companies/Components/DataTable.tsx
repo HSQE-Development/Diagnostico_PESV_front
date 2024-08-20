@@ -3,7 +3,6 @@ import { setCompanies, setDeleteCompany } from "@/stores/features/companySlice";
 import { useAppDispatch, useAppSelector } from "@/stores/hooks";
 import { companyService } from "@/stores/services/companyService";
 import {
-  Badge,
   Button,
   ConfigProvider,
   Input,

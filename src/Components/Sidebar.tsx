@@ -8,6 +8,7 @@ import { IoBarChartOutline, IoBusiness } from "react-icons/io5";
 import { MdOutlineBusinessCenter } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "@/stores/hooks";
+import { FaLayerGroup } from "react-icons/fa";
 
 export default function Sidebar() {
   const sideBarState = useAppSelector((state) => state.sidebarState);
@@ -31,6 +32,12 @@ export default function Sidebar() {
       label: "Arls",
       urls: ["/app/arls"],
       onPress: () => navigate("/app/arls"),
+    },
+    {
+      icon: <FaLayerGroup />,
+      label: "Grupos Empresariales",
+      urls: ["/app/corporate_group"],
+      onPress: () => navigate("/app/corporate_group"),
     },
   ];
   return (

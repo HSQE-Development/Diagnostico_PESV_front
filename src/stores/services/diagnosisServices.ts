@@ -30,7 +30,13 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 export const diagnosisService = createApi({
   reducerPath: "diagnosisApi",
   baseQuery: axiosBaseQuery,
-  tagTypes: ["DiagnosisQuestions", "DiagnosisGeneralData"],
+  tagTypes: [
+    "DiagnosisQuestions",
+    "DiagnosisGeneralData",
+    "DiagnosisTableReport",
+    "DiagnosisChartReport",
+    "DiagnosisTotalTableReport",
+  ],
   endpoints: (builder) => ({
     findById: builder.query<Diagnosis, { diagnosisId: number }>({
       query: ({ diagnosisId }) => ({
@@ -66,6 +72,7 @@ export const diagnosisService = createApi({
         url: `/diagnosis/radarChart?company_id=${companyId}&diagnosis=${diagnosisId}`,
         method: "GET",
       }),
+      providesTags: ["DiagnosisChartReport"],
     }),
     tableReportTotal: builder.query<
       TotalReport,
@@ -75,6 +82,7 @@ export const diagnosisService = createApi({
         url: `/diagnosis/tableReportTotal?company_id=${companyId}&diagnosis=${diagnosisId}`,
         method: "GET",
       }),
+      providesTags: ["DiagnosisTotalTableReport"],
     }),
     tableReport: builder.query<
       any,
@@ -84,15 +92,23 @@ export const diagnosisService = createApi({
         url: `/diagnosis/tableReport?company_id=${companyId}&diagnosis=${diagnosisId}`,
         method: "GET",
       }),
+      providesTags: ["DiagnosisTableReport"],
     }),
     saveDiagnosis: builder.mutation<DiagnosisChecklist[], CheckListDTO>({
       query: (dataDiagnosis) => ({
-        url: `/diagnosis/saveDiagnosis/`,
+        url: `/diagnosis/saveDiagnosis/?diagnosis=${dataDiagnosis.diagnosis}`,
         method: "POST",
         data: {
           diagnosis_data: dataDiagnosis,
         },
       }),
+      invalidatesTags: [
+        "DiagnosisTableReport",
+        "DiagnosisTotalTableReport",
+        "DiagnosisChartReport",
+        "DiagnosisQuestions",
+        "DiagnosisGeneralData",
+      ],
     }),
     generateReport: builder.mutation<
       { file: string },

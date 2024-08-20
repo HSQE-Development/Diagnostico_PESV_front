@@ -161,6 +161,7 @@ export default function CompanyInfo({ companyId, onlyInfo }: Props) {
             diagnosisDto: diagnosisData,
             diagnosisRequirementDto: diagnosisRequirementData,
             consultor: consultorSelect ?? 0,
+            diagnosis: diagnosisId ?? 0,
           }).unwrap();
           refetch();
           refetchDiagnosis();

@@ -72,7 +72,6 @@ export const diagnosisSlice = createSlice({
       );
 
       if (requirement) {
-        console.log(requirementId, compliance);
         const requirementIndex = state.diagnosisRequirementData.findIndex(
           (data) => data.requirement == requirementId
         );
@@ -230,7 +229,6 @@ const calculatePercentageCompleted = (
   if (totalVariableValue === 0) {
     return 0;
   }
-
   const percentage = (totalValueObtained / totalVariableValue) * 100;
   return parseFloat(percentage.toFixed(2));
 };
