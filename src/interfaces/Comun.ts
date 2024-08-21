@@ -9,10 +9,16 @@ export interface Comun {
   name: string;
 }
 
-
-export interface TableParams <T>{
+export interface TableParams<T> {
   pagination?: TablePaginationConfig;
   sortField?: SorterResult<T>["field"];
   sortOrder?: SorterResult<TablePaginationConfig>["order"];
   filters?: Record<string, any>;
+}
+
+export interface PaginationComun<T> {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: T[];
 }

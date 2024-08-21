@@ -1,3 +1,5 @@
+import { corporateGroupService } from "./services/corporateGroupService";
+
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import authReducer from "./features/authSlice";
 import { setupListeners } from "@reduxjs/toolkit/query";
@@ -56,6 +58,7 @@ const rootReducer = combineReducers({
   [userService.reducerPath]: userService.reducer,
   [diagnosisService.reducerPath]: diagnosisService.reducer,
   [arlService.reducerPath]: arlService.reducer,
+  [corporateGroupService.reducerPath]: corporateGroupService.reducer,
 });
 
 const persistConfig = {
@@ -88,7 +91,8 @@ export const store = configureStore({
       segmentService.middleware,
       userService.middleware,
       diagnosisService.middleware,
-      arlService.middleware
+      arlService.middleware,
+      corporateGroupService.middleware
     ),
 });
 

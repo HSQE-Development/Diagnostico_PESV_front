@@ -6,7 +6,7 @@ export default function CompanyList() {
   return (
     <>
       <div className="flex flex-col">
-        <CompanyCards />
+        {/* <CompanyCards companiesGroup={null} /> */}
         <Pagination
           align="center"
           total={85}

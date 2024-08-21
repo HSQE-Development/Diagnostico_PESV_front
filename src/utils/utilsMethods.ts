@@ -14,7 +14,9 @@
  * formatNIT("1234567890")
  * return -> "123456789-0"
  * @readonly
- * para volverlo al valor absoluto sin el -
+ * para volverlo al valor absoluto sin el - usar funcion removeHyphen
+ * @example
+ * removeHyphen(...string, "-")
  */
 export const formatNIT = (value: string) => {
   const cleaned = ("" + value).replace(/\D/g, "");
@@ -163,5 +165,27 @@ const colors = [
   "bg-pink-500",
 ];
 
-export const getRandomColorClass = () =>
+const colors_text = [
+  "text-red-500",
+  "text-blue-500",
+  "text-green-500",
+  "text-yellow-500",
+  "text-purple-500",
+  "text-pink-500",
+];
+
+export const getRandomColorClass = (): string =>
   colors[Math.floor(Math.random() * colors.length)];
+
+export const getRandomColorClassForText = (): string =>
+  colors_text[Math.floor(Math.random() * colors_text.length)];
+
+// Generar colores para diferentes estados
+export const generateColorStyles = (baseColor: string) => {
+  return {
+    textColor: baseColor,
+    bgColor: `${baseColor}20`, // Fondo con opacidad
+    hoverColor: `${baseColor}40`, // Hover con un poco más de opacidad
+    activeColor: `${baseColor}60`, // Active con aún más opacidad
+  };
+};

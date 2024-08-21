@@ -8,72 +8,37 @@ import DiagnosisPage from "./Features/Diagnosis/Index";
 import ArlPage from "./Features/Arls/Index";
 import DiagnosisTimeLinePage from "./Features/DiagnosisTimeLine/Index";
 import CorporateGroupPage from "./Features/CorporateGroup/Index";
+import ProtectedRoute from "./Components/ProtectedRoute";
 
 function App() {
   const router = createBrowserRouter([
-    {
-      path: "/",
-      element: <LoginPage />,
-    },
     {
       path: "/login",
       element: <LoginPage />,
     },
     {
       path: "/app",
-      element: (
-        <AppLayout>
-          <MainPage />
-        </AppLayout>
-      ),
-    },
-    {
-      path: "/app/my_profile",
-      element: (
-        <AppLayout>
-          <ProfilePage />
-        </AppLayout>
-      ),
-    },
-    {
-      path: "/app/companies",
-      element: (
-        <AppLayout>
-          <CompanyPage />
-        </AppLayout>
-      ),
-    },
-    {
-      path: "/app/companies/diagnosis/:idCompany",
-      element: (
-        <AppLayout>
-          <DiagnosisPage />
-        </AppLayout>
-      ),
-    },
-    {
-      path: "/app/arls",
-      element: (
-        <AppLayout>
-          <ArlPage />
-        </AppLayout>
-      ),
-    },
-    {
-      path: "/app/companies/diagnosis/history/:idCompany",
-      element: (
-        <AppLayout>
-          <DiagnosisTimeLinePage />
-        </AppLayout>
-      ),
-    },
-    {
-      path: "/app/corporate_group",
-      element: (
-        <AppLayout>
-          <CorporateGroupPage />
-        </AppLayout>
-      ),
+      element: <ProtectedRoute />, // Rutas protegidas debajo de /app
+      children: [
+        {
+          element: <AppLayout />, // AppLayout recibe los children
+          children: [
+            { path: "", element: <MainPage /> },
+            { path: "my_profile", element: <ProfilePage /> },
+            { path: "companies", element: <CompanyPage /> },
+            {
+              path: "companies/diagnosis/:idCompany",
+              element: <DiagnosisPage />,
+            },
+            {
+              path: "companies/diagnosis/history/:idCompany",
+              element: <DiagnosisTimeLinePage />,
+            },
+            { path: "arls", element: <ArlPage /> },
+            { path: "corporate_group", element: <CorporateGroupPage /> },
+          ],
+        },
+      ],
     },
   ]);
   return (
