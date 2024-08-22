@@ -36,7 +36,7 @@ export default function MiniProfile({
         <span className="text-sm">{username}</span>
         <div className="flex items-center justify-evenly gap-2">
           {cargo.map((role) => (
-            <Badge key={role.id} count={role.name} showZero color="#faad14" />
+            <Badge key={role.id} text={role.name} showZero color="#85CDFA" />
           ))}
         </div>
       </div>
@@ -46,7 +46,7 @@ export default function MiniProfile({
         placement="bottom"
         arrow={{ pointAtCenter: true }}
       >
-        <Avatar src={avatarUrl} />
+        <Avatar src={avatarUrl} alt="User Image" />
         {/* <Button>bottom</Button> */}
       </Dropdown>
     </div>

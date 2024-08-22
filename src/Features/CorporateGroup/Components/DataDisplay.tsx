@@ -2,6 +2,8 @@ import {
   Button,
   Collapse,
   CollapseProps,
+  Empty,
+  Modal,
   Pagination,
   Popover,
   Skeleton,
@@ -18,10 +20,24 @@ import {
   getRandomColorClassForText,
 } from "@/utils/utilsMethods";
 import { IoMdAdd } from "react-icons/io";
+import { TOAST_TYPE, toastHandler } from "@/utils/useToast";
+import { useModal } from "@/hooks/utilsHooks";
+import { CiSaveDown1 } from "react-icons/ci";
+import QuantityForm from "@/Features/Diagnosis/Components/Steps/QuantityForm";
+
+const useAddOrRemoveCompany = () => {
+  const [addOrRemoveCompanyOfGroupByGroupId, { isLoading: removeLoading }] =
+    corporateGroupService.useAddOrRemoveCompanyOfGroupByGroupIdMutation();
+  return { addOrRemoveCompanyOfGroupByGroupId, removeLoading };
+};
 
 const getItems = (
   data: CorporateGroupPagination,
-  defaultClasses: string
+  defaultClasses: string,
+  handleAddCompanyToGroup: (companyId: number, groupId: number) => void,
+  removeLoading: boolean,
+  onOpenCard: () => void,
+  isOpenCard: boolean
 ): CollapseProps["items"] => {
   return data.results.map((group, index) => {
     // Generar un color aleatorio para cada grupo
@@ -37,12 +53,6 @@ const getItems = (
               <FaLayerGroup className={`${textColor} text-xl mr-2`} />
               <span>{group.name}</span>
             </div>
-            {/* <Button
-              type="primary"
-              className={`bg-${baseColor} ${hoverColor} ${activeColor}`}
-            >
-              Empezar Diagnostico
-            </Button> */}
           </div>
         </>
       ),
@@ -52,7 +62,7 @@ const getItems = (
             <div className="flex items-center justify-end w-full my-2">
               <Popover
                 placement="right"
-                content={<CompanyList />}
+                content={<CompanyList corporateId={group.id} />}
                 title="Añadir Empresa al grupo"
                 trigger="click"
               >
@@ -60,8 +70,20 @@ const getItems = (
               </Popover>
             </div>
             <div className="grid  w-full gap-4 grid-cols-12">
+              {group.company_diagnoses_corporate.length <= 0 && <Empty />}
               {group.company_diagnoses_corporate.map((companies) => (
-                <CompanyCards companiesGroup={companies.company_detail} />
+                <CompanyCards
+                  companiesGroup={companies.company_detail}
+                  key={companies.company_detail.id}
+                  onDeleteClick={() =>
+                    handleAddCompanyToGroup(
+                      companies.company_detail.id,
+                      group.id
+                    )
+                  }
+                  isLoading={removeLoading}
+                  onClick={onOpenCard}
+                />
               ))}
             </div>
           </div>
@@ -81,6 +103,8 @@ export default function DataDisplay() {
     page_size: pageSize,
   });
 
+  const { isOpen, open, close } = useModal();
+
   useEffect(() => {
     if (data) setTotal(data.count);
   }, [data]);
@@ -93,11 +117,36 @@ export default function DataDisplay() {
     setCurrentPage(page);
   };
 
-  const handlePageSizeChange = (current: number, size: number) => {
+  const handlePageSizeChange = (size: number) => {
     setPageSize(size);
     setCurrentPage(1); // Reset to the first page when page size changes
   };
 
+  const { addOrRemoveCompanyOfGroupByGroupId, removeLoading } =
+    useAddOrRemoveCompany();
+
+  const handleAddCompanyToGroup = async (
+    companyId: number,
+    groupId: number
+  ) => {
+    try {
+      await addOrRemoveCompanyOfGroupByGroupId({
+        action: "delete", // Ajusta según la acción que desees realizar
+        company: companyId,
+        group: groupId,
+      }).unwrap();
+      toastHandler(
+        TOAST_TYPE.SUCCESS_TOAST,
+        "Empresa actualizada correctamente"
+      );
+    } catch (error: any) {
+      console.log("ERROR", error);
+      toastHandler(
+        TOAST_TYPE.ERROR_TOAST,
+        error.data?.error || "Error desconocido"
+      );
+    }
+  };
   return (
     <>
       {isLoading && <Skeleton avatar paragraph={{ rows: 4 }} active />}
@@ -112,7 +161,14 @@ export default function DataDisplay() {
               }`}
             />
           )}
-          items={getItems(data, "hover:bg-slate-50 transition-all")}
+          items={getItems(
+            data,
+            "hover:bg-slate-50 transition-all",
+            handleAddCompanyToGroup,
+            removeLoading,
+            open,
+            isOpen
+          )}
           className="md:mx-8 custom_collapsed mb-8"
           collapsible="icon"
         />
@@ -129,6 +185,24 @@ export default function DataDisplay() {
         onShowSizeChange={handlePageSizeChange}
         onChange={handlePageChange}
       />
+
+      <Modal
+        title={
+          <span className="flex items-center justify-start">
+            {" "}
+            <CiSaveDown1 className="mr-2" />
+            Conteo de empresa
+          </span>
+        }
+        centered
+        open={isOpen}
+        onOk={close}
+        onCancel={close}
+        width={1000}
+        footer={null}
+      >
+        <QuantityForm companyId={1} />
+      </Modal>
     </>
   );
 }

@@ -1,14 +1,16 @@
 import HeaderTitle from "@/Components/HeaderTitle";
-import { Button, Modal } from "antd";
-import React, { useState } from "react";
+import { Button, Modal, Skeleton } from "antd";
+import React, { lazy, Suspense } from "react";
 import { IoMdAdd } from "react-icons/io";
 import { IoBusiness } from "react-icons/io5";
-import DataTable from "./Components/DataTable";
 import { CiSaveDown1 } from "react-icons/ci";
 import ArlForm from "./Components/ArlForm";
+import { useModal } from "@/hooks/utilsHooks";
+
+const DataTable = lazy(() => import("./Components/DataTable"));
 
 export default function ArlPage() {
-  const [open, setOpen] = useState<boolean>(false);
+  const { isOpen, open, close } = useModal();
 
   return (
     <div className="flex flex-col">
@@ -23,12 +25,14 @@ export default function ArlPage() {
           className="mt-8 mb-4 md:mt-0 md:mb-0"
           type="primary"
           icon={<IoMdAdd />}
-          onClick={() => setOpen(true)}
+          onClick={open}
         >
           Agregar Arl
         </Button>
       </div>
-      <DataTable />
+      <Suspense fallback={<Skeleton />}>
+        <DataTable />
+      </Suspense>
 
       <Modal
         title={
@@ -39,10 +43,10 @@ export default function ArlPage() {
           </span>
         }
         centered
-        open={open}
-        onOk={() => setOpen(false)}
-        onCancel={() => setOpen(false)}
-        footer={<></>}
+        open={isOpen}
+        onOk={close}
+        onCancel={close}
+        footer={null}
       >
         <ArlForm />
       </Modal>

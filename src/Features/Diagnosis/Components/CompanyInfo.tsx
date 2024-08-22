@@ -34,64 +34,50 @@ export default function CompanyInfo({ companyId, onlyInfo }: Props) {
   const current = useAppSelector((state) => state.util.diagnosisCurrent);
   const stepsLenght = useAppSelector((state) => state.util.stepLenght);
   const [filteredConsultands, setFilteredConsultands] = useState<IUser[]>([]);
-  const { data: fetchConsultants, isLoading: loadConsultants } =
-    userService.useFindAllConsultantsQuery();
   const [searchParams] = useSearchParams();
   const diagnosisParam = searchParams.get("diagnosis");
   const diagnosisId = diagnosisParam
     ? parseInt(decryptId(diagnosisParam))
     : undefined;
-  const { data: diagnosisDataById, refetch: refetchDiagnosis } =
-    diagnosisService.useFindByIdQuery(
-      diagnosisId ? { diagnosisId } : skipToken
-    );
-  const { data, refetch } = companyService.useFindByIdQuery(
-    companyId ? { id: companyId } : skipToken
-  );
+
+  //States
   const [company, setCompany] = useState<Company | null>(null);
   const [sizeCompany, setSizeCompany] = useState<
     MisionalitySizeCriteria[] | null
   >(null);
-  const [saveAnswerCuestions, { isLoading }] =
-    diagnosisService.useSaveAnswerCuestionsMutation();
-
-  const [saveDiagnosis] = diagnosisService.useSaveDiagnosisMutation();
-  const [updateDiagnosis, { isLoading: updateDiagnosisLoading }] =
-    diagnosisService.useUpdateDiagnosisMutation();
   const [consultorSelect, setConsultorSelect] = useState<number | null>(null);
   const [size, setSize] = useState<number>(0);
-  const [userChanged, setUserChanged] = useState<boolean>(false);
   const [observationChanged, setObservationChanged] = useState<string | null>(
-    diagnosisDataById?.observation ?? null
+    null
   );
+  const [userChanged, setUserChanged] = useState<boolean>(false);
 
-  useEffect(() => {
-    refetchDiagnosis();
-    refetch();
-  }, [dispatch]);
-  useEffect(() => {
-    if (data) setCompany(data);
-  }, [data]);
-
+  //Consultas
+  const { data: fetchConsultants, isLoading: loadConsultants } =
+    userService.useFindAllConsultantsQuery();
+  const { data, refetch, isUninitialized } = companyService.useFindByIdQuery(
+    companyId ? { id: companyId } : skipToken
+  );
+  const {
+    data: diagnosisDataById,
+    refetch: refetchDiagnosis,
+    isUninitialized: unitializedDiagnosis,
+  } = diagnosisService.useFindByIdQuery(
+    diagnosisId ? { diagnosisId } : skipToken
+  );
   const { data: sizeData } =
     companyService.useFindcompanySizeByDedicactionIdQuery(
       company ? { id: company.mission_detail.id } : skipToken
     );
-  useEffect(() => {
-    if (sizeData) setSizeCompany(sizeData);
-  }, [sizeData]);
 
-  const segmentedOptions = sizeCompany?.map((size) => ({
-    label: size.size_detail.name, // Assuming CompanySize has a 'name' property
-    value: size.size_detail.id, // Assuming CompanySize has an 'id' property
-  }));
+  //Mutaciones
+  const [saveAnswerCuestions, { isLoading }] =
+    diagnosisService.useSaveAnswerCuestionsMutation();
+  const [saveDiagnosis] = diagnosisService.useSaveDiagnosisMutation();
+  const [updateDiagnosis, { isLoading: updateDiagnosisLoading }] =
+    diagnosisService.useUpdateDiagnosisMutation();
 
-  useEffect(() => {
-    if (diagnosisDataById) {
-      setConsultorSelect(diagnosisDataById.consultor_detail?.id ?? null);
-    }
-  }, [diagnosisDataById]);
-
+  //Storage
   const totalVehicles = useAppSelector(
     (state) => state.vehicleQuestion.totalQuantity
   );
@@ -99,16 +85,9 @@ export default function CompanyInfo({ companyId, onlyInfo }: Props) {
     (state) => state.driverQuestion.totalQuantity
   );
 
-  const vehicleData = useAppSelector(
-    (state) => state.vehicleQuestion.fleetData
-  );
-  const driverData = useAppSelector((state) => state.driverQuestion.driverData);
-  const diagnosisData = useAppSelector(
-    (state) => state.diagnosis.diagnosisData
-  );
-  const diagnosisRequirementData = useAppSelector(
-    (state) => state.diagnosis.diagnosisRequirementData
-  );
+  useEffect(() => {
+    if (data) setCompany(data);
+  }, [data]);
 
   useEffect(() => {
     if (fetchConsultants) {
@@ -124,20 +103,32 @@ export default function CompanyInfo({ companyId, onlyInfo }: Props) {
       setUserChanged(false);
     }
   }, [totalVehicles, totalDrivers]);
+
   useEffect(() => {
     if (diagnosisDataById) {
       setSize(diagnosisDataById.type_detail.id);
       setObservationChanged(diagnosisDataById.observation);
+      setConsultorSelect(diagnosisDataById.consultor_detail?.id ?? null);
     }
   }, [diagnosisDataById]);
 
+  useEffect(() => {
+    if (!isUninitialized) refetch();
+  }, [isUninitialized, refetch]);
+
+  useEffect(() => {
+    if (!unitializedDiagnosis) refetchDiagnosis();
+  }, [unitializedDiagnosis, refetchDiagnosis]);
+
+  useEffect(() => {
+    if (sizeData) setSizeCompany(sizeData);
+  }, [sizeData]);
+
+  //Funciones
   const handleSegmentChange = (newSize: number) => {
     setSize(newSize);
     setUserChanged(true); // Mark that the user has manually changed the segment
   };
-
-  const totalGeneral = totalDrivers + totalVehicles;
-
   const confirm = async () => {
     try {
       switch (current) {
@@ -203,6 +194,24 @@ export default function CompanyInfo({ companyId, onlyInfo }: Props) {
     });
     setFilteredConsultands(filtered || []);
   };
+
+  const segmentedOptions = sizeCompany?.map((size) => ({
+    label: size.size_detail.name, // Assuming CompanySize has a 'name' property
+    value: size.size_detail.id, // Assuming CompanySize has an 'id' property
+  }));
+
+  const vehicleData = useAppSelector(
+    (state) => state.vehicleQuestion.fleetData
+  );
+  const driverData = useAppSelector((state) => state.driverQuestion.driverData);
+  const diagnosisData = useAppSelector(
+    (state) => state.diagnosis.diagnosisData
+  );
+  const diagnosisRequirementData = useAppSelector(
+    (state) => state.diagnosis.diagnosisRequirementData
+  );
+
+  const totalGeneral = totalDrivers + totalVehicles;
 
   const consultandOptions = filteredConsultands.map((consultand) => ({
     value: consultand.id,
@@ -333,27 +342,6 @@ export default function CompanyInfo({ companyId, onlyInfo }: Props) {
           )}
         </>
       )}
-
-      {/* <div style={{ marginTop: 24 }}>
-        {current < steps.length - 1 && (
-          <Button type="primary" onClick={() => next()}>
-            Next
-          </Button>
-        )}
-        {current === steps.length - 1 && (
-          <Button
-            type="primary"
-            onClick={() => message.success("Processing complete!")}
-          >
-            Done
-          </Button>
-        )}
-        {current > 0 && (
-          <Button style={{ margin: "0 8px" }} onClick={() => prev()}>
-            Previous
-          </Button>
-        )}
-      </div> */}
     </div>
   );
 }

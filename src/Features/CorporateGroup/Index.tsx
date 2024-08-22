@@ -1,14 +1,16 @@
 import HeaderTitle from "@/Components/HeaderTitle";
-import { Button, Modal } from "antd";
-import React, { useState } from "react";
+import { Button, Modal, Skeleton } from "antd";
+import React, { lazy, Suspense } from "react";
 import { FaLayerGroup } from "react-icons/fa";
 import { IoMdAdd } from "react-icons/io";
-import DataDisplay from "./Components/DataDisplay";
 import { CiSaveDown1 } from "react-icons/ci";
 import GroupForm from "./Components/GroupForm";
+import { useModal } from "@/hooks/utilsHooks";
+
+const DataDisplay = lazy(() => import("./Components/DataDisplay"));
 
 export default function CorporateGroupPage() {
-  const [open, setOpen] = useState<boolean>(false);
+  const { isOpen, open, close } = useModal();
 
   return (
     <>
@@ -23,14 +25,15 @@ export default function CorporateGroupPage() {
             className="mt-8 mb-4 md:mt-0 md:mb-0"
             type="primary"
             icon={<IoMdAdd />}
-            onClick={() => setOpen(true)}
+            onClick={open}
           >
             Agregar grupo empresarial
           </Button>
         </div>
       </div>
-
-      <DataDisplay />
+      <Suspense fallback={<Skeleton avatar paragraph={{ rows: 4 }} active />}>
+        <DataDisplay />
+      </Suspense>
 
       <Modal
         title={
@@ -41,11 +44,11 @@ export default function CorporateGroupPage() {
           </span>
         }
         centered
-        open={open}
-        onOk={() => setOpen(false)}
-        onCancel={() => setOpen(false)}
+        open={isOpen}
+        onOk={close}
+        onCancel={close}
         width={500}
-        footer={<></>}
+        footer={null}
       >
         <GroupForm />
       </Modal>

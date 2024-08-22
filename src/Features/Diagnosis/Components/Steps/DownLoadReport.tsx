@@ -15,10 +15,7 @@ import { useSearchParams } from "react-router-dom";
 import FloatLabel from "@/Components/FloatLabel";
 import { MdArrowBackIosNew } from "react-icons/md";
 import { useAppDispatch } from "@/stores/hooks";
-import {
-  setNextDiagnosisCurrent,
-  setPrevDiagnosisCurrent,
-} from "@/stores/features/utilsSlice";
+import { setPrevDiagnosisCurrent } from "@/stores/features/utilsSlice";
 
 interface DownLoadReportProps {
   companyId: number;

@@ -1,4 +1,3 @@
-import { determineCompanySize } from "@/Features/Diagnosis/utils/functions";
 import { DriverDTO, DriverQuestion } from "@/interfaces/Company";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 

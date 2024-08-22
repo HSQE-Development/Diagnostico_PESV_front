@@ -1,14 +1,16 @@
 import HeaderTitle from "@/Components/HeaderTitle";
-import { Button, Modal } from "antd";
-import React, { useState } from "react";
+import { Button, Modal, Skeleton } from "antd";
+import React, { lazy, Suspense } from "react";
 import { IoMdAdd } from "react-icons/io";
 import { IoBusiness } from "react-icons/io5";
-import DataTable from "./Components/DataTable";
 import CompanyForm from "./Components/CompanyForm";
 import { CiSaveDown1 } from "react-icons/ci";
+import { useModal } from "@/hooks/utilsHooks";
+
+const DataTable = lazy(() => import("./Components/DataTable"));
 
 export default function CompanyPage() {
-  const [open, setOpen] = useState<boolean>(false);
+  const { isOpen, open, close } = useModal();
   return (
     <div className="flex flex-col">
       <div className="w-full flex flex-col md:flex-row items-center justify-between md:p-8">
@@ -22,12 +24,14 @@ export default function CompanyPage() {
           className="mt-8 mb-4 md:mt-0 md:mb-0"
           type="primary"
           icon={<IoMdAdd />}
-          onClick={() => setOpen(true)}
+          onClick={open}
         >
           Agregar Empresa
         </Button>
       </div>
-      <DataTable />
+      <Suspense fallback={<Skeleton />}>
+        <DataTable />
+      </Suspense>
 
       <Modal
         title={
@@ -38,11 +42,11 @@ export default function CompanyPage() {
           </span>
         }
         centered
-        open={open}
-        onOk={() => setOpen(false)}
-        onCancel={() => setOpen(false)}
+        open={isOpen}
+        onOk={close}
+        onCancel={close}
         width={1000}
-        footer={<></>}
+        footer={null}
       >
         <CompanyForm />
       </Modal>

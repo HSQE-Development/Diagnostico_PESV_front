@@ -2,7 +2,7 @@ import { useAppSelector } from "@/stores/hooks";
 import { Tooltip } from "antd";
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-
+import clsx from "clsx";
 export interface MenuSideProps {
   icon: React.ReactElement;
   label: string;
@@ -10,12 +10,7 @@ export interface MenuSideProps {
   urls?: string[];
 }
 
-export default function MenuSide({
-  icon,
-  label,
-  onPress,
-  urls,
-}: MenuSideProps) {
+function MenuSide({ icon, label, onPress, urls }: MenuSideProps) {
   const sideBarState = useAppSelector((state) => state.sidebarState);
   const [active, setActive] = useState<boolean>(false);
   const location = useLocation();
@@ -30,15 +25,16 @@ export default function MenuSide({
   return (
     <Tooltip placement="right" title={label}>
       <li
-        className={`${
-          active
-            ? "bg-black text-white shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)]"
-            : "text-[#9899A2]"
-        } cursor-pointer hover:bg-white active:bg-slate-200 hover:text-[#4D4E55] ${
-          !sideBarState.isCollapsed
-            ? "p-2 justify-center w-[90%]"
-            : "justify-start w-full"
-        } list-none rounded-md px-3 flex items-center transition-all`}
+        className={clsx(
+          "cursor-pointer hover:bg-white active:bg-slate-200 hover:text-[#4D4E55] list-none rounded-md px-3 flex items-center transition-all",
+          {
+            "bg-black text-white shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)]":
+              active,
+            "text-[#9899A2]": !active,
+            "p-2 justify-center w-[90%]": !sideBarState.isCollapsed,
+            "justify-start w-full": sideBarState.isCollapsed,
+          }
+        )}
         onClick={onPress}
       >
         {icon}
@@ -51,3 +47,5 @@ export default function MenuSide({
     </Tooltip>
   );
 }
+
+export default React.memo(MenuSide);

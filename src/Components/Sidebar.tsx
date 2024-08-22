@@ -1,6 +1,4 @@
-import React from "react";
-import LogoXs from "../assets/Logo_xs.png";
-import LogoXl from "../assets/Logo_xl.png";
+import React, { useMemo } from "react";
 import MenuSide, { MenuSideProps } from "./MenuSide";
 import { Button } from "antd";
 import { PiSignOutThin } from "react-icons/pi";
@@ -9,55 +7,73 @@ import { MdOutlineBusinessCenter } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "@/stores/hooks";
 import { FaLayerGroup } from "react-icons/fa";
+import clsx from "clsx";
+
+// Imágenes importadas normalmente
+import LogoXs from "../assets/Logo_xs.png";
+import LogoXl from "../assets/Logo_xl.png";
 
 export default function Sidebar() {
-  const sideBarState = useAppSelector((state) => state.sidebarState);
+  const { isCollapsed } = useAppSelector((state) => state.sidebarState);
   const navigate = useNavigate();
+  const menuitems: MenuSideProps[] = useMemo(
+    () => [
+      {
+        icon: <IoBarChartOutline />,
+        label: "Dashboard",
+        urls: ["/app"],
+        onPress: () => navigate("/app"),
+      },
+      {
+        icon: <IoBusiness />,
+        label: "Empresas",
+        urls: ["/app/companies"],
+        onPress: () => navigate("/app/companies"),
+      },
+      {
+        icon: <MdOutlineBusinessCenter />,
+        label: "Arls",
+        urls: ["/app/arls"],
+        onPress: () => navigate("/app/arls"),
+      },
+      {
+        icon: <FaLayerGroup />,
+        label: "Grupos Empresariales",
+        urls: ["/app/corporate_group"],
+        onPress: () => navigate("/app/corporate_group"),
+      },
+    ],
+    [navigate]
+  );
 
-  const menuitems: MenuSideProps[] = [
-    {
-      icon: <IoBarChartOutline />,
-      label: "Dashboard",
-      urls: ["/app"],
-      onPress: () => navigate("/app"),
-    },
-    {
-      icon: <IoBusiness />,
-      label: "Empresas",
-      urls: ["/app/companies"],
-      onPress: () => navigate("/app/companies"),
-    },
-    {
-      icon: <MdOutlineBusinessCenter />,
-      label: "Arls",
-      urls: ["/app/arls"],
-      onPress: () => navigate("/app/arls"),
-    },
-    {
-      icon: <FaLayerGroup />,
-      label: "Grupos Empresariales",
-      urls: ["/app/corporate_group"],
-      onPress: () => navigate("/app/corporate_group"),
-    },
-  ];
   return (
-    <div
-      className={`hidden md:flex flex-col justify-between h-full ${
-        sideBarState.isCollapsed ? "md:w-56 lg:w-52" : "md:w-20"
-      } transition-all`}
+    <aside
+      className={clsx(
+        "hidden md:flex flex-col justify-between h-full transition-all",
+        {
+          "md:w-56 lg:w-52": isCollapsed,
+          "md:w-20": !isCollapsed,
+        }
+      )}
     >
       <div className="flex flex-col overflow-y-auto">
         <div className="w-full flex justify-center items-center h-20 border-b">
-          {sideBarState.isCollapsed ? (
-            <img src={LogoXl} alt="" className="w-36 pointer-events-none" />
-          ) : (
-            <img src={LogoXs} alt="" className="w-10 pointer-events-none" />
-          )}
+          <img
+            src={isCollapsed ? LogoXl : LogoXs}
+            alt="Logo"
+            className={clsx("pointer-events-none", {
+              "w-36": isCollapsed,
+              "w-10": !isCollapsed,
+            })}
+            loading="lazy"
+            sizes={isCollapsed ? "(max-width: 600px) 50vw, 100vw" : "10vw"}
+          />
         </div>
         <ul
-          className={`my-4 flex flex-col ${
-            sideBarState.isCollapsed ? "items-start" : "items-center"
-          } justify-between p-4 gap-y-4 overflow-x-auto `}
+          className={clsx("my-4 flex flex-col p-4 gap-y-4 overflow-x-auto", {
+            "items-start": isCollapsed,
+            "items-center": !isCollapsed,
+          })}
         >
           {menuitems.map((items, i) => (
             <MenuSide
@@ -68,25 +84,13 @@ export default function Sidebar() {
               urls={items.urls}
             />
           ))}
-          {/* <MenuSide
-          icon={<BsDiagram3Fill />}
-          label="Diagnosticos"
-          onPress={() => navigate("/app")}
-          urls={["/app/companies/diagnosis/"]}
-        />
-        <MenuSide
-          icon={<BsDiagram3Fill />}
-          label="Diagnosticos"
-          onPress={() => navigate("/app")}
-          urls={["/app/companies/diagnosis/"]}
-        /> */}
         </ul>
       </div>
       <div className="w-full my-4 flex justify-center items-center">
         <Button size={"large"} icon={<PiSignOutThin />}>
-          {sideBarState.isCollapsed ? "Cerrar Sesión" : ""}
+          {isCollapsed ? "Cerrar Sesión" : ""}
         </Button>
       </div>
-    </div>
+    </aside>
   );
 }

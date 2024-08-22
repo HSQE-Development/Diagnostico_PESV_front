@@ -1,4 +1,5 @@
 import { Company } from "@/interfaces/Company";
+import { PaginationComun } from "@/interfaces/Comun";
 import {
   CorporateDTO,
   CorporateGroupPagination,
@@ -19,7 +20,7 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 export const corporateGroupService = createApi({
   reducerPath: "corporateGroupApi",
   baseQuery: axiosBaseQuery,
-  tagTypes: ["CorporateGroups"],
+  tagTypes: ["CorporateGroups", "CompaniesNotIncorpored"],
   endpoints: (builder) => ({
     // Define aquí tus endpoints
     findAll: builder.query<
@@ -46,7 +47,7 @@ export const corporateGroupService = createApi({
     }),
 
     findCompaniesNotInCorporate: builder.query<
-      Company[],
+      PaginationComun<Company>,
       { corporate: number }
     >({
       query: ({ corporate }) => ({
@@ -56,6 +57,22 @@ export const corporateGroupService = createApi({
           corporate: corporate,
         },
       }),
+      providesTags: ["CompaniesNotIncorpored"],
+    }),
+    addOrRemoveCompanyOfGroupByGroupId: builder.mutation<
+      Company,
+      { action: "add" | "delete"; company: number; group: number }
+    >({
+      query: ({ action, company, group }) => ({
+        url: "/corporate_groups/add_or_remove_company_of_group_by_group_id/",
+        method: "POST",
+        data: {
+          action,
+          company,
+          group,
+        },
+      }),
+      invalidatesTags: ["CompaniesNotIncorpored", "CorporateGroups"],
     }),
   }),
 });
