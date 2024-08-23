@@ -138,6 +138,24 @@ export const diagnosisService = createApi({
         },
       }),
     }),
+    generateWorkPlan: builder.mutation<
+      { file: string },
+      {
+        companyId: number;
+        format_to_save: string;
+        diagnosisId?: number;
+      }
+    >({
+      query: ({ companyId, format_to_save, diagnosisId }) => ({
+        url: `/diagnosis/generateWorkPlan/`,
+        method: "POST",
+        params: {
+          company: companyId,
+          format_to_save: format_to_save,
+          diagnosis: diagnosisId,
+        },
+      }),
+    }),
     findFleetsByCompanyId: builder.query<
       Fleet[],
       { companyId: number; diagnosisId?: number }

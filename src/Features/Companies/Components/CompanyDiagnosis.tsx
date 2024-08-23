@@ -48,7 +48,7 @@ export const DiagnosisItemList = ({ diagnosis }: { diagnosis: Diagnosis }) => {
             <CgEditBlackPoint />
             <span>Estado</span>
           </div>
-          {diagnosis.is_finalized ? (
+          {!diagnosis.in_progress ? (
             <Badge color="#86EFAC" count={"Completado"} />
           ) : (
             <Badge count={"En Progreso"} />
@@ -68,9 +68,7 @@ export default function CompanyDiagnosis({
 }: CompanydiagnosisProps) {
   const [showAll] = useState(false);
   // Sort the diagnosis array by is_finalized, with finalized items appearing last
-  const sortedDiagnosis = [...diagnosis].sort((a, b) => {
-    return a.is_finalized === b.is_finalized ? 0 : a.is_finalized ? 1 : -1;
-  });
+  const sortedDiagnosis = [...diagnosis].sort((a, b) => b.id - a.id);
   const displayedDiagnosis = showAll
     ? sortedDiagnosis
     : sortedDiagnosis.slice(0, 2); // Muestra cuantos items se muestran

@@ -68,7 +68,7 @@ export default function DiagnosisPage() {
       diagnosisId != undefined
     ) {
       const fleetData: FleetDTO[] = fleetByCompany.map((item) => ({
-        diagnosis: item.diagnosis_detail.id,
+        diagnosis_counter: item.diagnosis_counter_detail.id,
         quantity_arrended: item.quantity_arrended,
         quantity_leasing: item.quantity_leasing,
         quantity_contractors: item.quantity_contractors,
@@ -90,7 +90,7 @@ export default function DiagnosisPage() {
       diagnosisId != undefined
     ) {
       const driverData: DriverDTO[] = driverByCompanyid.map((item) => ({
-        diagnosis: item.diagnosis_detail.id,
+        diagnosis_counter: item.diagnosis_counter_detail.id,
         driver_question: item.driver_question_detail.id,
         quantity: item.quantity,
       }));

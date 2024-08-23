@@ -11,6 +11,7 @@ export interface Diagnosis {
   company_detail: Company;
   date_elabored: Date;
   is_finalized: boolean;
+  in_progress: boolean;
   diagnosis_step: number;
   type: number;
   type_detail: Compliance;
@@ -75,8 +76,8 @@ export interface Fleet {
   quantity_employees: number;
   vehicle_question: number;
   vehicle_question_detail: VehicleQuestion;
-  diagnosis: number;
-  diagnosis_detail: Diagnosis;
+  diagnosis_counter: number;
+  diagnosis_counter_detail: Diagnosis;
 }
 
 export type FleetDTO = {
@@ -97,8 +98,8 @@ export interface Driver extends Comun {
   quantity: number;
   driver_question: number;
   driver_question_detail: DriverQuestion;
-  diagnosis: number;
-  diagnosis_detail: Diagnosis;
+  diagnosis_counter: number;
+  diagnosis_counter_detail: Diagnosis;
 }
 
 export type DriverDTO = {

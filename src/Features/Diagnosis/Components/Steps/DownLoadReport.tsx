@@ -16,6 +16,7 @@ import FloatLabel from "@/Components/FloatLabel";
 import { MdArrowBackIosNew } from "react-icons/md";
 import { useAppDispatch } from "@/stores/hooks";
 import { setPrevDiagnosisCurrent } from "@/stores/features/utilsSlice";
+import DownLoadWorkPlan from "./DownLoadWorkPlan";
 
 interface DownLoadReportProps {
   companyId: number;
@@ -42,7 +43,7 @@ export const DownloadContent = ({
 
   return (
     <>
-      <div className="flex flex-col items-center justify-center gap-4 mt-4">
+      <div className="flex flex-col items-center justify-center gap-4 ">
         <div className="flex flex-col gap-4 gap-y-5">
           <FloatLabel label="Cronograma">
             <Input
@@ -135,25 +136,29 @@ export default function DownLoadReport({
         <Button icon={<MdArrowBackIosNew />} onClick={handleBackStep}>
           Atras
         </Button>
-        <Popover
-          content={
-            <DownloadContent
-              companyId={companyId}
-              scheduleParam={schedule}
-              sequenceParam={secuence}
-              diagnosisId={diagnosisId ?? 0}
-            />
-          }
-          trigger="click"
-          placement="bottom"
-        >
-          <Button
-            className="bg-orange-400 text-white border-orange-400 active:bg-orange-700 hover:bg-orange-300"
-            icon={<IoIosCloudDownload />}
+        <div className="flex items-center justify-evenly gap-2">
+          <Popover
+            content={
+              <DownloadContent
+                companyId={companyId}
+                scheduleParam={schedule}
+                sequenceParam={secuence}
+                diagnosisId={diagnosisId ?? 0}
+              />
+            }
+            trigger="click"
+            placement="bottom"
           >
-            Descargar Informe
-          </Button>
-        </Popover>
+            <Button
+              className=" text-orange-400 border-orange-400 active:bg-orange-700 hover:bg-orange-100"
+              icon={<IoIosCloudDownload />}
+              type="dashed"
+            >
+              Descargar Informe
+            </Button>
+          </Popover>
+          <DownLoadWorkPlan companyId={companyId} />
+        </div>
       </div>
       <div className="flex flex-1 justify-between items-start gap-4">
         <div className="w-2/4">

@@ -12,13 +12,13 @@ interface HistoryTimeLineProps {
 export default function HistoryTimeLine({ diagnosis }: HistoryTimeLineProps) {
   const [items, setItems] = useState<TimeLineItemProps[]>([]);
 
-  const sortedDiagnosis = [...diagnosis].sort((a, b) => {
-    return a.is_finalized === b.is_finalized ? 0 : a.is_finalized ? 1 : -1;
-  });
+  const sortedDiagnosis = [...diagnosis].sort((a, b) => b.id - a.id);
+
+  const highestId = Math.max(...sortedDiagnosis.map((d) => d.id));
   useEffect(() => {
     if (diagnosis) {
       const newItems = sortedDiagnosis.map((d) => ({
-        color: d.is_finalized ? "blue" : "red",
+        color: d.id === highestId ? "red" : "blue",
         children: <DiagnosisItemList diagnosis={d} />,
       }));
 
