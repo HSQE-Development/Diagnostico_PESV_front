@@ -10,11 +10,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@nivo/bar": "^0.87.0",
     "@nivo/core": "^0.87.0",
+    "@nivo/pie": "^0.87.0",
     "@nivo/radar": "^0.87.0",
     "@reduxjs/toolkit": "^2.2.6",
     "antd": "^5.19.0",
     "axios": "^1.7.2",
+    "color-thief-browser": "^2.0.2",
+    "colorthief": "^2.4.0",
     "commander": "^12.1.0",
     "formik": "^2.4.6",
     "lodash": "^4.17.21",

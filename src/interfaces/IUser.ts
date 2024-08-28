@@ -13,3 +13,14 @@ export interface IUser {
   groups: [number];
   groups_detail: Group[];
 }
+
+export type UserDTO = {
+  first_name: string;
+  last_name: string;
+  email: string;
+  password?: string;
+  licensia_sst: string | null;
+  cedula: string;
+  avatar: string | null;
+  groups: number[];
+};

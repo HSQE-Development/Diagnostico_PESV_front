@@ -1,4 +1,4 @@
-import { IUser } from "@/interfaces/IUser";
+import { IUser, UserDTO } from "@/interfaces/IUser";
 import axiosBaseQuery from "@/utils/axiosBaseQuery";
 import { createApi } from "@reduxjs/toolkit/query/react";
 /**
@@ -20,6 +20,22 @@ export const userService = createApi({
       query: () => ({
         url: "/sign/findAllConsultants",
         method: "GET",
+      }),
+    }),
+    update: builder.mutation<IUser, Partial<IUser>>({
+      query: (dataToChange) => ({
+        url: "/sign/update",
+        method: "PATCH",
+        data: {
+          ...dataToChange,
+        },
+      }),
+    }),
+    register: builder.mutation<IUser, UserDTO>({
+      query: (dataToChange) => ({
+        url: "/sign/register",
+        method: "POST",
+        data: dataToChange,
       }),
     }),
   }),

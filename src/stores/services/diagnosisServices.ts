@@ -204,5 +204,38 @@ export const diagnosisService = createApi({
       }),
       invalidatesTags: ["DiagnosisQuestions", "DiagnosisGeneralData"],
     }),
+    countDiagnosisByConsultor: builder.query<any, { consultor_id: number }>({
+      query: ({ consultor_id }) => ({
+        url: `/diagnosis/count_diagnosis_by_consultor`,
+        method: "GET",
+        params: {
+          consultor: consultor_id,
+        },
+      }),
+    }),
+    countDiagnosisByConsultorByType: builder.query<
+      any,
+      { consultor_id: number }
+    >({
+      query: ({ consultor_id }) => ({
+        url: `/diagnosis/count_diagnosis_by_consultor_by_type`,
+        method: "GET",
+        params: {
+          consultor: consultor_id,
+        },
+      }),
+    }),
+    countDiagnosisByConsultorByModeEjecution: builder.query<
+      any,
+      { consultor_id: number }
+    >({
+      query: ({ consultor_id }) => ({
+        url: `/diagnosis/count_diagnosis_by_consultor_by_mode_ejecution`,
+        method: "GET",
+        params: {
+          consultor: consultor_id,
+        },
+      }),
+    }),
   }),
 });

@@ -18,6 +18,7 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 export const authService = createApi({
   reducerPath: "authApi",
   baseQuery: axiosBaseQuery,
+  tagTypes: ["myProfileQuery"],
   endpoints: (builder) => ({
     login: builder.mutation<IAuth, { email: string; password: string }>({
       query: ({ email, password }) => ({
@@ -34,7 +35,16 @@ export const authService = createApi({
         url: "/sign/profile",
         method: "GET",
       }),
-    })
+      providesTags: ["myProfileQuery"],
+    }),
+    findById: builder.query<IUser, { user: number }>({
+      query: ({ user }) => ({
+        url: "/sign/find_by_id",
+        method: "GET",
+        params: {
+          user: user,
+        },
+      }),
+    }),
   }),
 });
-

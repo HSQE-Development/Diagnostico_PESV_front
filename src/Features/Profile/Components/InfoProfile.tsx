@@ -1,13 +1,15 @@
+import AutoShadowImage from "@/Components/AutoShadowImage";
 import { useAppSelector } from "@/stores/hooks";
-import { Button, Image, Modal, Skeleton, Space } from "antd";
+import { getColorByRole, getUservatarUrl } from "@/utils/getUserAvatarImage";
+import { Badge, Button, Modal, Skeleton, Space } from "antd";
 import React, { useState } from "react";
 import { GrDocumentConfig } from "react-icons/gr";
-import { IoIosNotificationsOutline } from "react-icons/io";
 import {
   MdAlternateEmail,
   MdModeEdit,
   MdOutlineDocumentScanner,
 } from "react-icons/md";
+import ProfileForm from "./ProfileForm";
 
 interface InfoProfileProps {
   isLoading: boolean;
@@ -16,9 +18,11 @@ export default function InfoProfile({ isLoading }: InfoProfileProps) {
   const [editModal, setEditModal] = useState<boolean>(false);
   const authUser = useAppSelector((state) => state.auth.authUser);
 
+  const avatarUrl = getUservatarUrl(authUser?.user?.avatar ?? "");
+
   return (
     <>
-      <div className=" flex flex-col items-center justify-start gap-y-8">
+      <div className=" flex flex-col items-center justify-start gap-y-8 ">
         {isLoading ? (
           <>
             <div className="flex flex-col justify-center items-center gap-y-4 my-4">
@@ -35,15 +39,20 @@ export default function InfoProfile({ isLoading }: InfoProfileProps) {
           </>
         ) : (
           <>
-            <Image
-              src="https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"
-              className="rounded-full my-5 w-72 px-2"
-            />
+            <AutoShadowImage src={avatarUrl} />
             <div className="flex flex-col items-center">
               <span className="">
                 {authUser?.user.first_name} {authUser?.user.last_name}
               </span>
-              <span className="font-bold text-black">SuperUser</span>
+              <div className="flex justify-center items-center gap-1 flex-wrap">
+                {authUser?.user?.groups_detail.map((group, index) => (
+                  <Badge
+                    key={index}
+                    count={group.name}
+                    color={getColorByRole(group.name).hex}
+                  />
+                ))}
+              </div>
             </div>
           </>
         )}
@@ -78,9 +87,6 @@ export default function InfoProfile({ isLoading }: InfoProfileProps) {
               >
                 Editar
               </Button>
-              <Button size="large" icon={<IoIosNotificationsOutline />}>
-                Notificaciones
-              </Button>
             </>
           )}
         </div>
@@ -98,7 +104,9 @@ export default function InfoProfile({ isLoading }: InfoProfileProps) {
                   <MdAlternateEmail className="font-bold" />
                   <span className="ml-2 font-bold">Email</span>
                 </div>
-                <span className="ml-4">{authUser?.user.email}</span>
+                <span className="ml-4 overflow-hidden text-ellipsis break-all">
+                  {authUser?.user.email}
+                </span>
               </div>
             </div>
             <div className="flex flex-col w-[80%] gap-4 bg-slate-200 p-2 rounded-md">
@@ -107,7 +115,9 @@ export default function InfoProfile({ isLoading }: InfoProfileProps) {
                   <MdOutlineDocumentScanner className="font-bold" />
                   <span className="ml-2 font-bold">Cédula</span>
                 </div>
-                <span className="ml-4">{authUser?.user.cedula}</span>
+                <span className="ml-4 overflow-hidden text-ellipsis break-all">
+                  {authUser?.user.cedula}
+                </span>
               </div>
             </div>
             <div className="flex flex-col w-[80%] gap-4 bg-slate-200 p-2 rounded-md mb-4">
@@ -116,7 +126,7 @@ export default function InfoProfile({ isLoading }: InfoProfileProps) {
                   <GrDocumentConfig className="font-bold" />
                   <span className="ml-2 font-bold">Licensia</span>
                 </div>
-                <span className="ml-4">
+                <span className="ml-4 overflow-hidden text-ellipsis break-all">
                   {authUser?.user.licensia_sst
                     ? authUser?.user.licensia_sst
                     : "Sin Licencia"}
@@ -134,9 +144,7 @@ export default function InfoProfile({ isLoading }: InfoProfileProps) {
         onCancel={() => setEditModal(false)}
         footer={<></>}
       >
-        <p>some contents...</p>
-        <p>some contents...</p>
-        <p>some contents...</p>
+        <ProfileForm id={authUser?.user.id ?? 0} />
       </Modal>
     </>
   );

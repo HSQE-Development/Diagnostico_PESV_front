@@ -3,6 +3,8 @@
  *
  */
 
+import { GetProp, UploadProps } from "antd";
+
 /**
  *
  * @param value el numero nit en string
@@ -188,4 +190,25 @@ export const generateColorStyles = (baseColor: string) => {
     hoverColor: `${baseColor}40`, // Hover con un poco más de opacidad
     activeColor: `${baseColor}60`, // Active con aún más opacidad
   };
+};
+
+export type FileTypeGetBase64Antd = Parameters<
+  GetProp<UploadProps, "beforeUpload">
+>[0];
+
+export const getBase64Antd = (file: FileTypeGetBase64Antd): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = (error) => reject(error);
+  });
+
+export const getFileBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = (error) => reject(error);
+  });
 };
