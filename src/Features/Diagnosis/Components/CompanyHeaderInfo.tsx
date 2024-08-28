@@ -33,7 +33,7 @@ export default function CompanyHeaderInfo({
         />
       </div>
       <div className="w-full bg-gradient-to-r from-zinc-100 to-sky-50 rounded-xl p-4 col-span-6 flex flex-col items-start justify-start">
-        <div className="flex items-center justify-around w-full my-2">
+        <div className="flex items-center justify-around w-full my-2 flex-wrap">
           <div className="flex items-center justify-start gap-2">
             <IoBusiness />
             {company?.name}

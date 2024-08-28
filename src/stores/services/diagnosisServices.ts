@@ -4,6 +4,7 @@ import {
   Fleet,
   ResponseSaveQuestions,
   SaveQuestionsDTO,
+  SaveQuestionsForCorporateDTO,
 } from "@/interfaces/Company";
 import {
   CheckListDTO,
@@ -165,7 +166,7 @@ export const diagnosisService = createApi({
         method: "GET",
         params: {
           company: companyId,
-          diagnosis: diagnosisId,
+          diagnosis: diagnosisId ?? 0,
         },
       }),
     }),
@@ -178,7 +179,7 @@ export const diagnosisService = createApi({
         method: "GET",
         params: {
           company: companyId,
-          diagnosis: diagnosisId,
+          diagnosis: diagnosisId ?? 0,
         },
       }),
     }),
@@ -188,6 +189,18 @@ export const diagnosisService = createApi({
     >({
       query: (questionsDTO) => ({
         url: `/diagnosis/saveAnswerCuestions/`,
+        method: "POST",
+        data: {
+          ...questionsDTO,
+        },
+      }),
+    }),
+    saveCountForCompanyInCorporate: builder.mutation<
+      ResponseSaveQuestions,
+      SaveQuestionsForCorporateDTO
+    >({
+      query: (questionsDTO) => ({
+        url: `/diagnosis/save_count_for_company_in_corporate/`,
         method: "POST",
         data: {
           ...questionsDTO,

@@ -7,12 +7,20 @@ import {
 import { useAppDispatch, useAppSelector } from "@/stores/hooks";
 import { companyService } from "@/stores/services/companyService";
 import { diagnosisService } from "@/stores/services/diagnosisServices";
-import { Input, Table, TableColumnsType, TableProps } from "antd";
+import { skipToken } from "@reduxjs/toolkit/query";
+import {
+  ConfigProvider,
+  Input,
+  Table,
+  TableColumnsType,
+  TableProps,
+} from "antd";
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
 interface Props {
   companyId: number;
+  noFetch?: boolean;
 }
 interface DataType extends VehicleQuestion {
   key: React.Key;
@@ -22,7 +30,7 @@ interface DataType extends VehicleQuestion {
  * @param companyId El id de la empresa para temas de consulta
  * @returns
  */
-export default function Vehiculos({ companyId }: Props) {
+export default function Vehiculos({ companyId, noFetch = false }: Props) {
   const { data: flotaVehiculosTerrestres, refetch } =
     companyService.useFindAllVehicleQuestionsQuery();
 
@@ -33,7 +41,10 @@ export default function Vehiculos({ companyId }: Props) {
     data: fleetByCompany,
     isLoading: isLoadingFleetByCompany,
     refetch: refetchFleet,
-  } = diagnosisService.useFindFleetsByCompanyIdQuery({ companyId });
+    isUninitialized,
+  } = diagnosisService.useFindFleetsByCompanyIdQuery(
+    noFetch ? skipToken : { companyId }
+  );
   const dispatch = useAppDispatch();
   const [inputValues, setInputValues] = useState<{
     [key: number]: {
@@ -56,9 +67,11 @@ export default function Vehiculos({ companyId }: Props) {
   });
 
   useEffect(() => {
-    refetch();
-    refetchFleet();
-  }, [companyId]);
+    if (!isUninitialized) {
+      refetch();
+      refetchFleet();
+    }
+  }, [companyId, isUninitialized]);
   useEffect(() => {
     if (flotaVehiculosTerrestres) {
       dispatch(setVehicleQuestions(flotaVehiculosTerrestres));
@@ -66,7 +79,12 @@ export default function Vehiculos({ companyId }: Props) {
   }, [flotaVehiculosTerrestres, dispatch]);
 
   useEffect(() => {
-    if (fleetByCompany && !isLoadingFleetByCompany && !isNewDiagnosis) {
+    if (
+      fleetByCompany &&
+      !isLoadingFleetByCompany &&
+      !isNewDiagnosis &&
+      !noFetch
+    ) {
       const initialInputValues: {
         [key: number]: {
           owned: number;
@@ -94,7 +112,7 @@ export default function Vehiculos({ companyId }: Props) {
       setInputValues(initialInputValues);
       // dispatch(setFleetData(fleetByCompany));
     }
-  }, [fleetByCompany, isLoadingFleetByCompany]);
+  }, [fleetByCompany, isLoadingFleetByCompany, noFetch]);
 
   const questionsVehicles = useAppSelector(
     (state) => state.vehicleQuestion.questions
@@ -125,7 +143,6 @@ export default function Vehiculos({ companyId }: Props) {
     setInputValues(updatedInputValues);
     // Crear una copia del estado actual de fleetData
     const updatedFleetData = [...vehicleQuestion.fleetData];
-    console.log("vehicleQuestion", vehicleQuestion);
 
     // Buscar si ya existe un dato para esta pregunta y tipo
     const existingIndex = updatedFleetData.findIndex(
@@ -197,7 +214,6 @@ export default function Vehiculos({ companyId }: Props) {
       title: "FLOTA DE VEHICULOS AUTOMOTORES",
       dataIndex: "name",
       width: "350px",
-      fixed: "left",
     },
     {
       title: "Cantidad Propios",
@@ -233,6 +249,7 @@ export default function Vehiculos({ companyId }: Props) {
     {
       title: "Cantidad Terceros",
       width: "10px",
+      responsive: ["md"],
       render: (_, record) => {
         const fleetInfo = inputValues[record.id] || {
           third_party: 0,
@@ -431,17 +448,28 @@ export default function Vehiculos({ companyId }: Props) {
     key: question.id,
   }));
   return (
-    <Table
-      columns={columns}
-      pagination={tableParams.pagination}
-      dataSource={dataSource}
-      size="small"
-      onChange={handleTableChange}
-      scroll={{ x: "max-content" }}
-      showSorterTooltip={{ target: "sorter-icon" }}
-      loading={isLoadingFleetByCompany}
-      //@ts-ignore
-      pagination={false}
-    />
+    <ConfigProvider
+      theme={{
+        components: {
+          Table: {
+            headerBg: "#e3e3e3",
+          },
+        },
+      }}
+    >
+      <Table
+        columns={columns}
+        pagination={tableParams.pagination}
+        dataSource={dataSource}
+        size="small"
+        onChange={handleTableChange}
+        scroll={{ x: "max-content" }}
+        showSorterTooltip={{ target: "sorter-icon" }}
+        loading={isLoadingFleetByCompany}
+        //@ts-ignore
+        pagination={false}
+        className="w-full"
+      />
+    </ConfigProvider>
   );
 }

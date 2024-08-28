@@ -7,12 +7,20 @@ import {
 import { useAppDispatch, useAppSelector } from "@/stores/hooks";
 import { companyService } from "@/stores/services/companyService";
 import { diagnosisService } from "@/stores/services/diagnosisServices";
-import { Input, Table, TableColumnsType, TableProps } from "antd";
+import { skipToken } from "@reduxjs/toolkit/query";
+import {
+  ConfigProvider,
+  Input,
+  Table,
+  TableColumnsType,
+  TableProps,
+} from "antd";
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
 interface Props {
   companyId: number;
+  noFetch?: boolean;
 }
 interface DataType extends DriverQuestion {
   key: React.Key;
@@ -22,7 +30,7 @@ interface DataType extends DriverQuestion {
  * @param companyId El id de la empresa para temas de consulta
  * @returns
  */
-export default function Conductores({ companyId }: Props) {
+export default function Conductores({ companyId, noFetch = false }: Props) {
   const dispatch = useAppDispatch();
   const { data: conductoresPreguntas, refetch } =
     companyService.useFindAllDriverQuestionsQuery();
@@ -30,8 +38,13 @@ export default function Conductores({ companyId }: Props) {
 
   const isNewDiagnosis = Boolean(searchParams.get("newDiagnosis") ?? "false");
 
-  const { data: driverByCompanyid, isLoading: isLoadingDriverByCompany } =
-    diagnosisService.useFindDriversByCompanyIdQuery({ companyId });
+  const {
+    data: driverByCompanyid,
+    isLoading: isLoadingDriverByCompany,
+    isUninitialized,
+  } = diagnosisService.useFindDriversByCompanyIdQuery(
+    noFetch ? skipToken : { companyId }
+  );
   const [inputValues, setInputValues] = useState<{
     [key: number]: {
       quantity: number;
@@ -44,15 +57,20 @@ export default function Conductores({ companyId }: Props) {
     },
   });
   useEffect(() => {
-    refetch();
-  }, [companyId]);
+    if (!isUninitialized) refetch();
+  }, [companyId, isUninitialized]);
   useEffect(() => {
     if (conductoresPreguntas) {
       dispatch(setDriverQuestions(conductoresPreguntas));
     }
   }, [conductoresPreguntas, dispatch]);
   useEffect(() => {
-    if (driverByCompanyid && !isLoadingDriverByCompany && !isNewDiagnosis) {
+    if (
+      driverByCompanyid &&
+      !isLoadingDriverByCompany &&
+      !isNewDiagnosis &&
+      !noFetch
+    ) {
       const initialInputValues: {
         [key: number]: {
           quantity: number;
@@ -117,7 +135,6 @@ export default function Conductores({ companyId }: Props) {
       title: "PERSONAS QUE CONDUCEN CON FINES MISIONALES",
       dataIndex: "name",
       width: "350px",
-      fixed: "left",
     },
     {
       title: "Cantidad",
@@ -126,7 +143,6 @@ export default function Conductores({ companyId }: Props) {
         const driverInfo = inputValues[record.id] || {
           quantity: 0,
         };
-        console.log(driverInfo);
         return (
           <>
             <Input
@@ -161,21 +177,31 @@ export default function Conductores({ companyId }: Props) {
     key: question.id,
   }));
   return (
-    <Table
-      columns={columns}
-      pagination={tableParams.pagination}
-      dataSource={dataSource}
-      size="small"
-      onChange={handleTableChange}
-      scroll={{ x: "max-content" }}
-      showSorterTooltip={{ target: "sorter-icon" }}
-      loading={isLoadingDriverByCompany}
-      //@ts-ignore
-      pagination={{
-        defaultPageSize: 10,
-        showSizeChanger: true,
-        pageSizeOptions: ["10", "20", "30"],
+    <ConfigProvider
+      theme={{
+        components: {
+          Table: {
+            headerBg: "#e3e3e3",
+          },
+        },
       }}
-    />
+    >
+      <Table
+        columns={columns}
+        pagination={tableParams.pagination}
+        dataSource={dataSource}
+        size="small"
+        onChange={handleTableChange}
+        scroll={{ x: "max-content" }}
+        showSorterTooltip={{ target: "sorter-icon" }}
+        loading={isLoadingDriverByCompany}
+        //@ts-ignore
+        pagination={{
+          defaultPageSize: 10,
+          showSizeChanger: true,
+          pageSizeOptions: ["10", "20", "30"],
+        }}
+      />
+    </ConfigProvider>
   );
 }

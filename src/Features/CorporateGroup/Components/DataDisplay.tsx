@@ -8,7 +8,7 @@ import {
   Popover,
   Skeleton,
 } from "antd";
-import React, { useEffect, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { SlArrowDown } from "react-icons/sl";
 import CompanyCards from "./CompanyCards";
 import { FaLayerGroup } from "react-icons/fa";
@@ -22,8 +22,8 @@ import {
 import { IoMdAdd } from "react-icons/io";
 import { TOAST_TYPE, toastHandler } from "@/utils/useToast";
 import { useModal } from "@/hooks/utilsHooks";
-import { CiSaveDown1 } from "react-icons/ci";
 import QuantityForm from "@/Features/Diagnosis/Components/Steps/QuantityForm";
+import { MdOutlineAccountTree } from "react-icons/md";
 
 const useAddOrRemoveCompany = () => {
   const [addOrRemoveCompanyOfGroupByGroupId, { isLoading: removeLoading }] =
@@ -37,7 +37,8 @@ const getItems = (
   handleAddCompanyToGroup: (companyId: number, groupId: number) => void,
   removeLoading: boolean,
   onOpenCard: () => void,
-  isOpenCard: boolean
+  setCompanyId: (id: number) => void,
+  setCorporateId: Dispatch<SetStateAction<number>>
 ): CollapseProps["items"] => {
   return data.results.map((group, index) => {
     // Generar un color aleatorio para cada grupo
@@ -82,7 +83,11 @@ const getItems = (
                     )
                   }
                   isLoading={removeLoading}
-                  onClick={onOpenCard}
+                  onClick={() => {
+                    onOpenCard()
+                    setCorporateId(group.id)
+                  }}
+                  setCompanyId={setCompanyId}
                 />
               ))}
             </div>
@@ -102,6 +107,12 @@ export default function DataDisplay() {
     page: currentPage,
     page_size: pageSize,
   });
+  const [companyId, setCompanyId] = useState<number>(0);
+  const [corporateId, setCorporateId] = useState<number>(0);
+
+  const handleSetCompanyId = (id: number) => {
+    setCompanyId(id);
+  };
 
   const { isOpen, open, close } = useModal();
 
@@ -167,7 +178,8 @@ export default function DataDisplay() {
             handleAddCompanyToGroup,
             removeLoading,
             open,
-            isOpen
+            handleSetCompanyId,
+            setCorporateId
           )}
           className="md:mx-8 custom_collapsed mb-8"
           collapsible="icon"
@@ -190,7 +202,7 @@ export default function DataDisplay() {
         title={
           <span className="flex items-center justify-start">
             {" "}
-            <CiSaveDown1 className="mr-2" />
+            <MdOutlineAccountTree className="mr-2" />
             Conteo de empresa
           </span>
         }
@@ -198,10 +210,14 @@ export default function DataDisplay() {
         open={isOpen}
         onOk={close}
         onCancel={close}
-        width={1000}
+        width={1300}
         footer={null}
       >
-        <QuantityForm companyId={1} />
+        <QuantityForm
+          companyId={companyId}
+          corporate_id={corporateId}
+          isOver={true}
+        />
       </Modal>
     </>
   );

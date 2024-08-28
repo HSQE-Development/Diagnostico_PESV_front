@@ -114,6 +114,14 @@ export type SaveQuestionsDTO = {
   driverData: DriverDTO[];
 };
 
+export type SaveQuestionsForCorporateDTO = {
+  company: number;
+  corporate: number;
+  consultor: number;
+  vehicleData: FleetDTO[];
+  driverData: DriverDTO[];
+};
+
 export type ResponseSaveQuestions = {
   diagnosis: number;
   vehicleData: FleetDTO[];
