@@ -1,24 +1,34 @@
 import { useAppSelector } from "@/stores/hooks";
 import { diagnosisService } from "@/stores/services/diagnosisServices";
 import { ResponsivePie } from "@nivo/pie";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 export default function CountBarChar() {
   const authUser = useAppSelector((state) => state.auth.authUser);
+  const [formattedData, setFormattedData] = useState([
+    {
+      id: 0,
+      label: "SIN DATOS",
+      value: 0,
+    },
+  ]);
 
   const { data } = diagnosisService.useCountDiagnosisByConsultorByTypeQuery({
     consultor_id: authUser?.user.id ?? 0,
   });
 
-  const formattedData = data
-    ? data.map((item: any) => ({
+  useEffect(() => {
+    if (data) {
+      setFormattedData;
+      data.map((item: any) => ({
         id: item.type__name,
         label: item.type__name,
         value: item.total,
-      }))
-    : [];
+      }));
+    }
+  }, [data]);
   return (
-    <div style={{ height: 300 }} className="flex items-center justify-center">
+    <div style={{ height: 300 }} className="flex items-center justify-center ">
       <ResponsivePie
         data={formattedData}
         margin={{ top: 40, right: 80, bottom: 80, left: 80 }}

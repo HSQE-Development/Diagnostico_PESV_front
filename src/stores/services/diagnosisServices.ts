@@ -1,3 +1,4 @@
+import { ComplianceTrendData } from "@/interfaces/Charts";
 import {
   Diagnosis,
   Driver,
@@ -265,6 +266,12 @@ export const diagnosisService = createApi({
         params: {
           consultor: consultor_id,
         },
+      }),
+    }),
+    complianceTrend: builder.query<ComplianceTrendData[], void>({
+      query: () => ({
+        url: `/diagnosis/compliance_trend`,
+        method: "GET",
       }),
     }),
   }),

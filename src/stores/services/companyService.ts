@@ -98,5 +98,11 @@ export const companyService = createApi({
         },
       }),
     }),
+    diagnosisByCompany: builder.query<any, void>({
+      query: () => ({
+        url: `/companies/diagnosis_by_company`,
+        method: "GET",
+      }),
+    }),
   }),
 });

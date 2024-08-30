@@ -229,7 +229,7 @@ export default function ProfileForm({ id }: ProfileProps) {
                   } text-white w-full`}
                   loading={isLoading || updateLoading || createLoading}
                 >
-                  {id ? "Editar" : "Guardar"}
+                  Guardar
                 </Button>
               </div>
             </div>
