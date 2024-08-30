@@ -25,7 +25,9 @@ export default function PesvNoteAndSegmented({
     );
 
   useEffect(() => {
-    if (sizeData) setSizeCompany(sizeData);
+    if (sizeData) {
+      setSizeCompany(sizeData);
+    }
   }, [sizeData]);
   //Storage
   const totalVehicles = useAppSelector(
@@ -34,7 +36,6 @@ export default function PesvNoteAndSegmented({
   const totalDrivers = useAppSelector(
     (state) => state.driverQuestion.totalQuantity
   );
-
   useEffect(() => {
     if (sizeCompany) {
       setSize(
@@ -42,7 +43,7 @@ export default function PesvNoteAndSegmented({
       );
       setUserChanged(false);
     }
-  }, [totalVehicles, totalDrivers]);
+  }, [sizeCompany, totalVehicles, totalDrivers]);
 
   const defaultColors = {
     itemActiveBg: "#007bff",

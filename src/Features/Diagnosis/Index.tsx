@@ -23,16 +23,24 @@ import { setDriverData } from "@/stores/features/driverQuestionSlice";
 import { DriverDTO, FleetDTO } from "@/interfaces/Company";
 import { diagnosisService } from "@/stores/services/diagnosisServices";
 import DownLoadReport from "./Components/Steps/DownLoadReport";
+import { useCorporate } from "@/context/CorporateGroupContext";
+import { setDiagnosis } from "@/stores/features/diagnosisSlice";
 
 export default function DiagnosisPage() {
   const dispatch = useAppDispatch();
+  const { corporateId, setCorporateId } = useCorporate();
   const { idCompany } = useParams();
   const [searchParams] = useSearchParams();
   const diagnosisParam = searchParams.get("diagnosis");
   const diagnosisId = diagnosisParam
     ? parseInt(decryptId(diagnosisParam))
     : undefined;
+  const corporateParam = searchParams.get("corporate");
+  const corporateParamParsed = corporateParam
+    ? parseInt(decryptId(corporateParam))
+    : undefined;
   const companyId = parseInt(decryptId(idCompany ?? ""));
+  setCorporateId(corporateParamParsed);
 
   const { data: companyById } = companyService.useFindByIdQuery(
     companyId ? { id: companyId } : skipToken
@@ -54,12 +62,24 @@ export default function DiagnosisPage() {
   );
 
   useEffect(() => {
-    if (companyById) {
-      dispatch(setDiagnosisCurrent(diagnosisData?.diagnosis_step ?? 0));
+    if (diagnosisData) {
+      dispatch(setDiagnosis(diagnosisData));
     }
-  }, [companyById, dispatch, diagnosisData?.diagnosis_step]);
+  }, [diagnosisData]);
 
-  const current = useAppSelector((state) => state.util.diagnosisCurrent);
+  const diagnosisDataStore = useAppSelector(
+    (state) => state.diagnosis.diagnosis
+  );
+
+  useEffect(() => {
+    if (corporateId) {
+      dispatch(setDiagnosisCurrent(diagnosisDataStore?.diagnosis_step ?? 0));
+    } else {
+      if (companyById) {
+        dispatch(setDiagnosisCurrent(diagnosisDataStore?.diagnosis_step ?? 0));
+      }
+    }
+  }, [companyById, dispatch, diagnosisDataStore?.diagnosis_step]);
 
   useEffect(() => {
     if (
@@ -98,18 +118,28 @@ export default function DiagnosisPage() {
     }
   }, [driverByCompanyid, isLoadingDriverByCompany, dispatch, diagnosisId]);
 
-  const steps = useMemo(
-    () => [
+  const current = useAppSelector((state) => state.util.diagnosisCurrent);
+  const steps = useMemo(() => {
+    // Crear un array de pasos condicionalmente
+    const stepsArray = [];
+
+    // Añadir los otros pasos
+    stepsArray.push(
       {
         title: "Conteo",
         content: <QuantityForm companyId={companyId} />,
-        icon: <MdAccountTree className="text-black" />,
+        icon:
+          corporateId || current > 0 ? null : (
+            <MdAccountTree className="text-black" />
+          ),
         subTitle: "Aqui se define el nivel de complejidad",
+        status: corporateId || current > 0 ? "finish" : "process",
       },
       {
         title: "Lista de Verificación",
         content: <DiagnosisForm companyId={companyId} />,
-        icon: <FaClipboardCheck />,
+        icon: current > 1 ? null : <FaClipboardCheck />,
+        status: current > 1 ? "finish" : "process",
       },
       {
         title: "Informe",
@@ -122,10 +152,11 @@ export default function DiagnosisPage() {
           />
         ),
         subTitle: "Generar el informe del diagnostico",
-      },
-    ],
-    [companyId]
-  );
+      }
+    );
+
+    return stepsArray;
+  }, [companyId, diagnosisData, corporateId]);
 
   const items = useMemo(
     () =>

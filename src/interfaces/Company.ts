@@ -14,13 +14,14 @@ export interface Diagnosis {
   in_progress: boolean;
   diagnosis_step: number;
   type: number;
-  type_detail: Compliance;
+  type_detail: Compliance | null;
   consultor: number;
   consultor_detail: IUser | null;
   mode_ejecution: string | null;
   schedule: string | null;
   sequence: string | null;
   observation: string | null;
+  corporate_group: number | null;
 }
 export interface Ciiu extends Comun {
   code: string;

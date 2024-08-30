@@ -39,10 +39,16 @@ export const diagnosisService = createApi({
     "DiagnosisTotalTableReport",
   ],
   endpoints: (builder) => ({
-    findById: builder.query<Diagnosis, { diagnosisId: number }>({
-      query: ({ diagnosisId }) => ({
+    findById: builder.query<
+      Diagnosis,
+      { diagnosisId: number; corporate_group?: number }
+    >({
+      query: ({ diagnosisId, corporate_group }) => ({
         url: `/diagnosis/${diagnosisId}`,
         method: "GET",
+        params: {
+          corporate_group: corporate_group,
+        },
       }),
       providesTags: ["DiagnosisGeneralData"],
     }),
@@ -159,27 +165,29 @@ export const diagnosisService = createApi({
     }),
     findFleetsByCompanyId: builder.query<
       Fleet[],
-      { companyId: number; diagnosisId?: number }
+      { companyId: number; diagnosisId?: number; corporate_group?: number }
     >({
-      query: ({ companyId, diagnosisId }) => ({
+      query: ({ companyId, diagnosisId, corporate_group }) => ({
         url: `/diagnosis/findFleetsByCompanyId`,
         method: "GET",
         params: {
           company: companyId,
           diagnosis: diagnosisId ?? 0,
+          corporate_group: corporate_group,
         },
       }),
     }),
     findDriversByCompanyId: builder.query<
       Driver[],
-      { companyId: number; diagnosisId?: number }
+      { companyId: number; diagnosisId?: number; corporate_group?: number }
     >({
-      query: ({ companyId, diagnosisId }) => ({
+      query: ({ companyId, diagnosisId, corporate_group }) => ({
         url: `/diagnosis/findDriversByCompanyId`,
         method: "GET",
         params: {
           company: companyId,
           diagnosis: diagnosisId ?? 0,
+          corporate_group: corporate_group,
         },
       }),
     }),
@@ -192,6 +200,15 @@ export const diagnosisService = createApi({
         method: "POST",
         data: {
           ...questionsDTO,
+        },
+      }),
+    }),
+    initDiagnosisCorporate: builder.mutation<Diagnosis, { corporate: number }>({
+      query: ({ corporate }) => ({
+        url: `/diagnosis/init_diagnosis_corporate/`,
+        method: "POST",
+        data: {
+          corporate: corporate,
         },
       }),
     }),

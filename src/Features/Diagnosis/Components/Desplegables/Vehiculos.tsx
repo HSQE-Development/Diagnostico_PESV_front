@@ -1,3 +1,4 @@
+import { useCorporate } from "@/context/CorporateGroupContext";
 import { FleetDTO, VehicleQuestion } from "@/interfaces/Company";
 import { TableParams } from "@/interfaces/Comun";
 import {
@@ -7,7 +8,6 @@ import {
 import { useAppDispatch, useAppSelector } from "@/stores/hooks";
 import { companyService } from "@/stores/services/companyService";
 import { diagnosisService } from "@/stores/services/diagnosisServices";
-import { skipToken } from "@reduxjs/toolkit/query";
 import {
   ConfigProvider,
   Input,
@@ -20,7 +20,6 @@ import { useSearchParams } from "react-router-dom";
 
 interface Props {
   companyId: number;
-  noFetch?: boolean;
 }
 interface DataType extends VehicleQuestion {
   key: React.Key;
@@ -30,22 +29,28 @@ interface DataType extends VehicleQuestion {
  * @param companyId El id de la empresa para temas de consulta
  * @returns
  */
-export default function Vehiculos({ companyId, noFetch = false }: Props) {
+export default function Vehiculos({ companyId }: Props) {
+  const { corporateId } = useCorporate();
+  const dispatch = useAppDispatch();
+
   const { data: flotaVehiculosTerrestres, refetch } =
     companyService.useFindAllVehicleQuestionsQuery();
 
   const [searchParams] = useSearchParams();
 
-  const isNewDiagnosis = Boolean(searchParams.get("newDiagnosis") ?? "false");
+  const isNewDiagnosis = corporateId
+    ? false
+    : Boolean(searchParams.get("newDiagnosis") ?? "false");
   const {
     data: fleetByCompany,
     isLoading: isLoadingFleetByCompany,
     refetch: refetchFleet,
     isUninitialized,
-  } = diagnosisService.useFindFleetsByCompanyIdQuery(
-    noFetch ? skipToken : { companyId }
-  );
-  const dispatch = useAppDispatch();
+  } = diagnosisService.useFindFleetsByCompanyIdQuery({
+    companyId,
+    corporate_group: corporateId,
+  });
+
   const [inputValues, setInputValues] = useState<{
     [key: number]: {
       owned: number;
@@ -71,7 +76,7 @@ export default function Vehiculos({ companyId, noFetch = false }: Props) {
       refetch();
       refetchFleet();
     }
-  }, [companyId, isUninitialized]);
+  }, [companyId, isUninitialized, refetch, refetchFleet]);
   useEffect(() => {
     if (flotaVehiculosTerrestres) {
       dispatch(setVehicleQuestions(flotaVehiculosTerrestres));
@@ -79,12 +84,13 @@ export default function Vehiculos({ companyId, noFetch = false }: Props) {
   }, [flotaVehiculosTerrestres, dispatch]);
 
   useEffect(() => {
-    if (
-      fleetByCompany &&
-      !isLoadingFleetByCompany &&
-      !isNewDiagnosis &&
-      !noFetch
-    ) {
+    if (!corporateId) {
+      dispatch(setFleetData([]));
+    }
+  }, [corporateId]);
+
+  useEffect(() => {
+    if (fleetByCompany && !isNewDiagnosis && corporateId) {
       const initialInputValues: {
         [key: number]: {
           owned: number;
@@ -110,9 +116,9 @@ export default function Vehiculos({ companyId, noFetch = false }: Props) {
         };
       });
       setInputValues(initialInputValues);
-      // dispatch(setFleetData(fleetByCompany));
+      dispatch(setFleetData(fleetByCompany));
     }
-  }, [fleetByCompany, isLoadingFleetByCompany, noFetch]);
+  }, [fleetByCompany]);
 
   const questionsVehicles = useAppSelector(
     (state) => state.vehicleQuestion.questions

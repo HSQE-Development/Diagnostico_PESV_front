@@ -1,3 +1,4 @@
+import { Diagnosis } from "@/interfaces/Company";
 import {
   DiagnosisDTO,
   DiagnosisQuestions,
@@ -18,12 +19,19 @@ const initialState = {
   observation: {} as {
     [req_id: number]: string | null;
   },
+  diagnosis: null as Diagnosis | null,
 };
 
 export const diagnosisSlice = createSlice({
   name: "diagnosis",
   initialState,
   reducers: {
+    setDiagnosis: (state, action: PayloadAction<Diagnosis>) => {
+      state.diagnosis = action.payload;
+    },
+    removeDiagnosis: (state) => {
+      state.diagnosis = null;
+    },
     setQuestions: (state, action: PayloadAction<DiagnosisQuestions[]>) => {
       state.questions = action.payload;
     },
@@ -265,6 +273,8 @@ export const {
   resetDiagnosis,
   setUpdateRequirement,
   setUpdateObservation,
+  setDiagnosis,
+  removeDiagnosis,
 } = diagnosisSlice.actions;
 
 export default diagnosisSlice.reducer;

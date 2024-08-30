@@ -5,15 +5,19 @@ import { PiSignOutThin } from "react-icons/pi";
 import { IoBarChartOutline, IoBusiness } from "react-icons/io5";
 import { MdOutlineBusinessCenter } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
-import { useAppSelector } from "@/stores/hooks";
+import { useAppDispatch, useAppSelector } from "@/stores/hooks";
 import { FaLayerGroup } from "react-icons/fa";
 import clsx from "clsx";
 
 // Imágenes importadas normalmente
 import LogoXs from "../assets/Logo_xs.png";
 import LogoXl from "../assets/Logo_xl.png";
+import { CiMenuBurger } from "react-icons/ci";
+import { setCollapsed } from "@/stores/features/sideBarSlice";
 
 export default function Sidebar() {
+  const dispatch = useAppDispatch();
+
   const { isCollapsed } = useAppSelector((state) => state.sidebarState);
   const navigate = useNavigate();
   const menuitems: MenuSideProps[] = useMemo(
@@ -48,16 +52,13 @@ export default function Sidebar() {
 
   return (
     <aside
-      className={clsx(
-        "hidden md:flex flex-col justify-between h-full transition-all",
-        {
-          "md:w-56 lg:w-52": isCollapsed,
-          "md:w-20": !isCollapsed,
-        }
-      )}
+      className={clsx("flex flex-col justify-between h-full transition-all", {
+        "w-full md:w-56 lg:w-52 ": isCollapsed,
+        "w-0 md:w-20": !isCollapsed,
+      })}
     >
       <div className="flex flex-col overflow-y-auto">
-        <div className="w-full flex justify-center items-center h-20 border-b">
+        <div className="w-full flex justify-between px-4 lg:px-0 lg:justify-center items-center h-20 border-b">
           <img
             src={isCollapsed ? LogoXl : LogoXs}
             alt="Logo"
@@ -67,6 +68,10 @@ export default function Sidebar() {
             })}
             loading="lazy"
             sizes={isCollapsed ? "(max-width: 600px) 50vw, 100vw" : "10vw"}
+          />
+          <CiMenuBurger
+            className="block md:hidden font-light text-2xl cursor-pointer"
+            onClick={() => dispatch(setCollapsed())}
           />
         </div>
         <ul
@@ -87,7 +92,13 @@ export default function Sidebar() {
         </ul>
       </div>
       <div className="w-full my-4 flex justify-center items-center">
-        <Button size={"large"} icon={<PiSignOutThin />}>
+        <Button
+          id="logout"
+          size={"large"}
+          icon={<PiSignOutThin />}
+          aria-label="Cerrar Sesion"
+          aria-labelledby="logout"
+        >
           {isCollapsed ? "Cerrar Sesión" : ""}
         </Button>
       </div>

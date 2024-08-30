@@ -36,6 +36,7 @@ import { BiSearch } from "react-icons/bi";
 import Highlighter from "react-highlight-words";
 import { IoDocumentAttach } from "react-icons/io5";
 import CompanyDiagnosis from "./CompanyDiagnosis";
+import { useCorporate } from "@/context/CorporateGroupContext";
 interface DataType extends Company {
   key: React.Key;
 }
@@ -53,6 +54,7 @@ interface DataTableProps {
 }
 
 export default function DataTable({ arlIdProp, onlyInfo }: DataTableProps) {
+  const { setCorporateId } = useCorporate();
   const navigate = useNavigate();
   const [tableParams, setTableParams] = useState<TableParams>({
     pagination: {
@@ -320,7 +322,9 @@ export default function DataTable({ arlIdProp, onlyInfo }: DataTableProps) {
                 title="Más detalles"
                 trigger="click"
               >
-                <Button type="link">Ver más ({hiddenCiius.length})</Button>
+                <Button type="link" aria-label="show-more">
+                  Ver más ({hiddenCiius.length})
+                </Button>
               </Popover>
             )}
           </div>
@@ -355,6 +359,7 @@ export default function DataTable({ arlIdProp, onlyInfo }: DataTableProps) {
                   key={i}
                   disabled={record.company_diagnosis.length <= 0}
                   icon={<IoDocumentAttach />}
+                  aria-label="realized_diagnosis"
                 ></Button>
               </Popover>
             </div>
@@ -392,18 +397,20 @@ export default function DataTable({ arlIdProp, onlyInfo }: DataTableProps) {
             <Tooltip title="Comenzar Diagnostico para esta empresa">
               <Button
                 icon={<MdOutlineDocumentScanner />}
-                onClick={() =>
+                onClick={() => {
+                  setCorporateId(undefined);
                   navigate(
                     `/app/companies/diagnosis/${encryptId(
                       record.id.toString()
                     )}?newDiagnosis=true`
-                  )
-                }
+                  );
+                }}
               />
             </Tooltip>
             <Button
               icon={<CiEdit />}
               onClick={() => handleEditModal(record.key)}
+              aria-label="edit-company"
             />
             <Popconfirm
               title="Eliminar Empresa"
@@ -413,7 +420,11 @@ export default function DataTable({ arlIdProp, onlyInfo }: DataTableProps) {
               okText="Eliminar"
               cancelText="No"
             >
-              <Button danger icon={<MdDeleteOutline />} />
+              <Button
+                danger
+                icon={<MdDeleteOutline />}
+                aria-label="delete-company"
+              />
             </Popconfirm>
           </div>
         ) : null,

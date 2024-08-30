@@ -6,10 +6,9 @@ import React from "react";
 export default function CountBarChar() {
   const authUser = useAppSelector((state) => state.auth.authUser);
 
-  const { data, error, isLoading } =
-    diagnosisService.useCountDiagnosisByConsultorByTypeQuery({
-      consultor_id: authUser?.user.id ?? 0,
-    });
+  const { data } = diagnosisService.useCountDiagnosisByConsultorByTypeQuery({
+    consultor_id: authUser?.user.id ?? 0,
+  });
 
   const formattedData = data
     ? data.map((item: any) => ({

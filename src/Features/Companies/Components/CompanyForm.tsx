@@ -1,4 +1,5 @@
 import FloatLabel from "@/Components/FloatLabel";
+import { useCorporate } from "@/context/CorporateGroupContext";
 import useCompany from "@/hooks/companyHooks";
 import { Arl } from "@/interfaces/Arl";
 import { Ciiu, CompanyDTO } from "@/interfaces/Company";
@@ -40,6 +41,8 @@ const initialValues: CompanyDTO = {
 };
 
 export default function CompanyForm({ id }: CompanyFormProps) {
+  const { setCorporateId } = useCorporate();
+
   const navigate = useNavigate();
   const { changeCompany, createCompany, isSaving, isUpdating } = useCompany();
   const { data: fetchSegments, isLoading } = segmentService.useFindAllQuery();
@@ -159,6 +162,7 @@ export default function CompanyForm({ id }: CompanyFormProps) {
       } else {
         // Aqui se registra
         const saveCompany = await createCompany(values);
+        setCorporateId(undefined);
         navigate(
           `/app/companies/diagnosis/${encryptId(
             saveCompany?.id.toString() ?? ""

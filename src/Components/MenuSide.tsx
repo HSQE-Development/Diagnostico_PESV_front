@@ -1,8 +1,10 @@
-import { useAppSelector } from "@/stores/hooks";
+import { useAppDispatch, useAppSelector } from "@/stores/hooks";
 import { Tooltip } from "antd";
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import clsx from "clsx";
+import { useMediaQuery } from "@/hooks/utilsHooks";
+import { setCollapsed } from "@/stores/features/sideBarSlice";
 export interface MenuSideProps {
   icon: React.ReactElement;
   label: string;
@@ -11,6 +13,8 @@ export interface MenuSideProps {
 }
 
 function MenuSide({ icon, label, onPress, urls }: MenuSideProps) {
+  const dispatch = useAppDispatch();
+
   const sideBarState = useAppSelector((state) => state.sidebarState);
   const [active, setActive] = useState<boolean>(false);
   const location = useLocation();
@@ -22,6 +26,7 @@ function MenuSide({ icon, label, onPress, urls }: MenuSideProps) {
       setActive(isActive);
     }
   }, [urls, location.pathname]);
+  const isMdOrLess = useMediaQuery("(max-width: 768px)");
   return (
     <Tooltip placement="right" title={label}>
       <li
@@ -35,7 +40,12 @@ function MenuSide({ icon, label, onPress, urls }: MenuSideProps) {
             "justify-start w-full": sideBarState.isCollapsed,
           }
         )}
-        onClick={onPress}
+        onClick={() => {
+          onPress?.();
+          if (isMdOrLess) {
+            dispatch(setCollapsed());
+          }
+        }}
       >
         {icon}
         {sideBarState.isCollapsed && (

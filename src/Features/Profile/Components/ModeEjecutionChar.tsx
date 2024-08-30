@@ -6,7 +6,7 @@ import React from "react";
 export default function ModeEjecutionChar() {
   const authUser = useAppSelector((state) => state.auth.authUser);
 
-  const { data, error, isLoading } =
+  const { data } =
     diagnosisService.useCountDiagnosisByConsultorByModeEjecutionQuery({
       consultor_id: authUser?.user.id ?? 0,
     });

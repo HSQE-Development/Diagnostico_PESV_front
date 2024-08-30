@@ -13,6 +13,10 @@ import ProtectedRoute from "./Components/ProtectedRoute";
 function App() {
   const router = createBrowserRouter([
     {
+      path: "/",
+      element: <LoginPage />,
+    },
+    {
       path: "/login",
       element: <LoginPage />,
     },

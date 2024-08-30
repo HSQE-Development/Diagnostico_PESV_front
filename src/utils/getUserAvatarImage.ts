@@ -1,4 +1,5 @@
 import DefaultProfile from "@/assets/defaultProfile.png";
+import { ColorPalette } from "@/interfaces/Comun";
 import { IUser } from "@/interfaces/IUser";
 
 enum Role {
@@ -19,10 +20,6 @@ export function getFullName(user?: IUser | null): string {
   return user ? `${user.first_name} ${user.last_name}` : "";
 }
 
-interface ColorPalette {
-  tailwind: string;
-  hex: string;
-}
 export function getColorByRole(role: string): ColorPalette {
   const roleValue = Role[role.toUpperCase() as keyof typeof Role] || role;
 

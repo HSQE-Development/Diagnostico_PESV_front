@@ -20,7 +20,7 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 export const corporateGroupService = createApi({
   reducerPath: "corporateGroupApi",
   baseQuery: axiosBaseQuery,
-  tagTypes: ["CorporateGroups", "CompaniesNotIncorpored"],
+  tagTypes: ["CorporateGroups", "CorporateGroupById", "CompaniesNotIncorpored"],
   endpoints: (builder) => ({
     // Define aquí tus endpoints
     findAll: builder.query<
@@ -36,6 +36,13 @@ export const corporateGroupService = createApi({
         },
       }),
       providesTags: ["CorporateGroups"],
+    }),
+    findById: builder.query<ICorporateGroup, { id: number }>({
+      query: ({ id }) => ({
+        url: `/corporate_groups/${id}`,
+        method: "GET",
+      }),
+      providesTags: ["CorporateGroupById"],
     }),
     saveCorporateGroup: builder.mutation<ICorporateGroup, CorporateDTO>({
       query: (dataDto) => ({

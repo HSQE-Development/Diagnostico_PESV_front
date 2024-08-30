@@ -31,10 +31,10 @@ export default function MiniProfile({
   ];
   const avatarUrl = getUservatarUrl(avatar ?? undefined);
   return (
-    <div className="flex justify-evenly items-center gap-x-2">
-      <div className="flex flex-col items-end">
+    <div className="flex justify-evenly items-center gap-x-2 transition-all">
+      <div className="flex flex-col items-end transition-all">
         <span className="text-sm">{username}</span>
-        <div className="flex items-center justify-evenly gap-2">
+        <div className="items-center justify-evenly gap-2 hidden sm:flex transition-all">
           {cargo.map((role) => (
             <Badge key={role.id} text={role.name} showZero color="#85CDFA" />
           ))}
@@ -43,7 +43,7 @@ export default function MiniProfile({
       {/* <Avatar src={<img src={url} alt="avatar" />} /> */}
       <Dropdown
         menu={{ items }}
-        placement="bottom"
+        placement="bottomLeft"
         arrow={{ pointAtCenter: true }}
       >
         <Avatar src={avatarUrl} alt="User Image" />

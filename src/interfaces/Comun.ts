@@ -22,3 +22,12 @@ export interface PaginationComun<T> {
   previous: string | null;
   results: T[];
 }
+
+export interface CorporateGroupId {
+  corporate_id?: number;
+}
+
+export interface ColorPalette {
+  tailwind: string;
+  hex: string;
+}

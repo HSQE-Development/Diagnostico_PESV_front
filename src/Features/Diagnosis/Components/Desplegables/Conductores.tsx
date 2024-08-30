@@ -1,3 +1,4 @@
+import { useCorporate } from "@/context/CorporateGroupContext";
 import { DriverDTO, DriverQuestion } from "@/interfaces/Company";
 import { TableParams } from "@/interfaces/Comun";
 import {
@@ -7,7 +8,6 @@ import {
 import { useAppDispatch, useAppSelector } from "@/stores/hooks";
 import { companyService } from "@/stores/services/companyService";
 import { diagnosisService } from "@/stores/services/diagnosisServices";
-import { skipToken } from "@reduxjs/toolkit/query";
 import {
   ConfigProvider,
   Input,
@@ -20,7 +20,6 @@ import { useSearchParams } from "react-router-dom";
 
 interface Props {
   companyId: number;
-  noFetch?: boolean;
 }
 interface DataType extends DriverQuestion {
   key: React.Key;
@@ -30,21 +29,27 @@ interface DataType extends DriverQuestion {
  * @param companyId El id de la empresa para temas de consulta
  * @returns
  */
-export default function Conductores({ companyId, noFetch = false }: Props) {
+export default function Conductores({ companyId }: Props) {
+  const { corporateId } = useCorporate();
   const dispatch = useAppDispatch();
+
   const { data: conductoresPreguntas, refetch } =
     companyService.useFindAllDriverQuestionsQuery();
+
   const [searchParams] = useSearchParams();
 
-  const isNewDiagnosis = Boolean(searchParams.get("newDiagnosis") ?? "false");
-
+  const isNewDiagnosis = corporateId
+    ? false
+    : Boolean(searchParams.get("newDiagnosis") ?? "false");
   const {
     data: driverByCompanyid,
     isLoading: isLoadingDriverByCompany,
+    refetch: refetchDriver,
     isUninitialized,
-  } = diagnosisService.useFindDriversByCompanyIdQuery(
-    noFetch ? skipToken : { companyId }
-  );
+  } = diagnosisService.useFindDriversByCompanyIdQuery({
+    companyId,
+    corporate_group: corporateId,
+  });
   const [inputValues, setInputValues] = useState<{
     [key: number]: {
       quantity: number;
@@ -57,20 +62,24 @@ export default function Conductores({ companyId, noFetch = false }: Props) {
     },
   });
   useEffect(() => {
-    if (!isUninitialized) refetch();
+    if (!isUninitialized) {
+      refetch();
+      refetchDriver();
+    }
   }, [companyId, isUninitialized]);
   useEffect(() => {
     if (conductoresPreguntas) {
       dispatch(setDriverQuestions(conductoresPreguntas));
     }
   }, [conductoresPreguntas, dispatch]);
+
   useEffect(() => {
-    if (
-      driverByCompanyid &&
-      !isLoadingDriverByCompany &&
-      !isNewDiagnosis &&
-      !noFetch
-    ) {
+    if (!corporateId) {
+      dispatch(setDriverData([]));
+    }
+  }, [corporateId]);
+  useEffect(() => {
+    if (driverByCompanyid && !isNewDiagnosis && corporateId) {
       const initialInputValues: {
         [key: number]: {
           quantity: number;
@@ -84,7 +93,7 @@ export default function Conductores({ companyId, noFetch = false }: Props) {
       setInputValues(initialInputValues);
       dispatch(setDriverData(driverByCompanyid));
     }
-  }, [driverByCompanyid, isLoadingDriverByCompany]);
+  }, [driverByCompanyid]);
 
   const questionDriver = useAppSelector(
     (state) => state.driverQuestion.questions

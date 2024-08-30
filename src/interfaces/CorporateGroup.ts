@@ -2,6 +2,7 @@ import { Company, Diagnosis } from "./Company";
 import { Comun, PaginationComun } from "./Comun";
 
 export interface ICorporateGroup extends Comun {
+  nit: string;
   company_diagnoses_corporate: ICorporateDiagnosisCompany[];
 }
 

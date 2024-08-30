@@ -40,7 +40,7 @@ export const DiagnosisItemList = ({ diagnosis }: { diagnosis: Diagnosis }) => {
             <span>Nivel PESV</span>
           </div>
           <span className="font-bold ml-2">
-            {diagnosis.type_detail.name.toUpperCase()}
+            {diagnosis.type_detail?.name.toUpperCase()}
           </span>
         </div>
         <div className="flex items-center justify-between w-full">

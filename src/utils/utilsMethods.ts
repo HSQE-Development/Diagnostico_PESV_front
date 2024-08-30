@@ -3,6 +3,7 @@
  *
  */
 
+import { ColorPalette } from "@/interfaces/Comun";
 import { GetProp, UploadProps } from "antd";
 
 /**
@@ -212,3 +213,22 @@ export const getFileBase64 = (file: File): Promise<string> => {
     reader.onerror = (error) => reject(error);
   });
 };
+
+enum LEVEL_PESV {
+  BASICO = 1,
+  ESTANDAR = 2,
+  AVANZADO = 3,
+}
+
+export function getColorByLevelPesv(level: number): ColorPalette {
+  switch (level) {
+    case LEVEL_PESV.BASICO:
+      return { tailwind: "bg-[#6cffc3]", hex: "#6cffc3" };
+    case LEVEL_PESV.ESTANDAR:
+      return { tailwind: "bg-[#6c91ff]", hex: "#6c91ff" };
+    case LEVEL_PESV.AVANZADO:
+      return { tailwind: "bg-[#ff6c6c]", hex: "#ff6c6c" };
+    default:
+      return { tailwind: "bg-[#007bff]", hex: "#007bff" };
+  }
+}

@@ -519,6 +519,7 @@ export default function DiagnosisDataTable({ companyId }: Props) {
       pagination={false} // Desactiva la paginación si no la necesitas
       expandable={expandableConfig}
       rowClassName={() => "bg-slate-100"}
+      className="w-full overflow-auto"
     />
   );
 }

@@ -1,33 +1,34 @@
 import { Company } from "@/interfaces/Company";
-import { MisionalitySizeCriteria } from "@/interfaces/Dedication";
 import { setNextDiagnosisCurrent } from "@/stores/features/utilsSlice";
 import { useAppDispatch, useAppSelector } from "@/stores/hooks";
 import { companyService } from "@/stores/services/companyService";
 import { diagnosisService } from "@/stores/services/diagnosisServices";
 import { decryptId, encryptId } from "@/utils/utilsMethods";
 import { skipToken } from "@reduxjs/toolkit/query";
-import { message } from "antd";
-import React, { useEffect, useState } from "react";
+import { message, Skeleton } from "antd";
+import React, { lazy, Suspense, useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { determineCompanySize } from "../utils/functions";
 import CompanyHeaderInfo from "./CompanyHeaderInfo";
 import ConsultandSelect from "./ConsultandSelect";
-import PesvNoteAndSegmented from "./PesvNoteAndSegmented";
 import ContinueOrSaveButton from "./ContinueOrSaveButton";
+import { useCorporate } from "@/context/CorporateGroupContext";
+import { corporateGroupService } from "@/stores/services/corporateGroupService";
+
+const PesvNoteAndSegmented = lazy(() => import("./PesvNoteAndSegmented"));
 
 interface Props {
   companyId: number;
-  corporate_id?: number;
 
   onlyInfo?: boolean;
   isOutOfContext?: boolean;
 }
 export default function CompanyInfo({
   companyId,
-  corporate_id,
   onlyInfo,
   isOutOfContext = false,
 }: Props) {
+  const { corporateId } = useCorporate();
+
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const current = useAppSelector((state) => state.util.diagnosisCurrent);
@@ -40,9 +41,6 @@ export default function CompanyInfo({
 
   //States
   const [company, setCompany] = useState<Company | null>(null);
-  const [sizeCompany, setSizeCompany] = useState<
-    MisionalitySizeCriteria[] | null
-  >(null);
   const [consultorSelect, setConsultorSelect] = useState<number | null>(null);
   const [size, setSize] = useState<number>(0);
   const [observationChanged, setObservationChanged] = useState<string | null>(
@@ -51,6 +49,10 @@ export default function CompanyInfo({
   const [userChanged, setUserChanged] = useState<boolean>(false);
 
   //Consultas
+  const { data: corporateData } = corporateGroupService.useFindByIdQuery(
+    corporateId ? { id: corporateId } : skipToken
+  );
+
   const { data, refetch, isUninitialized } = companyService.useFindByIdQuery(
     companyId ? { id: companyId } : skipToken
   );
@@ -59,12 +61,12 @@ export default function CompanyInfo({
     refetch: refetchDiagnosis,
     isUninitialized: unitializedDiagnosis,
   } = diagnosisService.useFindByIdQuery(
-    diagnosisId ? { diagnosisId } : skipToken
+    diagnosisId
+      ? { diagnosisId }
+      : corporateId
+      ? { diagnosisId: 0, corporate_group: corporateId }
+      : skipToken
   );
-  const { data: sizeData } =
-    companyService.useFindcompanySizeByDedicactionIdQuery(
-      company ? { id: company.mission_detail.id } : skipToken
-    );
 
   //Mutaciones
   const [saveAnswerCuestions, { isLoading }] =
@@ -88,22 +90,14 @@ export default function CompanyInfo({
   }, [data]);
 
   useEffect(() => {
-    if (sizeCompany) {
-      setSize(
-        determineCompanySize(sizeCompany, totalVehicles, totalDrivers) ?? 0
-      );
-      setUserChanged(false);
-    }
-  }, [totalVehicles, totalDrivers]);
-
-  useEffect(() => {
     if (diagnosisDataById) {
-      setSize(diagnosisDataById.type_detail.id);
+      if (!isOutOfContext) {
+        setSize(diagnosisDataById.type_detail?.id ?? 0);
+      }
       setObservationChanged(diagnosisDataById.observation);
       setConsultorSelect(diagnosisDataById.consultor_detail?.id ?? null);
     }
   }, [diagnosisDataById]);
-
   useEffect(() => {
     if (!isUninitialized) refetch();
   }, [isUninitialized, refetch]);
@@ -111,11 +105,6 @@ export default function CompanyInfo({
   useEffect(() => {
     if (!unitializedDiagnosis) refetchDiagnosis();
   }, [unitializedDiagnosis, refetchDiagnosis]);
-
-  useEffect(() => {
-    if (sizeData) setSizeCompany(sizeData);
-  }, [sizeData]);
-
   const confirm = async () => {
     try {
       switch (current) {
@@ -155,7 +144,6 @@ export default function CompanyInfo({
       );
     }
   };
-
   const handleUpdateDataOfDiagnosis = async () => {
     try {
       if (!isOutOfContext) {
@@ -172,7 +160,7 @@ export default function CompanyInfo({
         await saveCountForCompanyInCorporate({
           company: companyId,
           consultor: consultorSelect ?? 0,
-          corporate: corporate_id ?? 0,
+          corporate: corporateId ?? 0,
           driverData,
           vehicleData,
         });
@@ -198,21 +186,37 @@ export default function CompanyInfo({
 
   const totalGeneral = totalDrivers + totalVehicles;
 
+  const existCompany = companyId ? true : false;
+  console.log(corporateId);
   const renderConsultantAndPESV = () => (
     <>
-      <ConsultandSelect
-        consultorSelect={consultorSelect}
-        setConsultorSelect={setConsultorSelect}
-      />
-      <PesvNoteAndSegmented
-        size={size}
-        setSize={setSize}
-        userChanged={userChanged}
-        observationChanged={observationChanged}
-        setObservationChanged={setObservationChanged}
-        setUserChanged={setUserChanged}
-        company={company}
-      />
+      {!isOutOfContext && (
+        <ConsultandSelect
+          consultorSelect={consultorSelect}
+          setConsultorSelect={setConsultorSelect}
+        />
+      )}
+      {existCompany && (
+        <Suspense
+          fallback={
+            <>
+              <div className="flex w-full">
+                <Skeleton className="p-4 w-full" />
+              </div>
+            </>
+          }
+        >
+          <PesvNoteAndSegmented
+            size={size}
+            setSize={setSize}
+            userChanged={userChanged}
+            observationChanged={observationChanged}
+            setObservationChanged={setObservationChanged}
+            setUserChanged={setUserChanged}
+            company={company}
+          />
+        </Suspense>
+      )}
       <ContinueOrSaveButton
         userChanged={userChanged}
         totalGeneral={totalGeneral}
@@ -229,7 +233,7 @@ export default function CompanyInfo({
 
   return (
     <div className="grid grid-cols-6 gap-2 md:sticky top-2 w-full md:w-[30%] md:ml-8">
-      <CompanyHeaderInfo company={company} />
+      <CompanyHeaderInfo company={company} corporate_group={corporateData} />
       {isOutOfContext && !onlyInfo
         ? renderConsultantAndPESV()
         : current < stepsLenght - 1 && renderConsultantAndPESV()}

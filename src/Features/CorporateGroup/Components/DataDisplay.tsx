@@ -3,19 +3,20 @@ import {
   Collapse,
   CollapseProps,
   Empty,
+  message,
   Modal,
   Pagination,
   Popover,
   Skeleton,
 } from "antd";
-import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import React, { lazy, Suspense, useEffect, useState } from "react";
 import { SlArrowDown } from "react-icons/sl";
-import CompanyCards from "./CompanyCards";
 import { FaLayerGroup } from "react-icons/fa";
 import CompanyList from "./CompanyList";
 import { corporateGroupService } from "@/stores/services/corporateGroupService";
 import { CorporateGroupPagination } from "@/interfaces/CorporateGroup";
 import {
+  encryptId,
   generateColorStyles,
   getRandomColorClassForText,
 } from "@/utils/utilsMethods";
@@ -24,6 +25,10 @@ import { TOAST_TYPE, toastHandler } from "@/utils/useToast";
 import { useModal } from "@/hooks/utilsHooks";
 import QuantityForm from "@/Features/Diagnosis/Components/Steps/QuantityForm";
 import { MdOutlineAccountTree } from "react-icons/md";
+import { diagnosisService } from "@/stores/services/diagnosisServices";
+import { useNavigate } from "react-router-dom";
+import { useCorporate } from "@/context/CorporateGroupContext";
+const CompanyCards = lazy(() => import("./CompanyCards"));
 
 const useAddOrRemoveCompany = () => {
   const [addOrRemoveCompanyOfGroupByGroupId, { isLoading: removeLoading }] =
@@ -38,7 +43,9 @@ const getItems = (
   removeLoading: boolean,
   onOpenCard: () => void,
   setCompanyId: (id: number) => void,
-  setCorporateId: Dispatch<SetStateAction<number>>
+  setCorporateId: (id: number) => void,
+  handleInitDiagnosis: (id: number) => void,
+  initLoading: boolean
 ): CollapseProps["items"] => {
   return data.results.map((group, index) => {
     // Generar un color aleatorio para cada grupo
@@ -59,8 +66,15 @@ const getItems = (
       ),
       children: (
         <>
-          <div className="flex flex-col items-start justify-around w-full">
-            <div className="flex items-center justify-end w-full my-2">
+          <form className="flex flex-col items-start justify-around w-full">
+            <div className="flex items-center justify-between w-full my-2">
+              <Button
+                type="primary"
+                onClick={() => handleInitDiagnosis(group.id)}
+                loading={initLoading}
+              >
+                Empezar Diagnostico
+              </Button>
               <Popover
                 placement="right"
                 content={<CompanyList corporateId={group.id} />}
@@ -72,26 +86,28 @@ const getItems = (
             </div>
             <div className="grid  w-full gap-4 grid-cols-12">
               {group.company_diagnoses_corporate.length <= 0 && <Empty />}
-              {group.company_diagnoses_corporate.map((companies) => (
-                <CompanyCards
-                  companiesGroup={companies.company_detail}
-                  key={companies.company_detail.id}
-                  onDeleteClick={() =>
-                    handleAddCompanyToGroup(
-                      companies.company_detail.id,
-                      group.id
-                    )
-                  }
-                  isLoading={removeLoading}
-                  onClick={() => {
-                    onOpenCard()
-                    setCorporateId(group.id)
-                  }}
-                  setCompanyId={setCompanyId}
-                />
-              ))}
+              <Suspense fallback={<Skeleton.Node active />}>
+                {group.company_diagnoses_corporate.map((companies) => (
+                  <CompanyCards
+                    companiesGroup={companies.company_detail}
+                    key={companies.company_detail.id}
+                    onDeleteClick={() =>
+                      handleAddCompanyToGroup(
+                        companies.company_detail.id,
+                        group.id
+                      )
+                    }
+                    isLoading={removeLoading}
+                    onClick={() => {
+                      onOpenCard();
+                      setCorporateId(group.id);
+                    }}
+                    setCompanyId={setCompanyId}
+                  />
+                ))}
+              </Suspense>
             </div>
-          </div>
+          </form>
         </>
       ),
       className: `rounded-2xl my-2 ${defaultClasses} ${bgColor}`,
@@ -108,12 +124,12 @@ export default function DataDisplay() {
     page_size: pageSize,
   });
   const [companyId, setCompanyId] = useState<number>(0);
-  const [corporateId, setCorporateId] = useState<number>(0);
+  // const [corporateId, setCorporateId] = useState<number>(0);
+  const { setCorporateId } = useCorporate();
 
   const handleSetCompanyId = (id: number) => {
     setCompanyId(id);
   };
-
   const { isOpen, open, close } = useModal();
 
   useEffect(() => {
@@ -158,6 +174,30 @@ export default function DataDisplay() {
       );
     }
   };
+
+  const [initDiagnosisCorporate, { isLoading: initLoading }] =
+    diagnosisService.useInitDiagnosisCorporateMutation();
+
+  const navigate = useNavigate();
+
+  const handleInitDiagnosis = async (group_id: number) => {
+    try {
+      const data = await initDiagnosisCorporate({
+        corporate: group_id,
+      }).unwrap();
+      setCorporateId(group_id);
+      navigate(
+        `/app/companies/diagnosis/${encryptId("0")}/?diagnosis=${encryptId(
+          data.id.toString()
+        )}&corporate=${encryptId(group_id.toString())}`
+      );
+    } catch (error: any) {
+      console.log(error);
+      message.error(
+        "Error interno del sistema, comuniquese con un Administrador"
+      );
+    }
+  };
   return (
     <>
       {isLoading && <Skeleton avatar paragraph={{ rows: 4 }} active />}
@@ -179,7 +219,9 @@ export default function DataDisplay() {
             removeLoading,
             open,
             handleSetCompanyId,
-            setCorporateId
+            setCorporateId,
+            handleInitDiagnosis,
+            initLoading
           )}
           className="md:mx-8 custom_collapsed mb-8"
           collapsible="icon"
@@ -213,11 +255,7 @@ export default function DataDisplay() {
         width={1300}
         footer={null}
       >
-        <QuantityForm
-          companyId={companyId}
-          corporate_id={corporateId}
-          isOver={true}
-        />
+        <QuantityForm companyId={companyId} isOver={true} />
       </Modal>
     </>
   );
