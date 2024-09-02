@@ -32,6 +32,7 @@ export interface CheckListDTO {
   diagnosisDto: DiagnosisDTO[];
   diagnosisRequirementDto: DiagnosisRequirementDTO[];
   diagnosis: number;
+  mode_ejecution: string;
 }
 export interface DiagnosisDTO {
   question: number;

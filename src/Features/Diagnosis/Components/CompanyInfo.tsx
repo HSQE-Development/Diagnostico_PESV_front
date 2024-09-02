@@ -5,7 +5,7 @@ import { companyService } from "@/stores/services/companyService";
 import { diagnosisService } from "@/stores/services/diagnosisServices";
 import { decryptId, encryptId } from "@/utils/utilsMethods";
 import { skipToken } from "@reduxjs/toolkit/query";
-import { message, Skeleton } from "antd";
+import { message, Segmented, Skeleton } from "antd";
 import React, { lazy, Suspense, useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import CompanyHeaderInfo from "./CompanyHeaderInfo";
@@ -46,6 +46,7 @@ export default function CompanyInfo({
   const [observationChanged, setObservationChanged] = useState<string | null>(
     null
   );
+  const [ejecution, setEjecution] = useState<string>("virtual");
   const [userChanged, setUserChanged] = useState<boolean>(false);
 
   //Consultas
@@ -96,6 +97,7 @@ export default function CompanyInfo({
       }
       setObservationChanged(diagnosisDataById.observation);
       setConsultorSelect(diagnosisDataById.consultor_detail?.id ?? null);
+      setEjecution(diagnosisDataById.mode_ejecution ?? "presencial");
     }
   }, [diagnosisDataById]);
   useEffect(() => {
@@ -129,9 +131,8 @@ export default function CompanyInfo({
             diagnosisRequirementDto: diagnosisRequirementData,
             consultor: consultorSelect ?? 0,
             diagnosis: diagnosisId ?? 0,
+            mode_ejecution: ejecution,
           }).unwrap();
-          refetch();
-          refetchDiagnosis();
           dispatch(setNextDiagnosisCurrent());
           message.success("Diagnostico realizado correctamente");
           break;
@@ -187,14 +188,34 @@ export default function CompanyInfo({
   const totalGeneral = totalDrivers + totalVehicles;
 
   const existCompany = companyId ? true : false;
-  console.log(corporateId);
+  const handleSegmentChange = (newSize: string) => {
+    setEjecution(newSize); // Mark that the user has manually changed the segment
+  };
   const renderConsultantAndPESV = () => (
     <>
       {!isOutOfContext && (
-        <ConsultandSelect
-          consultorSelect={consultorSelect}
-          setConsultorSelect={setConsultorSelect}
-        />
+        <>
+          <ConsultandSelect
+            consultorSelect={consultorSelect}
+            setConsultorSelect={setConsultorSelect}
+          />
+          <Segmented
+            options={[
+              {
+                label: "Presencial",
+                value: "presencial",
+              },
+              {
+                label: "Virtual",
+                value: "virtual",
+              },
+            ]}
+            value={ejecution}
+            block
+            className="col-span-6"
+            onChange={handleSegmentChange}
+          />
+        </>
       )}
       {existCompany && (
         <Suspense
@@ -233,7 +254,11 @@ export default function CompanyInfo({
 
   return (
     <div className="grid grid-cols-6 gap-2 md:sticky top-2 w-full md:w-[30%] md:ml-8">
-      <CompanyHeaderInfo company={company} corporate_group={corporateData} />
+      <CompanyHeaderInfo
+        company={company}
+        corporate_group={corporateData}
+        isOutOfContext={isOutOfContext}
+      />
       {isOutOfContext && !onlyInfo
         ? renderConsultantAndPESV()
         : current < stepsLenght - 1 && renderConsultantAndPESV()}

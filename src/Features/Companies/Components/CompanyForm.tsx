@@ -23,6 +23,7 @@ import * as Yup from "yup";
 
 interface CompanyFormProps {
   id?: number;
+  onlyCreate?: boolean;
 }
 
 const initialValues: CompanyDTO = {
@@ -40,9 +41,9 @@ const initialValues: CompanyDTO = {
   ciius: null,
 };
 
-export default function CompanyForm({ id }: CompanyFormProps) {
+export default function CompanyForm({ id, onlyCreate }: CompanyFormProps) {
   const { setCorporateId } = useCorporate();
-
+  const [createOnly, setCreateOnly] = useState<boolean | undefined>(onlyCreate);
   const navigate = useNavigate();
   const { changeCompany, createCompany, isSaving, isUpdating } = useCompany();
   const { data: fetchSegments, isLoading } = segmentService.useFindAllQuery();
@@ -161,13 +162,15 @@ export default function CompanyForm({ id }: CompanyFormProps) {
         await changeCompany(id, values);
       } else {
         // Aqui se registra
-        const saveCompany = await createCompany(values);
         setCorporateId(undefined);
-        navigate(
-          `/app/companies/diagnosis/${encryptId(
-            saveCompany?.id.toString() ?? ""
-          )}`
-        );
+        const saveCompany = await createCompany(values);
+        if (saveCompany) {
+          if (!createOnly) {
+            navigate(
+              `/app/companies/diagnosis/${encryptId(saveCompany.id.toString())}`
+            );
+          }
+        }
       }
     } catch (error: any) {
       console.log("ERROR", error);
@@ -374,6 +377,23 @@ export default function CompanyForm({ id }: CompanyFormProps) {
                   <div className="text-red-600">{props.errors.dependant}</div>
                 ) : null}
               </div>
+              <div className="col-span-12 md:col-span-3">
+                <FloatLabel label="Teléfono Persona de contacto">
+                  <Input
+                    id="dependant_phone"
+                    name="dependant_phone"
+                    value={props.values.dependant_phone ?? ""}
+                    onChange={props.handleChange}
+                    onBlur={props.handleBlur}
+                  />
+                </FloatLabel>
+                {props.touched.dependant_phone &&
+                props.errors.dependant_phone ? (
+                  <div className="text-red-600">
+                    {props.errors.dependant_phone}
+                  </div>
+                ) : null}
+              </div>
               <div className="col-span-12 md:col-span-6">
                 <FloatLabel label="Misionalidad de la empresa">
                   <Select
@@ -395,24 +415,8 @@ export default function CompanyForm({ id }: CompanyFormProps) {
                   <div className="text-red-600">{props.errors.segment}</div>
                 ) : null}
               </div>
-              <div className="col-span-12 md:col-span-3">
-                <FloatLabel label="Teléfono Persona de contacto">
-                  <Input
-                    id="dependant_phone"
-                    name="dependant_phone"
-                    value={props.values.dependant_phone ?? ""}
-                    onChange={props.handleChange}
-                    onBlur={props.handleBlur}
-                  />
-                </FloatLabel>
-                {props.touched.dependant_phone &&
-                props.errors.dependant_phone ? (
-                  <div className="text-red-600">
-                    {props.errors.dependant_phone}
-                  </div>
-                ) : null}
-              </div>
-              <div className="col-span-12 md:col-span-3">
+
+              <div className="col-span-12 md:col-span-6">
                 <FloatLabel label="Certificaciones adquiridas">
                   <Input
                     id="acquired_certification"
@@ -465,7 +469,7 @@ export default function CompanyForm({ id }: CompanyFormProps) {
                 ) : null}
               </div> */}
             </div>
-            <div className="col-span-12 flex items-center justify-center mt-4">
+            <div className="col-span-12 flex items-center justify-center mt-4 gap-4">
               <Button
                 htmlType="submit"
                 icon={id ? <MdEdit /> : <CiSaveDown1 />}
@@ -477,8 +481,21 @@ export default function CompanyForm({ id }: CompanyFormProps) {
                 } text-white`}
                 loading={isSaving || isUpdating}
               >
-                {id ? "Editar" : "Guardar"}
+                {id ? "Editar" : "Guardar y empezar diagnostico"}
               </Button>
+              {!id && (
+                <Button
+                  type="dashed"
+                  htmlType="submit"
+                  icon={id ? <MdEdit /> : <CiSaveDown1 />}
+                  size="large"
+                  className={`border-purple-950 text-purple-700`}
+                  loading={isSaving || isUpdating}
+                  onClick={() => setCreateOnly(true)}
+                >
+                  {"Guardar"}
+                </Button>
+              )}
             </div>
           </form>
         );

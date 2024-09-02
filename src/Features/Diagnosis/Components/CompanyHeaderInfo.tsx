@@ -108,9 +108,11 @@ const CompanyHeaderData: React.FC<CompanyHeaderDataProps> = (props) => {
 export default function CompanyHeaderInfo({
   company,
   corporate_group,
+  isOutOfContext,
 }: {
   company: Company | null;
   corporate_group?: ICorporateGroup;
+  isOutOfContext?: boolean;
 }) {
   const { corporateId } = useCorporate();
 
@@ -120,6 +122,7 @@ export default function CompanyHeaderInfo({
   const totalDrivers = useAppSelector(
     (state) => state.driverQuestion.totalQuantity
   );
+  console.log(company);
   return (
     <>
       <div className="col-span-6 ">
@@ -151,9 +154,9 @@ export default function CompanyHeaderInfo({
         </div>
       )}
       {!corporateId ||
-        (company && (
-          <div className="col-span-6 flex items-center justify-center gap-8">
-            <div className=" bg-gray-100 rounded-xl w-2/4 h-24">
+        (isOutOfContext && company && (
+          <div className="col-span-6 flex items-center justify-center gap-2">
+            <div className=" bg-gray-100 rounded-xl w-1/2 h-24">
               <Statistic
                 title="Total Vehìculos"
                 value={totalVehicles}
@@ -162,7 +165,7 @@ export default function CompanyHeaderInfo({
                 className="w-full h-full flex flex-col justify-center items-center"
               />
             </div>
-            <div className=" bg-gray-100 rounded-xl w-2/4 h-24">
+            <div className=" bg-gray-100 rounded-xl w-1/2 h-24">
               <Statistic
                 title="Total Conductores"
                 value={totalDrivers}

@@ -5,6 +5,8 @@ export const determineCompanySize = (
   totalVehicles: number,
   totalDrivers: number
 ): number | null => {
+  let selectedSize: number | null = null;
+
   for (const criteria of missionCriteria) {
     const sizeCriteria = criteria.criteria_detail;
 
@@ -19,11 +21,15 @@ export const determineCompanySize = (
       sizeCriteria.driver_min <= totalDrivers && totalDrivers <= driverMax;
 
     // Return the size ID if the criteria are met
-    if (vehicleInRange || driverInRange) {
+    if (vehicleInRange && driverInRange) {
       return criteria.size_detail.id;
+    }
+    // Si al menos uno de los criterios se cumple, guardar temporalmente el tamaño
+    if (vehicleInRange || driverInRange) {
+      selectedSize = criteria.size_detail.id;
     }
   }
 
   // If no criteria are met, return null
-  return null;
+  return selectedSize;
 };

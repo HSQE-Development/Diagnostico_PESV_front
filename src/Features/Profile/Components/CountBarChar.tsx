@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 
 export default function CountBarChar() {
   const authUser = useAppSelector((state) => state.auth.authUser);
-  const [formattedData, setFormattedData] = useState([
+  const [formattedData, setFormattedData] = useState<any[]>([
     {
       id: 0,
       label: "SIN DATOS",
@@ -19,12 +19,12 @@ export default function CountBarChar() {
 
   useEffect(() => {
     if (data) {
-      setFormattedData;
-      data.map((item: any) => ({
+      const formatted = data.map((item: any) => ({
         id: item.type__name,
         label: item.type__name,
         value: item.total,
       }));
+      setFormattedData(formatted);
     }
   }, [data]);
   return (
@@ -36,7 +36,7 @@ export default function CountBarChar() {
         padAngle={0.7}
         cornerRadius={3}
         activeOuterRadiusOffset={8}
-        colors={{ scheme: "nivo" }}
+        colors={{ scheme: "category10" }}
         borderWidth={1}
         borderColor={{ from: "color", modifiers: [["darker", 0.2]] }}
         arcLinkLabelsSkipAngle={10}

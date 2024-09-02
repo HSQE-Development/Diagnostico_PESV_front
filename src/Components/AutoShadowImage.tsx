@@ -39,7 +39,8 @@ const AutoShadowImage: React.FC<AutoShadowImageProps> = ({
     <ImageAntd
       src={src}
       alt={alt}
-      className={`w-full h-1/4  object-cover transition-all ${className}`}
+      height={"20rem"}
+      className={`w-full max-h-96 object-cover transition-all ${className}`}
       style={{ boxShadow }}
     />
   );

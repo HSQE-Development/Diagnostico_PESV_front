@@ -157,9 +157,13 @@ export default function Conductores({ companyId }: Props) {
             <Input
               key={record.id}
               value={driverInfo.quantity ?? 0}
-              onChange={(e) =>
-                handleDriverChange(parseInt(e.target.value) ?? 0, record.id)
-              }
+              onChange={(e) => {
+                const value = e.target.value;
+                handleDriverChange(
+                  value === "" ? 0 : parseInt(value, 10) || 0,
+                  record.id
+                );
+              }}
             />
           </>
         );

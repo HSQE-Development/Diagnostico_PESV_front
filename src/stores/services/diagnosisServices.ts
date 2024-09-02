@@ -258,7 +258,7 @@ export const diagnosisService = createApi({
     }),
     countDiagnosisByConsultorByModeEjecution: builder.query<
       any,
-      { consultor_id: number }
+      { consultor_id?: number }
     >({
       query: ({ consultor_id }) => ({
         url: `/diagnosis/count_diagnosis_by_consultor_by_mode_ejecution`,
@@ -266,6 +266,12 @@ export const diagnosisService = createApi({
         params: {
           consultor: consultor_id,
         },
+      }),
+    }),
+    countDiagnosisByConsultors: builder.query<any, void>({
+      query: () => ({
+        url: `/diagnosis/count_diagnosis_by_consultors`,
+        method: "GET",
       }),
     }),
     complianceTrend: builder.query<ComplianceTrendData[], void>({

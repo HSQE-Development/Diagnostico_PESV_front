@@ -240,13 +240,14 @@ export default function Vehiculos({ companyId }: Props) {
             <Input
               key={record.id}
               value={fleetInfo.owned ?? 0}
-              onChange={(e) =>
+              onChange={(e) => {
+                const value = e.target.value;
                 handleFleetChange(
-                  parseInt(e.target.value) ?? 0,
+                  value === "" ? 0 : parseInt(value, 10) || 0, // Si el valor es "", se asigna 0, si no, se convierte a número.
                   record.id,
                   "owned"
-                )
-              }
+                );
+              }}
             />
           </>
         );
@@ -267,13 +268,14 @@ export default function Vehiculos({ companyId }: Props) {
               key={record.id}
               min={0}
               value={fleetInfo.third_party ?? 0}
-              onChange={(e) =>
+              onChange={(e) => {
+                const value = e.target.value;
                 handleFleetChange(
-                  parseInt(e.target.value) ?? 0,
+                  value === "" ? 0 : parseInt(value, 10) || 0,
                   record.id,
                   "third_party"
-                )
-              }
+                );
+              }}
             />
           </>
         );
@@ -293,13 +295,14 @@ export default function Vehiculos({ companyId }: Props) {
               key={record.id}
               min={0}
               value={fleetInfo.arrended ?? 0}
-              onChange={(e) =>
+              onChange={(e) => {
+                const value = e.target.value;
                 handleFleetChange(
-                  parseInt(e.target.value) ?? 0,
+                  value === "" ? 0 : parseInt(value, 10) || 0,
                   record.id,
                   "arrended"
-                )
-              }
+                );
+              }}
             />
           </>
         );
@@ -319,13 +322,14 @@ export default function Vehiculos({ companyId }: Props) {
               key={record.id}
               min={0}
               value={fleetInfo.contractors ?? 0}
-              onChange={(e) =>
+              onChange={(e) => {
+                const value = e.target.value;
                 handleFleetChange(
-                  parseInt(e.target.value) ?? 0,
+                  value === "" ? 0 : parseInt(value, 10) || 0,
                   record.id,
                   "contractors"
-                )
-              }
+                );
+              }}
             />
           </>
         );
@@ -345,13 +349,14 @@ export default function Vehiculos({ companyId }: Props) {
               key={record.id}
               min={0}
               value={fleetInfo.intermediation ?? 0}
-              onChange={(e) =>
+              onChange={(e) => {
+                const value = e.target.value;
                 handleFleetChange(
-                  parseInt(e.target.value) ?? 0,
+                  value === "" ? 0 : parseInt(value, 10) || 0,
                   record.id,
                   "intermediation"
-                )
-              }
+                );
+              }}
             />
           </>
         );
@@ -371,13 +376,14 @@ export default function Vehiculos({ companyId }: Props) {
               key={record.id}
               min={0}
               value={fleetInfo.leasing ?? 0}
-              onChange={(e) =>
+              onChange={(e) => {
+                const value = e.target.value;
                 handleFleetChange(
-                  parseInt(e.target.value) ?? 0,
+                  value === "" ? 0 : parseInt(value, 10) || 0,
                   record.id,
                   "leasing"
-                )
-              }
+                );
+              }}
             />
           </>
         );
@@ -397,13 +403,14 @@ export default function Vehiculos({ companyId }: Props) {
               key={record.id}
               min={0}
               value={fleetInfo.renting ?? 0}
-              onChange={(e) =>
+              onChange={(e) => {
+                const value = e.target.value;
                 handleFleetChange(
-                  parseInt(e.target.value) ?? 0,
+                  value === "" ? 0 : parseInt(value, 10) || 0,
                   record.id,
                   "renting"
-                )
-              }
+                );
+              }}
             />
           </>
         );
@@ -423,13 +430,14 @@ export default function Vehiculos({ companyId }: Props) {
               key={record.id}
               min={0}
               value={fleetInfo.employees ?? 0}
-              onChange={(e) =>
+              onChange={(e) => {
+                const value = e.target.value;
                 handleFleetChange(
-                  parseInt(e.target.value) ?? 0,
+                  value === "" ? 0 : parseInt(value, 10) || 0,
                   record.id,
                   "employees"
-                )
-              }
+                );
+              }}
             />
           </>
         );

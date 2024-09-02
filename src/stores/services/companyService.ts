@@ -8,6 +8,7 @@ import {
 import { MisionalitySizeCriteria, Mission } from "@/interfaces/Dedication";
 import axiosBaseQuery from "@/utils/axiosBaseQuery";
 import { createApi } from "@reduxjs/toolkit/query/react";
+import { corporateGroupService } from "./corporateGroupService";
 
 /**
  * IMPORTANTE:
@@ -24,6 +25,7 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 export const companyService = createApi({
   reducerPath: "companyApi",
   baseQuery: axiosBaseQuery,
+  tagTypes: ["GetCompamies"],
   endpoints: (builder) => ({
     findAll: builder.query<Company[], { arlId?: number | null }>({
       query: ({ arlId }) => ({
@@ -31,6 +33,7 @@ export const companyService = createApi({
         method: "GET",
         params: { arlId: arlId !== undefined ? arlId : null },
       }),
+      providesTags: ["GetCompamies"],
     }),
     findById: builder.query<Company, { id: number }>({
       query: ({ id }) => ({
@@ -46,12 +49,14 @@ export const companyService = createApi({
           ...updatedCompany,
         },
       }),
+      invalidatesTags: ["GetCompamies"],
     }),
     deleteCompany: builder.mutation<Company, { id: number }>({
       query: ({ id }) => ({
         url: `/companies/delete/${id}`,
         method: "DELETE",
       }),
+      invalidatesTags: ["GetCompamies"],
     }),
     save: builder.mutation<Company, CompanyDTO>({
       query: (companyData) => ({
@@ -61,6 +66,14 @@ export const companyService = createApi({
           ...companyData,
         },
       }),
+      invalidatesTags: ["GetCompamies"],
+      onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
+        await queryFulfilled;
+        // Invalida el tag 'User' en el servicio 'userApi'
+        dispatch(
+          corporateGroupService.util.invalidateTags(["CompaniesNotIncorpored"])
+        );
+      },
     }),
     findAllDedications: builder.query<Mission[], void>({
       query: () => ({

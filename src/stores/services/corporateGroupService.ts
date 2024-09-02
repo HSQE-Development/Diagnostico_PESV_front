@@ -55,13 +55,16 @@ export const corporateGroupService = createApi({
 
     findCompaniesNotInCorporate: builder.query<
       PaginationComun<Company>,
-      { corporate: number }
+      { corporate: number; page: number; page_size: number; search?: string }
     >({
-      query: ({ corporate }) => ({
+      query: ({ corporate, page, page_size, search }) => ({
         url: "/corporate_groups/companies_not_in_corporate",
         method: "GET",
         params: {
           corporate: corporate,
+          page: page,
+          page_size: page_size,
+          search,
         },
       }),
       providesTags: ["CompaniesNotIncorpored"],

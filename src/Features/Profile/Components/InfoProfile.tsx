@@ -22,7 +22,7 @@ export default function InfoProfile({ isLoading }: InfoProfileProps) {
 
   return (
     <>
-      <div className=" flex flex-col items-center justify-start gap-y-8 ">
+      <div className=" flex flex-col items-center justify-start gap-y-8 w-full">
         {isLoading ? (
           <>
             <div className="flex flex-col justify-center items-center gap-y-4 my-4">

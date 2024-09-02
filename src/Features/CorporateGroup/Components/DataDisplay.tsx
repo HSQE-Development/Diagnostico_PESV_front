@@ -72,6 +72,7 @@ const getItems = (
                 type="primary"
                 onClick={() => handleInitDiagnosis(group.id)}
                 loading={initLoading}
+                disabled={group.company_diagnoses_corporate.length <= 0}
               >
                 Empezar Diagnostico
               </Button>
@@ -85,7 +86,12 @@ const getItems = (
               </Popover>
             </div>
             <div className="grid  w-full gap-4 grid-cols-12">
-              {group.company_diagnoses_corporate.length <= 0 && <Empty />}
+              {group.company_diagnoses_corporate.length <= 0 && (
+                <Empty
+                  className="col-span-12"
+                  description="No hay empresas asignadas a este grupo"
+                />
+              )}
               <Suspense fallback={<Skeleton.Node active />}>
                 {group.company_diagnoses_corporate.map((companies) => (
                   <CompanyCards

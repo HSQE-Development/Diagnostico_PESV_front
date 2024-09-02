@@ -3,6 +3,8 @@ import React from "react";
 import { BiChart } from "react-icons/bi";
 import ChecklistTrendChart from "./Components/ChecklistTrendChart";
 import DiagnosisByCompanyChart from "./Components/DiagnosisByCompanyChart";
+import DiagnosisCountByEjecution from "./Components/DiagnosisCountByEjecution";
+import { Empty } from "antd";
 
 export default function MainPage() {
   return (
@@ -23,9 +25,15 @@ export default function MainPage() {
           <div className="flex flex-col w-full col-span-4 md:col-span-2 lg:col-span-1 bg-zinc-50 border-2 rounded-xl shadow-xl items-center justify-center p-4">
             <DiagnosisByCompanyChart />
           </div>
-          <div className="flex flex-col w-full col-span-4 md:col-span-2 lg:col-span-1  bg-white border-2 rounded-xl shadow-xl items-center justify-center p-4"></div>
-          <div className="flex flex-col w-full col-span-4 md:col-span-2 lg:col-span-1  bg-white border-2 rounded-xl shadow-xl items-center justify-center p-4"></div>
-          <div className="flex flex-col w-full col-span-4 md:col-span-2 lg:col-span-1  bg-white border-2 rounded-xl shadow-xl items-center justify-center p-4"></div>
+          <div className="flex flex-col w-full col-span-4 md:col-span-2 lg:col-span-1  bg-white border-2 rounded-xl shadow-xl items-center justify-center p-4">
+            <DiagnosisCountByEjecution />
+          </div>
+          <div className="flex flex-col w-full col-span-4 md:col-span-2 lg:col-span-1  bg-white border-2 rounded-xl shadow-xl items-center justify-center p-4">
+            <Empty description={"Sin datos"} />
+          </div>
+          <div className="flex flex-col w-full col-span-4 md:col-span-2 lg:col-span-1  bg-white border-2 rounded-xl shadow-xl items-center justify-center p-4">
+            <Empty description={"Sin datos"} />
+          </div>
         </div>
       </div>
     </div>
