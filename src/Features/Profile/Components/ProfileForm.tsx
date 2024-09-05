@@ -2,11 +2,11 @@ import FloatLabel from "@/Components/FloatLabel";
 import { UserDTO } from "@/interfaces/IUser";
 import { authService } from "@/stores/services/authService";
 import { getUservatarUrl } from "@/utils/getUserAvatarImage";
-import { Button, Image, Input, Upload, UploadFile } from "antd";
+import { Button, Image, Input, Select, Space, Upload, UploadFile } from "antd";
 import { Formik } from "formik";
 import React, { useEffect, useState } from "react";
 import { MdEdit } from "react-icons/md";
-import { CiSaveDown1 } from "react-icons/ci";
+import { CiCircleInfo, CiSaveDown1 } from "react-icons/ci";
 import * as Yup from "yup";
 import useUser from "@/hooks/userHooks";
 import { TOAST_TYPE, toastHandler } from "@/utils/useToast";
@@ -16,6 +16,9 @@ import {
   getBase64Antd,
   getFileBase64,
 } from "@/utils/utilsMethods";
+import { useAppSelector } from "@/stores/hooks";
+import { Group } from "@/interfaces/Group";
+import { userService } from "@/stores/services/userService";
 
 const initialValues: UserDTO = {
   first_name: "",
@@ -28,18 +31,35 @@ const initialValues: UserDTO = {
 };
 
 type ProfileProps = {
-  id: number;
+  id?: number;
 };
 export default function ProfileForm({ id }: ProfileProps) {
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const { changeUser, updateLoading, createUser, createLoading } = useUser();
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
+  const [filterGroup, setFilterGroup] = useState<Group[]>([]);
+
+  const { data: fetchGroups, isLoading: loadGroups } =
+    userService.useFindAllGroupsQuery();
 
   const { data: fetchDataUser, isLoading } = authService.useFindByIdQuery({
     user: id,
   });
 
+  useEffect(() => {
+    if (!loadGroups && fetchGroups && Array.isArray(fetchGroups)) {
+      setFilterGroup(fetchGroups);
+    }
+  }, [fetchGroups, loadGroups]);
+
+  const groupOptions = filterGroup.map((ciiu) => ({
+    value: ciiu.id,
+    label: ciiu.name,
+  }));
+
+  const authUser = useAppSelector((state) => state.auth.authUser);
+  const is_my_profile = authUser?.user.id === id;
   const validationSchema = Yup.object().shape({
     first_name: Yup.string().required("Campo Obligatorio"),
     last_name: Yup.string().required("Campo Obligatorio"),
@@ -53,7 +73,7 @@ export default function ProfileForm({ id }: ProfileProps) {
     try {
       if (id) {
         //Aqui se edita
-        await changeUser(id, values);
+        await changeUser(id, values, is_my_profile);
       } else {
         // Aqui se registra
         await createUser(values);
@@ -138,29 +158,40 @@ export default function ProfileForm({ id }: ProfileProps) {
             className="w-full flex flex-col items-stretch"
             onSubmit={props.handleSubmit}
           >
-            <Upload
-              fileList={fileList}
-              showUploadList={{ showPreviewIcon: true, showRemoveIcon: false }}
-              accept="image/*"
-              listType="picture-circle"
-              onPreview={handlePreview}
-              onChange={handleUploadChange}
-            >
-              Cambiar Imagen de Perfil
-            </Upload>
-
-            {previewImage && (
-              <Image
-                wrapperStyle={{ display: "none" }}
-                preview={{
-                  visible: previewOpen,
-                  onVisibleChange: (visible) => setPreviewOpen(visible),
-                  afterOpenChange: (visible) => !visible && setPreviewImage(""),
+            <div className="flex items-center justify-center mb-4">
+              <Upload
+                fileList={fileList}
+                showUploadList={{
+                  showPreviewIcon: true,
+                  showRemoveIcon: id ? false : true,
                 }}
-                src={previewImage}
-              />
-            )}
+                accept="image/*"
+                listType="picture-circle"
+                onPreview={handlePreview}
+                onChange={handleUploadChange}
+              >
+                {id ? "Cambiar Imagen de Perfil" : "Agregar foto de perfil"}
+              </Upload>
 
+              {previewImage && (
+                <Image
+                  wrapperStyle={{ display: "none" }}
+                  preview={{
+                    visible: previewOpen,
+                    onVisibleChange: (visible) => setPreviewOpen(visible),
+                    afterOpenChange: (visible) =>
+                      !visible && setPreviewImage(""),
+                  }}
+                  src={previewImage}
+                />
+              )}
+            </div>
+            <div className="flex items-center justify-start gap-2">
+              <CiCircleInfo />
+              <small>
+                Nota: Al correo registrado se enviara una contraseña al usuario
+              </small>
+            </div>
             <div className="grid grid-cols-12 mt-8 gap-4 gap-y-6">
               <div className="col-span-6">
                 <FloatLabel label="Nombre">
@@ -217,6 +248,36 @@ export default function ProfileForm({ id }: ProfileProps) {
                   />
                 </FloatLabel>
               </div>
+              <div className="col-span-12">
+                <FloatLabel label="Permisos">
+                  <Select
+                    showSearch
+                    value={props.values.groups}
+                    mode="multiple"
+                    style={{ width: "100%" }}
+                    filterOption={(input, option) =>
+                      (option?.label ?? "")
+                        .toLowerCase()
+                        .includes(input.toLowerCase())
+                    }
+                    options={groupOptions}
+                    virtual
+                    loading={loadGroups}
+                    allowClear
+                    optionRender={(option) => (
+                      <Space>
+                        <span>{option.data.label}</span>
+                      </Space>
+                    )}
+                    labelRender={(option) => (
+                      <>
+                        <span>{option.label}</span>
+                      </>
+                    )}
+                    onChange={(value) => props.setFieldValue("groups", value)}
+                  />
+                </FloatLabel>
+              </div>
               <div className="col-span-12 flex items-center justify-center ">
                 <Button
                   htmlType="submit"
@@ -225,7 +286,7 @@ export default function ProfileForm({ id }: ProfileProps) {
                   className={`${
                     id
                       ? "bg-orange-500 border-2 border-orange-400 hover:bg-orange-400 active:bg-orange-300"
-                      : "bg-green-500 border-2 border-green-400"
+                      : "bg-green-500 border-2 border-green-400 hover:bg-green-600 active:bg-green-400"
                   } text-white w-full`}
                   loading={isLoading || updateLoading || createLoading}
                 >

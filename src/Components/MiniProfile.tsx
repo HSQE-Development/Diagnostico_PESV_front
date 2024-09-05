@@ -1,4 +1,7 @@
 import { Group } from "@/interfaces/Group";
+import { clearAuthUser } from "@/stores/features/authSlice";
+import { useAppDispatch, useAppSelector } from "@/stores/hooks";
+import { authService } from "@/stores/services/authService";
 import { getUservatarUrl } from "@/utils/getUserAvatarImage";
 import { Avatar, Badge, Dropdown, MenuProps } from "antd";
 import React from "react";
@@ -16,7 +19,16 @@ export default function MiniProfile({
   avatar,
 }: MiniProfileProps) {
   const navigate = useNavigate();
-
+  const dispatch = useAppDispatch();
+  const authUser = useAppSelector((state) => state.auth.authUser);
+  const [logout] = authService.useLogoutMutation();
+  const handleLogout = async () => {
+    await logout({
+      refresh: authUser?.tokens.refresh ?? "",
+    }).unwrap();
+    dispatch(clearAuthUser());
+    navigate("/login");
+  };
   const items: MenuProps["items"] = [
     {
       label: "Perfil",
@@ -26,7 +38,7 @@ export default function MiniProfile({
     {
       label: "Cerrar Sesión",
       key: "2",
-      onClick: () => navigate("/login"),
+      onClick: () => handleLogout(),
     },
   ];
   const avatarUrl = getUservatarUrl(avatar ?? undefined);

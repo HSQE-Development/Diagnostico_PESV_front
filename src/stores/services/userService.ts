@@ -1,3 +1,4 @@
+import { Group } from "@/interfaces/Group";
 import { IUser, UserDTO } from "@/interfaces/IUser";
 import axiosBaseQuery from "@/utils/axiosBaseQuery";
 import { createApi } from "@reduxjs/toolkit/query/react";
@@ -15,10 +16,24 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 export const userService = createApi({
   reducerPath: "userApi",
   baseQuery: axiosBaseQuery,
+  tagTypes: ["FetchUsers", "FindUserById"],
   endpoints: (builder) => ({
+    findAll: builder.query<IUser[], void>({
+      query: () => ({
+        url: "/sign/findAll",
+        method: "GET",
+      }),
+      providesTags: ["FetchUsers"],
+    }),
     findAllConsultants: builder.query<IUser[], void>({
       query: () => ({
         url: "/sign/findAllConsultants",
+        method: "GET",
+      }),
+    }),
+    findAllGroups: builder.query<Group[], void>({
+      query: () => ({
+        url: "/sign/findAllGroups",
         method: "GET",
       }),
     }),
@@ -30,6 +45,7 @@ export const userService = createApi({
           ...dataToChange,
         },
       }),
+      invalidatesTags: ["FetchUsers", "FindUserById"],
     }),
     register: builder.mutation<IUser, UserDTO>({
       query: (dataToChange) => ({
@@ -37,6 +53,14 @@ export const userService = createApi({
         method: "POST",
         data: dataToChange,
       }),
+      invalidatesTags: ["FetchUsers", "FindUserById"],
+    }),
+    findById: builder.query<IUser, { id: number }>({
+      query: ({ id }) => ({
+        url: `/sign/${id}`,
+        method: "GET",
+      }),
+      providesTags: ["FindUserById"],
     }),
   }),
 });

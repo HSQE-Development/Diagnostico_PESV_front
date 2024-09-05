@@ -40,11 +40,12 @@ export const diagnosisSlice = createSlice({
       action: PayloadAction<DiagnosisQuestionsGroup[]>
     ) => {
       state.questionsGrouped = action.payload;
-      state.totalVariableValue = calculateTotalVariableValue(action.payload);
-      state.percentageCompleted = calculatePercentageCompleted(
-        state.totalValueObtained,
-        state.totalVariableValue
-      );
+
+      // state.totalVariableValue = calculateTotalVariableValue(action.payload);
+      // state.percentageCompleted = calculatePercentageCompleted(
+      //   state.totalValueObtained,
+      //   state.totalVariableValue
+      // );
     },
     setUpdateObservation: (
       state,
@@ -98,6 +99,13 @@ export const diagnosisSlice = createSlice({
         }
       }
     },
+    setCheckDiagnosisDataForChanges: (state) => {
+      state.diagnosisData = state.diagnosisData.filter((data) =>
+        state.questionsGrouped.some((grouped) =>
+          grouped.questions.some((question) => question.id === data.question)
+        )
+      );
+    },
     setUpdatePercentage: (
       state,
       action: PayloadAction<{
@@ -105,7 +113,12 @@ export const diagnosisSlice = createSlice({
         compliance: number;
       }>
     ) => {
+      state.totalVariableValue = calculateTotalVariableValue(
+        state.questionsGrouped
+      );
       const { questionId, compliance } = action.payload;
+      // Filtrar diagnosisData para eliminar preguntas que ya no están en questionsGrouped
+
       const question = findQuestionById(state.questionsGrouped, questionId);
       if (question) {
         const diagnosisIndex = state.diagnosisData.findIndex(
@@ -275,6 +288,7 @@ export const {
   setUpdateObservation,
   setDiagnosis,
   removeDiagnosis,
+  setCheckDiagnosisDataForChanges,
 } = diagnosisSlice.actions;
 
 export default diagnosisSlice.reducer;

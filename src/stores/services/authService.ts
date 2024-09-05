@@ -30,6 +30,15 @@ export const authService = createApi({
         },
       }),
     }),
+    logout: builder.mutation<{ message: string }, { refresh: string }>({
+      query: ({ refresh }) => ({
+        url: "/sign/logout",
+        method: "POST",
+        data: {
+          refresh: refresh,
+        },
+      }),
+    }),
     myProfile: builder.query<IUser, void>({
       query: () => ({
         url: "/sign/profile",
@@ -37,7 +46,7 @@ export const authService = createApi({
       }),
       providesTags: ["myProfileQuery"],
     }),
-    findById: builder.query<IUser, { user: number }>({
+    findById: builder.query<IUser, { user?: number }>({
       query: ({ user }) => ({
         url: "/sign/find_by_id",
         method: "GET",

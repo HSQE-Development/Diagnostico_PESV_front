@@ -51,7 +51,9 @@ export default function DiagnosisDataTable({ companyId }: Props) {
   useEffect(() => {
     refetch();
   }, [companyId]);
-
+  const questionsGrouped = useAppSelector(
+    (state) => state.diagnosis.questionsGrouped
+  );
   useEffect(() => {
     if (diagnosisQuestionsByCompany) {
       // Agrupar preguntas por step
@@ -63,9 +65,6 @@ export default function DiagnosisDataTable({ companyId }: Props) {
     refetch();
   }, [dispatch]);
 
-  const questionsGrouped = useAppSelector(
-    (state) => state.diagnosis.questionsGrouped
-  );
   const diagnosisData = useAppSelector(
     (state) => state.diagnosis.diagnosisData
   );

@@ -144,9 +144,9 @@ export default function DataTable() {
     },
   ];
 
-  const dataSource = arls.map((company: Arl) => ({
-    ...company,
-    key: company.id, // Utilizando el ID como clave única
+  const dataSource = arls.map((arl: Arl) => ({
+    ...arl,
+    key: arl.id, // Utilizando el ID como clave única
   }));
   return (
     <>

@@ -24,6 +24,7 @@ import * as Yup from "yup";
 interface CompanyFormProps {
   id?: number;
   onlyCreate?: boolean;
+  isUseOut?: boolean;
 }
 
 const initialValues: CompanyDTO = {
@@ -41,7 +42,11 @@ const initialValues: CompanyDTO = {
   ciius: null,
 };
 
-export default function CompanyForm({ id, onlyCreate }: CompanyFormProps) {
+export default function CompanyForm({
+  id,
+  onlyCreate,
+  isUseOut,
+}: CompanyFormProps) {
   const { setCorporateId } = useCorporate();
   const [createOnly, setCreateOnly] = useState<boolean | undefined>(onlyCreate);
   const navigate = useNavigate();
@@ -470,26 +475,28 @@ export default function CompanyForm({ id, onlyCreate }: CompanyFormProps) {
               </div> */}
             </div>
             <div className="col-span-12 flex items-center justify-center mt-4 gap-4">
-              <Button
-                htmlType="submit"
-                icon={id ? <MdEdit /> : <CiSaveDown1 />}
-                size="large"
-                className={`${
-                  id
-                    ? "bg-orange-400 border-2 border-orange-400"
-                    : "bg-green-500 border-2 border-green-400"
-                } text-white`}
-                loading={isSaving || isUpdating}
-              >
-                {id ? "Editar" : "Guardar y empezar diagnostico"}
-              </Button>
+              {!isUseOut && (
+                <Button
+                  htmlType="submit"
+                  icon={id ? <MdEdit /> : <CiSaveDown1 />}
+                  size="large"
+                  className={`${
+                    id
+                      ? "bg-orange-400 border-2 border-orange-400"
+                      : "bg-green-500 border-2 border-green-400"
+                  } text-white`}
+                  loading={isSaving || isUpdating}
+                >
+                  {id ? "Editar" : "Guardar y empezar diagnostico"}
+                </Button>
+              )}
               {!id && (
                 <Button
                   type="dashed"
                   htmlType="submit"
                   icon={id ? <MdEdit /> : <CiSaveDown1 />}
                   size="large"
-                  className={`border-purple-950 text-purple-700`}
+                  className={`border-purple-950 text-purple-700 hover:bg-purple-100 active:bg-purple-200`}
                   loading={isSaving || isUpdating}
                   onClick={() => setCreateOnly(true)}
                 >

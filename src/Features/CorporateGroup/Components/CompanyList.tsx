@@ -119,7 +119,7 @@ export default function CompanyList({ corporateId }: CompanyListProps) {
         width={1000}
         footer={null}
       >
-        <CompanyForm onlyCreate={true} />
+        <CompanyForm onlyCreate={true} isUseOut={true} />
       </Modal>
     </>
   );

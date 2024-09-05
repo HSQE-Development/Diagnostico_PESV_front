@@ -1,4 +1,4 @@
-import { Button, Input, Popover } from "antd";
+import { Button, Input, message, Popover } from "antd";
 import React, { useState } from "react";
 import { IoIosCloudDownload } from "react-icons/io";
 import ReportTable from "../Report/ReportTable";
@@ -17,6 +17,7 @@ import { MdArrowBackIosNew } from "react-icons/md";
 import { useAppDispatch } from "@/stores/hooks";
 import { setPrevDiagnosisCurrent } from "@/stores/features/utilsSlice";
 import DownLoadWorkPlan from "./DownLoadWorkPlan";
+import { FiSend } from "react-icons/fi";
 
 interface DownLoadReportProps {
   companyId: number;
@@ -38,8 +39,29 @@ export const DownloadContent = ({
   const [generateReport, { isLoading }] =
     diagnosisService.useGenerateReportMutation();
 
+  const [sendReport, { isLoading: emailLoading }] =
+    diagnosisService.useSendReportMutation();
+
+  const [emailTo, setEmailTo] = useState<string>("");
   const [schedule, setSchedule] = useState<string>(scheduleParam);
   const [sequence, setSequence] = useState<string>(sequenceParam);
+
+  const handleSendReport = async () => {
+    try {
+      await sendReport({
+        company: companyId,
+        diagnosis: diagnosisId ?? 0,
+        schedule,
+        sequence,
+        email_to: emailTo,
+      }).unwrap();
+      message.success("Correo enviado correctamente");
+    } catch (error: any) {
+      message.error(
+        error.data?.error || "Ocurrió un error al enviar el correo"
+      );
+    }
+  };
 
   return (
     <>
@@ -64,7 +86,7 @@ export const DownloadContent = ({
             />
           </FloatLabel>
         </div>
-        <div className="w-full flex justify-around flex-1">
+        <div className="w-full flex justify-around flex-1 gap-2">
           <Button
             loading={isLoading}
             onClick={async () => {
@@ -85,13 +107,12 @@ export const DownloadContent = ({
             type="primary"
             htmlType="button"
             disabled={sequence == "" || schedule == ""}
-          >
-            Word
-          </Button>
+            className="w-1/2"
+          ></Button>
           <Button
             loading={isLoading}
             icon={<FaRegFilePdf />}
-            className="bg-red-500 text-white border-red-500 active:bg-red-700 hover:bg-red-400 disabled:bg-gray-100 disabled:text-gray-400 disabled:border-gray-300"
+            className="bg-red-500 text-white border-red-500 active:bg-red-700 hover:bg-red-400 disabled:bg-gray-100 disabled:text-gray-400 disabled:border-gray-300 w-1/2"
             htmlType="button"
             disabled={sequence == "" || schedule == ""}
             onClick={async () => {
@@ -108,9 +129,49 @@ export const DownloadContent = ({
                 `Diagnostico_PESV_${new Date()}.pdf`
               );
             }}
+          ></Button>
+        </div>
+        <div className="w-full flex flex-col">
+          <Popover
+            content={
+              <>
+                <div className="w-full flex flex-col justify-center items-start px-4 gap-2 gap-y-2">
+                  <div className="mt-2">
+                    <FloatLabel label="Enviar email a">
+                      <Input
+                        id="email_to"
+                        name="email_to"
+                        type="email"
+                        value={emailTo}
+                        onChange={(e) => setEmailTo(e.target.value)}
+                      />
+                    </FloatLabel>
+                  </div>
+                  <Button
+                    icon={<FiSend />}
+                    onClick={handleSendReport}
+                    className="w-full"
+                    loading={emailLoading}
+                  >
+                    Enviar
+                  </Button>
+                </div>
+              </>
+            }
+            title="Envio de correo"
+            trigger="click"
+            placement="left"
           >
-            PDF
-          </Button>
+            <Button
+              loading={isLoading}
+              icon={<FaRegFilePdf />}
+              className="bg-purple-500 text-white border-purple-500 active:bg-purple-700 hover:bg-purple-400 disabled:bg-gray-100 disabled:text-gray-400 disabled:border-gray-300"
+              htmlType="button"
+              disabled={sequence == "" || schedule == ""}
+            >
+              Enviar por email
+            </Button>
+          </Popover>
         </div>
       </div>
     </>

@@ -15,12 +15,10 @@ import {
   Table,
   TableColumnsType,
   TableColumnType,
-  TablePaginationConfig,
-  TableProps,
   Tag,
   Tooltip,
 } from "antd";
-import { FilterDropdownProps, SorterResult } from "antd/es/table/interface";
+import { FilterDropdownProps } from "antd/es/table/interface";
 import React, { useEffect, useRef, useState } from "react";
 import { CiEdit } from "react-icons/ci";
 import {
@@ -41,13 +39,6 @@ interface DataType extends Company {
   key: React.Key;
 }
 type DataIndex = keyof DataType;
-interface TableParams {
-  pagination?: TablePaginationConfig;
-  sortField?: SorterResult<DataType>["field"];
-  sortOrder?: SorterResult<DataType>["order"];
-  filters?: Record<string, any>;
-}
-
 interface DataTableProps {
   arlIdProp?: number;
   onlyInfo?: boolean;
@@ -56,12 +47,6 @@ interface DataTableProps {
 export default function DataTable({ arlIdProp, onlyInfo }: DataTableProps) {
   const { setCorporateId } = useCorporate();
   const navigate = useNavigate();
-  const [tableParams, setTableParams] = useState<TableParams>({
-    pagination: {
-      current: 1,
-      pageSize: 10,
-    },
-  });
   const dispatch = useAppDispatch();
   const params = new URLSearchParams(window.location.search);
   const arlIdQueryParam = params.get("idArl");
@@ -431,20 +416,6 @@ export default function DataTable({ arlIdProp, onlyInfo }: DataTableProps) {
     },
   ];
 
-  const handleTableChange: TableProps<DataType>["onChange"] = (
-    pagination,
-    filters,
-    sorter
-  ) => {
-    const isMultipleSort = Array.isArray(sorter);
-    setTableParams({
-      pagination,
-      filters,
-      sortOrder: isMultipleSort ? undefined : sorter.order,
-      sortField: isMultipleSort ? undefined : sorter.field,
-    });
-  };
-
   const dataSource = companies.map((company: Company) => ({
     ...company,
     key: company.id, // Utilizando el ID como clave única
@@ -467,8 +438,6 @@ export default function DataTable({ arlIdProp, onlyInfo }: DataTableProps) {
           size="small"
           columns={columns}
           dataSource={dataSource}
-          pagination={tableParams.pagination}
-          onChange={handleTableChange}
           scroll={{ x: "max-content" }}
           showSorterTooltip={{ target: "sorter-icon" }}
           loading={isLoading}

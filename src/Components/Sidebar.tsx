@@ -6,7 +6,7 @@ import { IoBarChartOutline, IoBusiness } from "react-icons/io5";
 import { MdOutlineBusinessCenter } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "@/stores/hooks";
-import { FaLayerGroup } from "react-icons/fa";
+import { FaLayerGroup, FaUserFriends } from "react-icons/fa";
 import clsx from "clsx";
 
 // Imágenes importadas normalmente
@@ -14,10 +14,13 @@ import LogoXs from "../assets/Logo_xs.png";
 import LogoXl from "../assets/Logo_xl.png";
 import { CiMenuBurger } from "react-icons/ci";
 import { setCollapsed } from "@/stores/features/sideBarSlice";
+import { authService } from "@/stores/services/authService";
+import { clearAuthUser } from "@/stores/features/authSlice";
 
 export default function Sidebar() {
   const dispatch = useAppDispatch();
-
+  const authUser = useAppSelector((state) => state.auth.authUser);
+  const [logout, { isLoading }] = authService.useLogoutMutation();
   const { isCollapsed } = useAppSelector((state) => state.sidebarState);
   const navigate = useNavigate();
   const menuitems: MenuSideProps[] = useMemo(
@@ -46,9 +49,23 @@ export default function Sidebar() {
         urls: ["/app/corporate_group"],
         onPress: () => navigate("/app/corporate_group"),
       },
+      {
+        icon: <FaUserFriends />,
+        label: "Gestión de usuarios",
+        urls: ["/app/users"],
+        onPress: () => navigate("/app/users"),
+      },
     ],
     [navigate]
   );
+
+  const handleLogout = async () => {
+    await logout({
+      refresh: authUser?.tokens.refresh ?? "",
+    }).unwrap();
+    dispatch(clearAuthUser());
+    navigate("/login");
+  };
 
   return (
     <aside
@@ -98,6 +115,8 @@ export default function Sidebar() {
           icon={<PiSignOutThin />}
           aria-label="Cerrar Sesion"
           aria-labelledby="logout"
+          onClick={handleLogout}
+          loading={isLoading}
         >
           {isCollapsed ? "Cerrar Sesión" : ""}
         </Button>

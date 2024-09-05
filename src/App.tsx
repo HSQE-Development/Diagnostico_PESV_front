@@ -9,6 +9,10 @@ import ArlPage from "./Features/Arls/Index";
 import DiagnosisTimeLinePage from "./Features/DiagnosisTimeLine/Index";
 import CorporateGroupPage from "./Features/CorporateGroup/Index";
 import ProtectedRoute from "./Components/ProtectedRoute";
+import ExternalRoute from "./Components/ExternalRoute";
+import ExternalLayout from "./Components/ExternalLayout";
+import ExternalPage from "./Features/ExternalCompany/Index";
+import UsersPage from "./Features/Users/Index";
 
 function App() {
   const router = createBrowserRouter([
@@ -28,6 +32,7 @@ function App() {
           element: <AppLayout />, // AppLayout recibe los children
           children: [
             { path: "", element: <MainPage /> },
+            { path: "users", element: <UsersPage /> },
             { path: "my_profile", element: <ProfilePage /> },
             { path: "companies", element: <CompanyPage /> },
             {
@@ -41,6 +46,16 @@ function App() {
             { path: "arls", element: <ArlPage /> },
             { path: "corporate_group", element: <CorporateGroupPage /> },
           ],
+        },
+      ],
+    },
+    {
+      path: "/external-use",
+      element: <ExternalRoute />,
+      children: [
+        {
+          element: <ExternalLayout />,
+          children: [{ path: "", element: <ExternalPage /> }],
         },
       ],
     },

@@ -13,8 +13,12 @@ import ProfileForm from "./ProfileForm";
 
 interface InfoProfileProps {
   isLoading: boolean;
+  profileId?: number;
 }
-export default function InfoProfile({ isLoading }: InfoProfileProps) {
+export default function InfoProfile({
+  isLoading,
+  profileId,
+}: InfoProfileProps) {
   const [editModal, setEditModal] = useState<boolean>(false);
   const authUser = useAppSelector((state) => state.auth.authUser);
 

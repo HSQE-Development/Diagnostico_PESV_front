@@ -56,6 +56,7 @@ export default function ChecklistTrendChart() {
     >
       <ResponsiveLine
         data={formattedData}
+        curve="natural" // Define la curva como lineal para eliminar la tensión
         margin={{ top: 20, right: 20, bottom: 60, left: 50 }}
         xScale={{
           type: "point", // Usa "time" si x es una fecha
@@ -84,7 +85,7 @@ export default function ChecklistTrendChart() {
           legendOffset: -40,
           format: (value) => Math.round(value), // Redondear los valores del eje Y
         }}
-        colors={{ scheme: "nivo" }}
+        colors={{ scheme: "purple_orange" }}
         lineWidth={2}
         pointSize={6}
         pointColor={{ theme: "background" }}

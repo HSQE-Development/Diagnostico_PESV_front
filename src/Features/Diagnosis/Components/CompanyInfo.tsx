@@ -13,6 +13,7 @@ import ConsultandSelect from "./ConsultandSelect";
 import ContinueOrSaveButton from "./ContinueOrSaveButton";
 import { useCorporate } from "@/context/CorporateGroupContext";
 import { corporateGroupService } from "@/stores/services/corporateGroupService";
+import { setCheckDiagnosisDataForChanges } from "@/stores/features/diagnosisSlice";
 
 const PesvNoteAndSegmented = lazy(() => import("./PesvNoteAndSegmented"));
 
@@ -46,7 +47,7 @@ export default function CompanyInfo({
   const [observationChanged, setObservationChanged] = useState<string | null>(
     null
   );
-  const [ejecution, setEjecution] = useState<string>("virtual");
+  const [ejecution, setEjecution] = useState<string>("presencial");
   const [userChanged, setUserChanged] = useState<boolean>(false);
 
   //Consultas
@@ -107,6 +108,10 @@ export default function CompanyInfo({
   useEffect(() => {
     if (!unitializedDiagnosis) refetchDiagnosis();
   }, [unitializedDiagnosis, refetchDiagnosis]);
+
+  const diagnosisData = useAppSelector(
+    (state) => state.diagnosis.diagnosisData
+  );
   const confirm = async () => {
     try {
       switch (current) {
@@ -125,6 +130,7 @@ export default function CompanyInfo({
           );
           break;
         case 1:
+          dispatch(setCheckDiagnosisDataForChanges());
           await saveDiagnosis({
             company: companyId,
             diagnosisDto: diagnosisData,
@@ -178,9 +184,7 @@ export default function CompanyInfo({
     (state) => state.vehicleQuestion.fleetData
   );
   const driverData = useAppSelector((state) => state.driverQuestion.driverData);
-  const diagnosisData = useAppSelector(
-    (state) => state.diagnosis.diagnosisData
-  );
+
   const diagnosisRequirementData = useAppSelector(
     (state) => state.diagnosis.diagnosisRequirementData
   );
@@ -188,8 +192,8 @@ export default function CompanyInfo({
   const totalGeneral = totalDrivers + totalVehicles;
 
   const existCompany = companyId ? true : false;
-  const handleSegmentChange = (newSize: string) => {
-    setEjecution(newSize); // Mark that the user has manually changed the segment
+  const handleSegmentChange = (newEjecution: string) => {
+    setEjecution(newEjecution); // Mark that the user has manually changed the segment
   };
   const renderConsultantAndPESV = () => (
     <>
@@ -235,6 +239,7 @@ export default function CompanyInfo({
             setObservationChanged={setObservationChanged}
             setUserChanged={setUserChanged}
             company={company}
+            is_in_count={current == 0 || isOutOfContext ? true : false}
           />
         </Suspense>
       )}

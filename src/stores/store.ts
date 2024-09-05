@@ -12,6 +12,7 @@ import companyReducer from "@/stores/features/companySlice";
 import segmentReducer from "@/stores/features/segmentSlice";
 import { companyService } from "./services/companyService";
 import { segmentService } from "./services/segmentServices";
+import userReducer from "@/stores/features/userSlice";
 import { userService } from "./services/userService";
 import vehicleQuestionSlideReducer from "@/stores/features/vehicleQuestionsSlice";
 import driverQuestionSlideReducer from "@/stores/features/driverQuestionSlice";
@@ -51,6 +52,7 @@ const rootReducer = combineReducers({
   util: utilsReducer,
   diagnosis: diagnosisReducer,
   arls: arlReducer,
+  users: userReducer,
   corporateGroups: corporateGroupReducer,
   [authService.reducerPath]: authService.reducer,
   [companyService.reducerPath]: companyService.reducer,

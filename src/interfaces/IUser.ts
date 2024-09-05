@@ -12,6 +12,7 @@ export interface IUser {
   avatar: string | null;
   groups: [number];
   groups_detail: Group[];
+  change_password: boolean;
 }
 
 export type UserDTO = {

@@ -14,6 +14,7 @@ export default function PesvNoteAndSegmented({
   setObservationChanged,
   setUserChanged,
   company,
+  is_in_count,
 }: any) {
   const [sizeCompany, setSizeCompany] = useState<
     MisionalitySizeCriteria[] | null
@@ -24,12 +25,6 @@ export default function PesvNoteAndSegmented({
       company ? { id: company.mission_detail.id } : skipToken
     );
 
-  useEffect(() => {
-    if (sizeData) {
-      setSizeCompany(sizeData);
-    }
-  }, [sizeData]);
-  //Storage
   const totalVehicles = useAppSelector(
     (state) => state.vehicleQuestion.totalQuantity
   );
@@ -38,12 +33,21 @@ export default function PesvNoteAndSegmented({
   );
   useEffect(() => {
     if (sizeCompany) {
-      setSize(
-        determineCompanySize(sizeCompany, totalVehicles, totalDrivers) ?? 0
-      );
-      setUserChanged(false);
+      if (is_in_count) {
+        setSize(
+          determineCompanySize(sizeCompany, totalVehicles, totalDrivers) ?? 0
+        );
+        setUserChanged(false);
+      }
     }
-  }, [sizeCompany, totalVehicles, totalDrivers]);
+  }, [is_in_count, sizeCompany, totalVehicles, totalDrivers, company]);
+
+  // console.log(sizeData);
+  useEffect(() => {
+    if (sizeData) {
+      setSizeCompany(sizeData);
+    }
+  }, [sizeData, company]);
 
   const defaultColors = {
     itemActiveBg: "#007bff",

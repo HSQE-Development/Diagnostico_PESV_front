@@ -280,5 +280,29 @@ export const diagnosisService = createApi({
         method: "GET",
       }),
     }),
+    sendReport: builder.mutation<
+      string,
+      {
+        email_to: string;
+        diagnosis: number;
+        company: number;
+        schedule: string;
+        sequence: string;
+      }
+    >({
+      query: ({ email_to, diagnosis, company, schedule, sequence }) => ({
+        url: `/diagnosis/send_report/`,
+        method: "POST",
+        data: {
+          email_to: email_to,
+          diagnosis: diagnosis,
+          company: company,
+        },
+        params: {
+          schedule: schedule,
+          sequence: sequence,
+        },
+      }),
+    }),
   }),
 });

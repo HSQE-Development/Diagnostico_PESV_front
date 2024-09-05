@@ -122,7 +122,6 @@ export default function CompanyHeaderInfo({
   const totalDrivers = useAppSelector(
     (state) => state.driverQuestion.totalQuantity
   );
-  console.log(company);
   return (
     <>
       <div className="col-span-6 ">
@@ -153,29 +152,30 @@ export default function CompanyHeaderInfo({
           </div>
         </div>
       )}
-      {!corporateId ||
-        (isOutOfContext && company && (
-          <div className="col-span-6 flex items-center justify-center gap-2">
-            <div className=" bg-gray-100 rounded-xl w-1/2 h-24">
-              <Statistic
-                title="Total Vehìculos"
-                value={totalVehicles}
-                valueStyle={{ color: "#3f8600" }}
-                prefix={<FaCar />}
-                className="w-full h-full flex flex-col justify-center items-center"
-              />
+      {!corporateId &&
+        (isOutOfContext ||
+          (company && (
+            <div className="col-span-6 flex items-center justify-center gap-2">
+              <div className=" bg-gray-100 rounded-xl w-1/2 h-24">
+                <Statistic
+                  title="Total Vehìculos"
+                  value={totalVehicles}
+                  valueStyle={{ color: "#3f8600" }}
+                  prefix={<FaCar />}
+                  className="w-full h-full flex flex-col justify-center items-center"
+                />
+              </div>
+              <div className=" bg-gray-100 rounded-xl w-1/2 h-24">
+                <Statistic
+                  title="Total Conductores"
+                  value={totalDrivers}
+                  valueStyle={{ color: "#3f8600" }}
+                  prefix={<MdEmojiPeople />}
+                  className="w-full h-full flex flex-col justify-center items-center"
+                />
+              </div>
             </div>
-            <div className=" bg-gray-100 rounded-xl w-1/2 h-24">
-              <Statistic
-                title="Total Conductores"
-                value={totalDrivers}
-                valueStyle={{ color: "#3f8600" }}
-                prefix={<MdEmojiPeople />}
-                className="w-full h-full flex flex-col justify-center items-center"
-              />
-            </div>
-          </div>
-        ))}
+          )))}
     </>
   );
 }
