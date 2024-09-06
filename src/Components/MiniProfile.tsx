@@ -1,3 +1,4 @@
+import { useCorporate } from "@/context/CorporateGroupContext";
 import { Group } from "@/interfaces/Group";
 import { clearAuthUser } from "@/stores/features/authSlice";
 import { useAppDispatch, useAppSelector } from "@/stores/hooks";
@@ -18,6 +19,8 @@ export default function MiniProfile({
   cargo,
   avatar,
 }: MiniProfileProps) {
+  const { isExternal: is_external_company } = useCorporate();
+
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const authUser = useAppSelector((state) => state.auth.authUser);
@@ -34,6 +37,7 @@ export default function MiniProfile({
       label: "Perfil",
       key: "1",
       onClick: () => navigate("/app/my_profile"),
+      className: `${is_external_company ? "hidden" : ""}`,
     },
     {
       label: "Cerrar Sesión",

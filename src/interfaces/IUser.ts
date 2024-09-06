@@ -13,6 +13,7 @@ export interface IUser {
   groups: [number];
   groups_detail: Group[];
   change_password: boolean;
+  external_step: number;
 }
 
 export type UserDTO = {

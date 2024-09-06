@@ -13,11 +13,11 @@ import ProfileForm from "./ProfileForm";
 
 interface InfoProfileProps {
   isLoading: boolean;
-  profileId?: number;
+  useExternal?: boolean;
 }
 export default function InfoProfile({
   isLoading,
-  profileId,
+  useExternal,
 }: InfoProfileProps) {
   const [editModal, setEditModal] = useState<boolean>(false);
   const authUser = useAppSelector((state) => state.auth.authUser);
@@ -148,7 +148,7 @@ export default function InfoProfile({
         onCancel={() => setEditModal(false)}
         footer={<></>}
       >
-        <ProfileForm id={authUser?.user.id ?? 0} />
+        <ProfileForm id={authUser?.user.id ?? 0} useExternal={useExternal} />
       </Modal>
     </>
   );

@@ -31,3 +31,7 @@ export interface ColorPalette {
   tailwind: string;
   hex: string;
 }
+
+export interface ConfigComun {
+  isExternal: boolean;
+}

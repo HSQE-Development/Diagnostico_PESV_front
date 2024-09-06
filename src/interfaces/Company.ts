@@ -22,6 +22,7 @@ export interface Diagnosis {
   sequence: string | null;
   observation: string | null;
   corporate_group: number | null;
+  external_count_complete: boolean;
 }
 export interface Ciiu extends Comun {
   code: string;
@@ -61,6 +62,7 @@ export type CompanyDTO = {
   size: number | null;
   arl: number | null;
   ciius: number[] | null;
+  external_user?: boolean;
 };
 
 export interface VehicleQuestion extends Comun {}
@@ -110,6 +112,7 @@ export type DriverDTO = {
 
 export type SaveQuestionsDTO = {
   company: number;
+  external_count_complete?: boolean;
   consultor: number;
   vehicleData: FleetDTO[];
   driverData: DriverDTO[];

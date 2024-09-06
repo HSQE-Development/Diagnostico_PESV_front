@@ -1,6 +1,7 @@
 .float-label {
   position: relative;
   margin-bottom: auto;
+  width: 100%;
 }
 
 .label {
@@ -9,7 +10,7 @@
   left: 0.75em;
   pointer-events: none;
   transition: all 0.2s ease;
-  color: #aaa;
+  color: #696969;
 }
 
 .label-float {

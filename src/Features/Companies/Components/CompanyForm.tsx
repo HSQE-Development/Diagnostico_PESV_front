@@ -3,6 +3,7 @@ import { useCorporate } from "@/context/CorporateGroupContext";
 import useCompany from "@/hooks/companyHooks";
 import { Arl } from "@/interfaces/Arl";
 import { Ciiu, CompanyDTO } from "@/interfaces/Company";
+import { ConfigComun } from "@/interfaces/Comun";
 import { Mission } from "@/interfaces/Dedication";
 import { setSegments } from "@/stores/features/segmentSlice";
 import { useAppDispatch, useAppSelector } from "@/stores/hooks";
@@ -17,11 +18,11 @@ import { Formik } from "formik";
 import { debounce } from "lodash";
 import React, { useEffect, useState } from "react";
 import { CiSaveDown1 } from "react-icons/ci";
-import { MdEdit } from "react-icons/md";
+import { MdEdit, MdNavigateNext } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 
-interface CompanyFormProps {
+interface CompanyFormProps extends Partial<ConfigComun> {
   id?: number;
   onlyCreate?: boolean;
   isUseOut?: boolean;
@@ -46,8 +47,9 @@ export default function CompanyForm({
   id,
   onlyCreate,
   isUseOut,
+  isExternal,
 }: CompanyFormProps) {
-  const { setCorporateId } = useCorporate();
+  const { setCorporateId, isExternal: external_user } = useCorporate();
   const [createOnly, setCreateOnly] = useState<boolean | undefined>(onlyCreate);
   const navigate = useNavigate();
   const { changeCompany, createCompany, isSaving, isUpdating } = useCompany();
@@ -168,7 +170,7 @@ export default function CompanyForm({
       } else {
         // Aqui se registra
         setCorporateId(undefined);
-        const saveCompany = await createCompany(values);
+        const saveCompany = await createCompany(values, external_user);
         if (saveCompany) {
           if (!createOnly) {
             navigate(
@@ -494,13 +496,22 @@ export default function CompanyForm({
                 <Button
                   type="dashed"
                   htmlType="submit"
-                  icon={id ? <MdEdit /> : <CiSaveDown1 />}
+                  icon={
+                    id ? (
+                      <MdEdit />
+                    ) : isExternal ? (
+                      <MdNavigateNext />
+                    ) : (
+                      <CiSaveDown1 />
+                    )
+                  }
+                  iconPosition={isExternal ? "end" : "start"}
                   size="large"
                   className={`border-purple-950 text-purple-700 hover:bg-purple-100 active:bg-purple-200`}
                   loading={isSaving || isUpdating}
                   onClick={() => setCreateOnly(true)}
                 >
-                  {"Guardar"}
+                  {isExternal ? "Continuar" : "Guardar"}
                 </Button>
               )}
             </div>

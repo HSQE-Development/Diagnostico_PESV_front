@@ -1,9 +1,9 @@
-import React, { lazy, Suspense } from "react";
+import React, { lazy, Suspense, useEffect } from "react";
 import { CiMenuBurger, CiMenuFries } from "react-icons/ci";
 import { useAppDispatch, useAppSelector } from "@/stores/hooks";
 import { setCollapsed } from "@/stores/features/sideBarSlice";
 import MiniProfilePreload from "./Preloads/MiniProfilePreload";
-import LogoXl from "../assets/Logo_xl.png";
+import { useCorporate } from "@/context/CorporateGroupContext";
 
 const MiniProfile = lazy(() => import("./MiniProfile"));
 type NavbarProps = {
@@ -15,22 +15,29 @@ export default function Navbar({ isExternal }: NavbarProps) {
   const dispatch = useAppDispatch();
   const isCollapsed = useAppSelector((state) => state.sidebarState.isCollapsed);
 
+  const { setIsExternal } = useCorporate();
+
+  useEffect(() => {
+    if (authUser) {
+      const userRoles = authUser.user.groups_detail.map((role) => role.name);
+      console.log(userRoles);
+      if (userRoles.includes("Empresa Externa")) {
+        setIsExternal(true);
+      } else {
+        setIsExternal(false);
+      }
+    }
+  }, [authUser]);
+
   return (
     <header
-      className={`w-full z-20  min-h-20 bg-white transition-all border-b flex ${
-        isExternal
-          ? "justify-center border-b-4 border-black"
-          : "justify-between"
-      } items-center px-8`}
+      className={`w-full z-20  min-h-20 bg-white transition-all border-b flex ${"justify-between"} items-center px-8`}
     >
       <nav
         className={`flex ${
-          isExternal ? "justify-center items-center gap-4" : "justify-between"
+          isExternal ? "justify-center" : "justify-between"
         } items-center w-full`}
       >
-        {isExternal && (
-          <img src={LogoXl} className="w-32" alt="Logo" loading="lazy" />
-        )}
         {!isExternal && (
           <>
             {isCollapsed ? (
@@ -47,14 +54,8 @@ export default function Navbar({ isExternal }: NavbarProps) {
           </>
         )}
         <h2 className="hidden md:block text-xl font-semibold">
-          Diagnostico PESV
-          {isExternal && (
-            <small className="text-zinc-500 text-sm align-text-bottom">
-              para empresas
-            </small>
-          )}
+          {isExternal ? "Caracterización de empresas" : "Diagnostico PESV"}
         </h2>
-
         {!isExternal && (
           <Suspense fallback={<MiniProfilePreload />}>
             <MiniProfile

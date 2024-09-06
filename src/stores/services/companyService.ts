@@ -9,6 +9,7 @@ import { MisionalitySizeCriteria, Mission } from "@/interfaces/Dedication";
 import axiosBaseQuery from "@/utils/axiosBaseQuery";
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { corporateGroupService } from "./corporateGroupService";
+import { userService } from "./userService";
 
 /**
  * IMPORTANTE:
@@ -73,6 +74,7 @@ export const companyService = createApi({
         dispatch(
           corporateGroupService.util.invalidateTags(["CompaniesNotIncorpored"])
         );
+        dispatch(userService.util.invalidateTags(["FindUserById"]));
       },
     }),
     findAllDedications: builder.query<Mission[], void>({
@@ -115,6 +117,15 @@ export const companyService = createApi({
       query: () => ({
         url: `/companies/diagnosis_by_company`,
         method: "GET",
+      }),
+    }),
+    findCompanyByNit: builder.query<Company, { nit: string }>({
+      query: ({ nit }) => ({
+        url: `/companies/find_company_by_nit`,
+        method: "GET",
+        params: {
+          nit: nit,
+        },
       }),
     }),
   }),

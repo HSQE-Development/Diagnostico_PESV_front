@@ -5,7 +5,7 @@ import MainSteper from "./Components/MainSteper";
 
 export default function ExternalPage() {
   return (
-    <div className="flex flex-col bg-white w-full h-full rounded-2xl p-2">
+    <div className="flex flex-col w-full h-full rounded-2xl p-2">
       <HeaderTitle
         icon={<FaFileWaveform />}
         title="Caracterización de la empresa"

@@ -1,5 +1,8 @@
 import { Company } from "@/interfaces/Company";
-import { setNextDiagnosisCurrent } from "@/stores/features/utilsSlice";
+import {
+  setNextDiagnosisCurrent,
+  setNextExternalCurrent,
+} from "@/stores/features/utilsSlice";
 import { useAppDispatch, useAppSelector } from "@/stores/hooks";
 import { companyService } from "@/stores/services/companyService";
 import { diagnosisService } from "@/stores/services/diagnosisServices";
@@ -14,10 +17,11 @@ import ContinueOrSaveButton from "./ContinueOrSaveButton";
 import { useCorporate } from "@/context/CorporateGroupContext";
 import { corporateGroupService } from "@/stores/services/corporateGroupService";
 import { setCheckDiagnosisDataForChanges } from "@/stores/features/diagnosisSlice";
+import { ConfigComun } from "@/interfaces/Comun";
 
 const PesvNoteAndSegmented = lazy(() => import("./PesvNoteAndSegmented"));
 
-interface Props {
+interface Props extends Partial<ConfigComun> {
   companyId: number;
 
   onlyInfo?: boolean;
@@ -27,6 +31,7 @@ export default function CompanyInfo({
   companyId,
   onlyInfo,
   isOutOfContext = false,
+  isExternal,
 }: Props) {
   const { corporateId } = useCorporate();
 
@@ -163,6 +168,16 @@ export default function CompanyInfo({
         // ejecutará después de que updateDiagnosis termine
         refetchDiagnosis();
         setUserChanged(false);
+      } else if (isExternal) {
+        await saveAnswerCuestions({
+          company: companyId,
+          vehicleData,
+          driverData,
+          consultor: consultorSelect ?? 0,
+          external_count_complete: true,
+        }).unwrap();
+        dispatch(setNextExternalCurrent());
+        message.success("Conteo Actualizado correctamente");
       } else {
         await saveCountForCompanyInCorporate({
           company: companyId,
@@ -240,6 +255,7 @@ export default function CompanyInfo({
             setUserChanged={setUserChanged}
             company={company}
             is_in_count={current == 0 || isOutOfContext ? true : false}
+            isExternal={isExternal}
           />
         </Suspense>
       )}
@@ -253,6 +269,7 @@ export default function CompanyInfo({
         handleUpdateDataOfDiagnosis={handleUpdateDataOfDiagnosis}
         isOutOfContext={isOutOfContext}
         corporateLoading={corporateLoading}
+        isExternal={isExternal}
       />
     </>
   );
@@ -263,6 +280,7 @@ export default function CompanyInfo({
         company={company}
         corporate_group={corporateData}
         isOutOfContext={isOutOfContext}
+        isExternal={isExternal}
       />
       {isOutOfContext && !onlyInfo
         ? renderConsultantAndPESV()

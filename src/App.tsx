@@ -2,7 +2,11 @@ import LoginPage from "./Features/Login/Index";
 import MainPage from "./Features/App/Index";
 import AppLayout from "./Components/AppLayout";
 import ProfilePage from "./Features/Profile/Index";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import {
+  createBrowserRouter,
+  Navigate,
+  RouterProvider,
+} from "react-router-dom";
 import CompanyPage from "./Features/Companies/Index";
 import DiagnosisPage from "./Features/Diagnosis/Index";
 import ArlPage from "./Features/Arls/Index";
@@ -13,23 +17,28 @@ import ExternalRoute from "./Components/ExternalRoute";
 import ExternalLayout from "./Components/ExternalLayout";
 import ExternalPage from "./Features/ExternalCompany/Index";
 import UsersPage from "./Features/Users/Index";
+import ChangePasswordPage from "./Features/ChangePassword/Index";
 
 function App() {
   const router = createBrowserRouter([
     {
       path: "/",
-      element: <LoginPage />,
+      element: <Navigate to="/app" replace />, // Redirige a /app
     },
     {
       path: "/login",
       element: <LoginPage />,
     },
     {
+      path: "/change_password",
+      element: <ChangePasswordPage />,
+    },
+    {
       path: "/app",
       element: <ProtectedRoute />, // Rutas protegidas debajo de /app
       children: [
         {
-          element: <AppLayout />, // AppLayout recibe los children
+          element: <AppLayout />,
           children: [
             { path: "", element: <MainPage /> },
             { path: "users", element: <UsersPage /> },
@@ -55,7 +64,10 @@ function App() {
       children: [
         {
           element: <ExternalLayout />,
-          children: [{ path: "", element: <ExternalPage /> }],
+          children: [
+            { path: "", element: <ExternalPage /> },
+            { path: "my_profile", element: <ProfilePage useExternal /> },
+          ],
         },
       ],
     },

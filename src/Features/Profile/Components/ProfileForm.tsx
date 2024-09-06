@@ -32,8 +32,9 @@ const initialValues: UserDTO = {
 
 type ProfileProps = {
   id?: number;
+  useExternal?: boolean;
 };
-export default function ProfileForm({ id }: ProfileProps) {
+export default function ProfileForm({ id, useExternal }: ProfileProps) {
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const { changeUser, updateLoading, createUser, createLoading } = useUser();
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -237,47 +238,53 @@ export default function ProfileForm({ id }: ProfileProps) {
                   />
                 </FloatLabel>
               </div>
-              <div className="col-span-12">
-                <FloatLabel label="Licencia SST">
-                  <Input
-                    id="licensia_sst"
-                    name="licensia_sst"
-                    type="text"
-                    value={props.values.licensia_sst ?? ""}
-                    onChange={props.handleChange}
-                  />
-                </FloatLabel>
-              </div>
-              <div className="col-span-12">
-                <FloatLabel label="Permisos">
-                  <Select
-                    showSearch
-                    value={props.values.groups}
-                    mode="multiple"
-                    style={{ width: "100%" }}
-                    filterOption={(input, option) =>
-                      (option?.label ?? "")
-                        .toLowerCase()
-                        .includes(input.toLowerCase())
-                    }
-                    options={groupOptions}
-                    virtual
-                    loading={loadGroups}
-                    allowClear
-                    optionRender={(option) => (
-                      <Space>
-                        <span>{option.data.label}</span>
-                      </Space>
-                    )}
-                    labelRender={(option) => (
-                      <>
-                        <span>{option.label}</span>
-                      </>
-                    )}
-                    onChange={(value) => props.setFieldValue("groups", value)}
-                  />
-                </FloatLabel>
-              </div>
+              {!useExternal && (
+                <>
+                  <div className="col-span-12">
+                    <FloatLabel label="Licencia SST">
+                      <Input
+                        id="licensia_sst"
+                        name="licensia_sst"
+                        type="text"
+                        value={props.values.licensia_sst ?? ""}
+                        onChange={props.handleChange}
+                      />
+                    </FloatLabel>
+                  </div>
+                  <div className="col-span-12">
+                    <FloatLabel label="Permisos">
+                      <Select
+                        showSearch
+                        value={props.values.groups}
+                        mode="multiple"
+                        style={{ width: "100%" }}
+                        filterOption={(input, option) =>
+                          (option?.label ?? "")
+                            .toLowerCase()
+                            .includes(input.toLowerCase())
+                        }
+                        options={groupOptions}
+                        virtual
+                        loading={loadGroups}
+                        allowClear
+                        optionRender={(option) => (
+                          <Space>
+                            <span>{option.data.label}</span>
+                          </Space>
+                        )}
+                        labelRender={(option) => (
+                          <>
+                            <span>{option.label}</span>
+                          </>
+                        )}
+                        onChange={(value) =>
+                          props.setFieldValue("groups", value)
+                        }
+                      />
+                    </FloatLabel>
+                  </div>
+                </>
+              )}
               <div className="col-span-12 flex items-center justify-center ">
                 <Button
                   htmlType="submit"

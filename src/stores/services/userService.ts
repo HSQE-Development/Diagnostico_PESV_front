@@ -47,6 +47,19 @@ export const userService = createApi({
       }),
       invalidatesTags: ["FetchUsers", "FindUserById"],
     }),
+    changePassword: builder.mutation<IUser, { user: number; password: string }>(
+      {
+        query: (dataToChange) => ({
+          url: "/sign/change_password",
+          method: "PATCH",
+          data: {
+            user: dataToChange.user,
+            password: dataToChange.password,
+          },
+        }),
+        invalidatesTags: ["FetchUsers", "FindUserById"],
+      }
+    ),
     register: builder.mutation<IUser, UserDTO>({
       query: (dataToChange) => ({
         url: "/sign/register",

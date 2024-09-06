@@ -27,7 +27,7 @@ const CompanyHeaderData: React.FC<CompanyHeaderDataProps> = (props) => {
         props.corporate_group
           ? "py-0 px-4 bg-gradient-to-r from-zinc-100 to-sky-50"
           : props.isInfo
-          ? "p-0 bg-zinc-100"
+          ? "p-0 bg-zi  nc-100"
           : "bg-gradient-to-r from-zinc-100 to-sky-50 p-4 "
       } col-span-6 flex flex-col items-start justify-start`}
     >
@@ -109,10 +109,12 @@ export default function CompanyHeaderInfo({
   company,
   corporate_group,
   isOutOfContext,
+  isExternal,
 }: {
   company: Company | null;
   corporate_group?: ICorporateGroup;
   isOutOfContext?: boolean;
+  isExternal?: boolean;
 }) {
   const { corporateId } = useCorporate();
 
@@ -176,6 +178,29 @@ export default function CompanyHeaderInfo({
               </div>
             </div>
           )))}
+
+      {isExternal && (
+        <div className="col-span-6 flex items-center justify-center gap-2">
+          <div className=" bg-gray-100 rounded-xl w-1/2 h-24">
+            <Statistic
+              title="Total Vehìculos"
+              value={totalVehicles}
+              valueStyle={{ color: "#3f8600" }}
+              prefix={<FaCar />}
+              className="w-full h-full flex flex-col justify-center items-center"
+            />
+          </div>
+          <div className=" bg-gray-100 rounded-xl w-1/2 h-24">
+            <Statistic
+              title="Total Conductores"
+              value={totalDrivers}
+              valueStyle={{ color: "#3f8600" }}
+              prefix={<MdEmojiPeople />}
+              className="w-full h-full flex flex-col justify-center items-center"
+            />
+          </div>
+        </div>
+      )}
     </>
   );
 }

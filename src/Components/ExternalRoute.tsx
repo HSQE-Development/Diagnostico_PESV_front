@@ -10,7 +10,7 @@ export default function ExternalRoute() {
 
     // Verifica si la ruta actual no está permitida
     if (!allowedRoutes.includes(location.pathname)) {
-      navigate("/external-link", { replace: true });
+      navigate("/external-use", { replace: true });
     }
   }, [location, navigate]);
   return <Outlet />;

@@ -3,7 +3,8 @@ import { setCompany, setUpdateCompany } from "@/stores/features/companySlice";
 import { useAppDispatch } from "@/stores/hooks";
 import { companyService } from "@/stores/services/companyService";
 import { TOAST_TYPE, toastHandler } from "@/utils/useToast";
-import { removeHyphen } from "@/utils/utilsMethods";
+import { encryptId, removeHyphen } from "@/utils/utilsMethods";
+import { useLocation, useNavigate } from "react-router-dom";
 
 /**
  * Custom hook to handle company-related operations such as creating and updating a company.
@@ -15,7 +16,8 @@ const useCompany = () => {
   const [updateCompany, { isLoading: isUpdating }] =
     companyService.useUpdateCompanyMutation();
   const [save, { isLoading: isSaving }] = companyService.useSaveMutation();
-
+  const navigate = useNavigate();
+  const location = useLocation();
   /**
    * Function to update an existing company.
    *
@@ -39,7 +41,6 @@ const useCompany = () => {
         size: values.size ?? undefined,
         ciius: values.ciius ?? null,
         arl: values.arl ?? undefined,
-        
       }).unwrap();
       toastHandler(TOAST_TYPE.SUCCESS_TOAST, "Actualizado Correctamente");
       dispatch(setUpdateCompany(updatedCompany));
@@ -57,16 +58,25 @@ const useCompany = () => {
    * @param {CompanyDTO} values - The data for the new company.
    * @returns {Promise<void>} - A promise that resolves when the creation is complete.
    */
-  const createCompany = async (values: CompanyDTO) => {
+  const createCompany = async (values: CompanyDTO, external_user?: boolean) => {
     try {
       values.nit = removeHyphen(values.nit, "-");
       values.acquired_certification =
         values.acquired_certification == ""
           ? null
           : values.acquired_certification;
+      values.external_user = external_user;
       const savedCompany = await save(values).unwrap(); //Metodo que guarda
       toastHandler(TOAST_TYPE.SUCCESS_TOAST, "Registrado Correctamente");
       dispatch(setCompany(savedCompany));
+      if (external_user) {
+        navigate(
+          `${location.pathname}?company=${encryptId(
+            savedCompany.id.toString()
+          )}`,
+          { replace: true }
+        );
+      }
       return savedCompany;
     } catch (error: any) {
       toastHandler(TOAST_TYPE.ERROR_TOAST, error.data.error);

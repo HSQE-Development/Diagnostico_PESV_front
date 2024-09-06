@@ -1,9 +1,25 @@
-import CompanyForm from "@/Features/Companies/Components/CompanyForm";
-import { Steps } from "antd";
-import React, { useMemo } from "react";
+import { decryptId } from "@/utils/utilsMethods";
+import { Skeleton, Steps } from "antd";
+import React, { lazy, Suspense, useMemo } from "react";
 import { FaWpforms } from "react-icons/fa";
+import { useSearchParams } from "react-router-dom";
+import { CiCircleCheck, CiSearch } from "react-icons/ci";
+import { useAppDispatch, useAppSelector } from "@/stores/hooks";
+import SuccesMessage from "./SuccesMessage";
+const QuantityForm = lazy(
+  () => import("@/Features/Diagnosis/Components/Steps/QuantityForm")
+);
+const SearchCompanyByNitForm = lazy(() => import("./SearchCompanyByNitForm"));
 
 export default function MainSteper() {
+  const [searchParams] = useSearchParams();
+  const companyParam = searchParams.get("company");
+  const companyId = companyParam
+    ? parseInt(decryptId(companyParam))
+    : undefined;
+  const dispatch = useAppDispatch();
+  const externalCurrent = useAppSelector((state) => state.util.externalCurrent);
+  console.log(externalCurrent);
   const steps = useMemo(() => {
     // Crear un array de pasos condicionalmente
     const stepsArray = [];
@@ -11,21 +27,42 @@ export default function MainSteper() {
     // Añadir los otros pasos
     stepsArray.push(
       {
-        title: "Caracterizacón",
-        content: <CompanyForm isUseOut />,
-        icon: <FaWpforms />,
-        subTitle: "Datos de tu empresa ;D",
+        title: "Busqueda",
+        content: (
+          <Suspense fallback={<Skeleton active />}>
+            <SearchCompanyByNitForm />
+          </Suspense>
+        ),
+        icon: externalCurrent > 0 ? null : <CiSearch />,
+        subTitle: "Busca tu empresa por NIT",
+        status: externalCurrent > 0 ? "finish" : "process", // Asigna un estado adecuado
       },
       {
-        title: "Flota vehicular",
-        content: <CompanyForm isUseOut />,
-        icon: <FaWpforms />,
+        title: "Caracterizacón",
+        content: (
+          <Suspense fallback={<Skeleton active />}>
+            <QuantityForm companyId={companyId ?? 0} isOver isExternal />
+          </Suspense>
+        ),
+        icon: externalCurrent > 1 ? null : <FaWpforms />,
         subTitle: "Cuantos vehiculos y cuantos conductores tienes?",
+        status: externalCurrent > 1 ? "finish" : "process", // Asigna un estado adecuado
+      },
+      {
+        status: "finish",
+        icon: <CiCircleCheck />,
+        title: "Fin",
+        content: (
+          <>
+            <SuccesMessage />
+          </>
+        ),
+        subTitle: "La informaciòn sera validada por un acesor",
       }
     );
 
     return stepsArray;
-  }, []);
+  }, [externalCurrent, dispatch]);
 
   const items = useMemo(
     () =>
@@ -37,13 +74,13 @@ export default function MainSteper() {
       })),
     [steps]
   );
-
-  const contentToRender = steps[0].content;
+  const validCurrent = externalCurrent >= 0 && externalCurrent < steps.length;
+  const contentToRender = validCurrent ? steps[externalCurrent].content : null;
   return (
     <>
-      <div className="mx-4 mt-4">
-        <Steps size="small" current={0} items={items} />
-        <div className="mt-4 border-2 border-dashed rounded-xl p-2">
+      <div className="mx-4 mt-4 bg-zinc-100 py-4 px-2 rounded-2xl ">
+        <Steps size="small" current={externalCurrent} items={items} />
+        <div className="mt-4 border-2 border-dashed rounded-xl px-2 py-4 bg-white ">
           {contentToRender}
         </div>
       </div>

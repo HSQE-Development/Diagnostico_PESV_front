@@ -15,6 +15,7 @@ export default function PesvNoteAndSegmented({
   setUserChanged,
   company,
   is_in_count,
+  isExternal,
 }: any) {
   const [sizeCompany, setSizeCompany] = useState<
     MisionalitySizeCriteria[] | null
@@ -93,8 +94,10 @@ export default function PesvNoteAndSegmented({
     <div className="col-span-6 mt-4">
       <span className="font-bold mr-1">Nota:</span>
       <small>
-        El nivel del PESV es auto calculado, sin embargo si se desea cambiar
-        debe seleccionar una opción y dejar la observacion del por que lo cambia
+        El nivel del PESV es auto calculado
+        {isExternal
+          ? "."
+          : ", sin embargo si se desea cambiar  debe seleccionar una opción y dejar la observacion del por que lo cambia"}
       </small>
       <ConfigProvider
         theme={{
@@ -110,7 +113,7 @@ export default function PesvNoteAndSegmented({
           options={segmentedOptions || []}
           block
           value={size}
-          onChange={handleSegmentChange}
+          onChange={isExternal ? () => null : handleSegmentChange}
         />
       </ConfigProvider>
       {/* Conditionally render the TextArea if the user manually changed the segment */}

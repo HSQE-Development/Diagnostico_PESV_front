@@ -6,6 +6,7 @@ enum Role {
   SUPER_ADMIN = "SuperAdmin",
   ADMIN = "Admin",
   CONSULTOR = "Consultor",
+  ANALISTA = "Analista",
 }
 
 export const getUservatarUrl = (avatarbackend: string | undefined): string => {
@@ -30,6 +31,8 @@ export function getColorByRole(role: string): ColorPalette {
       return { tailwind: "bg-blue-500", hex: "#4299E1" };
     case Role.CONSULTOR:
       return { tailwind: "bg-green-500", hex: "#48BB78" };
+    case Role.ANALISTA:
+      return { tailwind: "bg-cyan-600", hex: "#0891b2" };
     default:
       return { tailwind: "bg-gray-500", hex: "#718096" };
   }

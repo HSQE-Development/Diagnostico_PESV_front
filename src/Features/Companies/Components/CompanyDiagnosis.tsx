@@ -48,15 +48,28 @@ export const DiagnosisItemList = ({ diagnosis }: { diagnosis: Diagnosis }) => {
             <CgEditBlackPoint />
             <span>Estado</span>
           </div>
-          {!diagnosis.in_progress ? (
-            <Badge color="#86EFAC" count={"Completado"} />
-          ) : (
-            <Badge count={"En Progreso"} />
-          )}
+          <Badge
+            count={
+              diagnosis.in_progress
+                ? diagnosis.external_count_complete
+                  ? "Conteo finalizado"
+                  : "En Progreso"
+                : "Completado"
+            }
+            color={
+              diagnosis.in_progress
+                ? diagnosis.external_count_complete
+                  ? "#7e22ce" // Color para "Conteo finalizado"
+                  : undefined // Color predeterminado para "En Progreso"
+                : "#86EFAC" // Color para "Completado"
+            }
+          />
         </div>
-        <div className="flex items-center justify-between w-full">
-          <InfoConsultors consultand={diagnosis.consultor_detail} />
-        </div>
+        {diagnosis.consultor_detail && (
+          <div className="flex items-center justify-between w-full">
+            <InfoConsultors consultand={diagnosis.consultor_detail} />
+          </div>
+        )}
       </button>
     </>
   );
