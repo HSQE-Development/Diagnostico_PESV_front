@@ -44,7 +44,7 @@ export const companyService = createApi({
     }),
     updateCompany: builder.mutation<Company, Partial<Company>>({
       query: (updatedCompany) => ({
-        url: `/companies/update/${updatedCompany.id}/`,
+        url: `/companies/${updatedCompany.id}/`,
         method: "PATCH",
         data: {
           ...updatedCompany,

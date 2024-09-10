@@ -18,6 +18,7 @@ import {
 import axiosBaseQuery from "@/utils/axiosBaseQuery";
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { userService } from "./userService";
+import { Notification } from "@/interfaces/Notification";
 
 // const { useLoginMutation } = companyService;
 // export { useLoginMutation }; // Esta exportación causa un error de TypeScript
@@ -39,6 +40,7 @@ export const diagnosisService = createApi({
     "DiagnosisTableReport",
     "DiagnosisChartReport",
     "DiagnosisTotalTableReport",
+    "Notification",
   ],
   endpoints: (builder) => ({
     findById: builder.query<
@@ -308,6 +310,36 @@ export const diagnosisService = createApi({
           sequence: sequence,
         },
       }),
+    }),
+    findNotificationsByUser: builder.query<
+      Notification[] | [],
+      {
+        user: number;
+      }
+    >({
+      query: ({ user }) => ({
+        url: `/diagnosis/find_notifications_by_user`,
+        method: "GET",
+        params: {
+          user: user,
+        },
+      }),
+      providesTags: ["Notification"],
+    }),
+    readNotifications: builder.mutation<
+      { message: boolean },
+      {
+        notifications: number[];
+      }
+    >({
+      query: ({ notifications }) => ({
+        url: `/diagnosis/read_notifications/`,
+        method: "PATCH",
+        data: {
+          notifications: notifications,
+        },
+      }),
+      invalidatesTags: ["Notification"],
     }),
   }),
 });

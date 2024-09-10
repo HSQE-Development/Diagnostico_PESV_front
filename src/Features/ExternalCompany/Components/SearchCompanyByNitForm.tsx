@@ -1,5 +1,6 @@
 import FloatLabel from "@/Components/FloatLabel";
 import { companyService } from "@/stores/services/companyService";
+import { formatNIT, removeHyphen } from "@/utils/utilsMethods";
 import { Button, Empty, Input, Skeleton } from "antd";
 import React, { lazy, Suspense, useState } from "react";
 import { CiSearch } from "react-icons/ci";
@@ -13,7 +14,8 @@ export default function SearchCompanyByNitForm() {
 
   const handleSearch = () => {
     if (nit) {
-      trigger({ nit }); // Llama manualmente a la búsqueda con el nit actual
+      const newNit = removeHyphen(nit, "-");
+      trigger({ nit: newNit }); // Llama manualmente a la búsqueda con el nit actual
     }
   };
 
@@ -26,7 +28,7 @@ export default function SearchCompanyByNitForm() {
             id="nit"
             name="nit"
             value={nit ?? ""}
-            onChange={(e) => setNit(e.target.value)}
+            onChange={(e) => setNit(formatNIT(e.target.value))}
           />
         </FloatLabel>
         <Button

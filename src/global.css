@@ -54,3 +54,7 @@ main::-webkit-scrollbar-thumb {
 .custom_collapsed .ant-collapse-header {
   @apply flex items-center;
 }
+
+.ant-drawer-content-wrapper {
+  @apply md:m-[0.5rem];
+}

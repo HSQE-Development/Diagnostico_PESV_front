@@ -13,7 +13,7 @@ import { segmentService } from "@/stores/services/segmentServices";
 import { TOAST_TYPE, toastHandler } from "@/utils/useToast";
 import { encryptId, formatNIT } from "@/utils/utilsMethods";
 import { skipToken } from "@reduxjs/toolkit/query";
-import { Button, Input, Select, Space } from "antd";
+import { Button, Input, Select, Space, Switch } from "antd";
 import { Formik } from "formik";
 import { debounce } from "lodash";
 import React, { useEffect, useState } from "react";
@@ -41,6 +41,7 @@ const initialValues: CompanyDTO = {
   mission: null,
   arl: null,
   ciius: null,
+  enable_for_counting: false,
 };
 
 export default function CompanyForm({
@@ -211,6 +212,7 @@ export default function CompanyForm({
               mission: fetchCompany.mission_detail.id,
               arl: fetchCompany.arl_detail.id,
               ciius: fetchCompany.ciius_detail?.map((ciiu) => ciiu.id) ?? null,
+              enable_for_counting: fetchCompany.enable_for_counting,
             });
           }
           // setDedicationId(fetchCompany?.dedication_detail.id);
@@ -439,6 +441,21 @@ export default function CompanyForm({
                     {props.errors.acquired_certification}
                   </div>
                 ) : null}
+              </div>
+              <div className="col-span-12 md:col-span-6 flex items-center gap-2">
+                <label htmlFor="enable_for_counting">
+                  Habilitado para conteo externo?
+                </label>
+                <Switch
+                  id="enable_for_counting"
+                  defaultChecked
+                  value={props.values.enable_for_counting}
+                  onChange={(value) => {
+                    props.setFieldValue("enable_for_counting", value);
+                  }}
+                  checkedChildren="Si"
+                  unCheckedChildren="No"
+                />
               </div>
               {/* <div className="col-span-12 md:col-span-6">
                 <FloatLabel label="Diagnósticos realizados">

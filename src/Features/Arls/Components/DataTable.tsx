@@ -9,10 +9,8 @@ import {
   Popconfirm,
   Table,
   TableColumnsType,
-  TablePaginationConfig,
   Tooltip,
 } from "antd";
-import { SorterResult } from "antd/es/table/interface";
 import React, { useEffect, useState } from "react";
 import { CiEdit } from "react-icons/ci";
 import { MdDeleteOutline, MdEdit, MdOutlineBusiness } from "react-icons/md";
@@ -25,20 +23,8 @@ import { default as CompanyDataTable } from "@/Features/Companies/Components/Dat
 interface DataType extends Arl {
   key: React.Key;
 }
-interface TableParams {
-  pagination?: TablePaginationConfig;
-  sortField?: SorterResult<DataType>["field"];
-  sortOrder?: SorterResult<DataType>["order"];
-  filters?: Record<string, any>;
-}
 export default function DataTable() {
   const navigate = useNavigate();
-  const [tableParams] = useState<TableParams>({
-    pagination: {
-      current: 1,
-      pageSize: 10,
-    },
-  });
   const { data: fetchArls, refetch, isLoading } = arlService.useFindAllQuery();
   const dispatch = useAppDispatch();
   const { deleteArlById, isDeleting } = useArl();
@@ -154,7 +140,6 @@ export default function DataTable() {
         size="small"
         columns={columns}
         dataSource={dataSource}
-        pagination={tableParams.pagination}
         scroll={{ x: "max-content" }}
         showSorterTooltip={{ target: "sorter-icon" }}
         loading={isLoading}

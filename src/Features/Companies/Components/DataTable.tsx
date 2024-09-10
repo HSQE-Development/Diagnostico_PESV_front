@@ -45,6 +45,8 @@ interface DataTableProps {
 }
 
 export default function DataTable({ arlIdProp, onlyInfo }: DataTableProps) {
+  const authUser = useAppSelector((state) => state.auth.authUser);
+
   const { setCorporateId } = useCorporate();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -61,6 +63,17 @@ export default function DataTable({ arlIdProp, onlyInfo }: DataTableProps) {
   const { data: fetchCompanies, isLoading } = companyService.useFindAllQuery({
     arlId: arlIdToUse,
   });
+
+  //WEBSOCKET
+  useEffect(() => {
+    const socket = new WebSocket(
+      `${import.meta.env.VITE_PUBLIC_WEBSOCKET_URL}/diagnosis/`
+    );
+    socket.onmessage = (diagnosis) => {
+      const data = JSON.parse(diagnosis.data);
+      console.log(data);
+    };
+  }, [authUser, dispatch]);
 
   useEffect(() => {
     if (fetchCompanies) {
@@ -291,16 +304,13 @@ export default function DataTable({ arlIdProp, onlyInfo }: DataTableProps) {
                 content={() => (
                   <>
                     {hiddenCiius.map((ciiu) => (
-                      <>
+                      <React.Fragment key={ciiu.id}>
                         <div className="flex flex-wrap">
-                          <Tag
-                            key={ciiu.id}
-                            className="whitespace-normal inline-block"
-                          >
+                          <Tag className="whitespace-normal inline-block">
                             {ciiu.code}-{ciiu.name}
                           </Tag>
                         </div>
-                      </>
+                      </React.Fragment>
                     ))}
                   </>
                 )}

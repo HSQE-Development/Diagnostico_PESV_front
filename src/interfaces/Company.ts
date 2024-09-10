@@ -47,6 +47,7 @@ export interface Company extends Comun {
   ciius: number[] | null;
   ciius_detail: Ciiu[] | null;
   company_diagnosis: Diagnosis[];
+  enable_for_counting: boolean;
 }
 
 export type CompanyDTO = {
@@ -63,6 +64,7 @@ export type CompanyDTO = {
   arl: number | null;
   ciius: number[] | null;
   external_user?: boolean;
+  enable_for_counting: boolean;
 };
 
 export interface VehicleQuestion extends Comun {}

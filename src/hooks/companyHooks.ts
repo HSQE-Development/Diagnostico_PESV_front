@@ -41,6 +41,7 @@ const useCompany = () => {
         size: values.size ?? undefined,
         ciius: values.ciius ?? null,
         arl: values.arl ?? undefined,
+        enable_for_counting: values.enable_for_counting,
       }).unwrap();
       toastHandler(TOAST_TYPE.SUCCESS_TOAST, "Actualizado Correctamente");
       dispatch(setUpdateCompany(updatedCompany));

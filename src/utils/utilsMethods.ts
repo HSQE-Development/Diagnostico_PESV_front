@@ -5,7 +5,9 @@
 
 import { ColorPalette } from "@/interfaces/Comun";
 import { GetProp, UploadProps } from "antd";
-
+import moment from "moment/moment";
+import "moment/locale/es";
+moment.locale("es"); // Configura el locale
 /**
  *
  * @param value el numero nit en string
@@ -231,4 +233,15 @@ export function getColorByLevelPesv(level: number): ColorPalette {
     default:
       return { tailwind: "bg-[#007bff]", hex: "#007bff" };
   }
+}
+
+/**
+ * Formatea una fecha en un formato relativo.
+ * @param date - La fecha que quieres formatear.
+ * @returns La cadena de texto en formato relativo.
+ */
+export function timeAgo(date: Date): string {
+  // Configura el locale en español
+  console.log(moment.locale());
+  return moment(date).fromNow();
 }

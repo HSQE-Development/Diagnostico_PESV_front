@@ -86,15 +86,23 @@ export default function CompanyCard({ company }: CompanyCardProps) {
           </span>
         </div>
         <div className="flex flex-col md:flex-row items-center justify-end gap-4">
-          <small className="flex items-center gap-1 text-zinc-500">
+          <small
+            className={`flex items-center gap-1  ${
+              !company.enable_for_counting ? "text-red-400" : "text-zinc-500"
+            }`}
+          >
             <CiCircleInfo />
-            Si los datos son correctos, continuemos
+
+            {!company.enable_for_counting
+              ? "Esta empresa aún no esta habilitada para hacer el conteo"
+              : "Si los datos son correctos, continuemos"}
           </small>
           <Button
             icon={<MdNavigateNext />}
             iconPosition="end"
-            className="bg-black hover:bg-slate-600 active:bg-slate-400 text-white font-bold w-full md:w-auto border-black"
+            className="bg-black hover:bg-slate-600 active:bg-slate-400 text-white font-bold w-full md:w-auto border-black disabled:bg-slate-400 disabled:border-slate-400"
             onClick={handleNext}
+            disabled={!company.enable_for_counting}
           >
             Continuar
           </Button>

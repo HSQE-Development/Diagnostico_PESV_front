@@ -5,6 +5,7 @@ import {
   DiagnosisQuestionsGroup,
   DiagnosisRequirementDTO,
 } from "@/interfaces/Diagnosis";
+import { Notification } from "@/interfaces/Notification";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 const initialState = {
@@ -20,6 +21,7 @@ const initialState = {
     [req_id: number]: string | null;
   },
   diagnosis: null as Diagnosis | null,
+  diagnosis_notifications: [] as Notification[],
 };
 
 export const diagnosisSlice = createSlice({
@@ -31,6 +33,21 @@ export const diagnosisSlice = createSlice({
     },
     removeDiagnosis: (state) => {
       state.diagnosis = null;
+    },
+    setDiagnosisNotifications: (
+      state,
+      action: PayloadAction<Notification[]>
+    ) => {
+      state.diagnosis_notifications = action.payload;
+    },
+    setDiagnosisNotification: (state, action: PayloadAction<Notification>) => {
+      const notificationExists = state.diagnosis_notifications.find(
+        (notification) => notification.id === action.payload.id
+      );
+
+      if (!notificationExists) {
+        state.diagnosis_notifications.push(action.payload);
+      }
     },
     setQuestions: (state, action: PayloadAction<DiagnosisQuestions[]>) => {
       state.questions = action.payload;
@@ -289,6 +306,8 @@ export const {
   setDiagnosis,
   removeDiagnosis,
   setCheckDiagnosisDataForChanges,
+  setDiagnosisNotifications,
+  setDiagnosisNotification,
 } = diagnosisSlice.actions;
 
 export default diagnosisSlice.reducer;

@@ -23,6 +23,6 @@ export type UserDTO = {
   password?: string;
   licensia_sst: string | null;
   cedula: string;
-  avatar: string | null;
+  avatar?: string | null;
   groups: number[];
 };

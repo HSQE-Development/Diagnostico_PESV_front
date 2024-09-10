@@ -72,9 +72,16 @@ export default function ProfileForm({ id, useExternal }: ProfileProps) {
 
   const handleSubmit = async (values: UserDTO) => {
     try {
+      const updatedValues = { ...values };
+
+      // Si el avatar es una URL (ya existente), no lo enviamos
+      if (updatedValues.avatar && updatedValues.avatar.startsWith("/media/")) {
+        delete updatedValues.avatar;
+      }
+
       if (id) {
         //Aqui se edita
-        await changeUser(id, values, is_my_profile);
+        await changeUser(id, updatedValues, is_my_profile);
       } else {
         // Aqui se registra
         await createUser(values);
