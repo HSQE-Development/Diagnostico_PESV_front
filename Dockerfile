@@ -15,18 +15,6 @@ COPY . .
 # Listar las dependencias instaladas
 RUN npm run build
 
-# Usa una imagen base de Nginx para servir la aplicación
-FROM nginx:alpine
-
-# Copia los archivos generados por Vite al directorio de Nginx
-COPY --from=builder /app/dist /usr/share/nginx/html
-
-# Copia la configuración personalizada de Nginx
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Exponer el puerto que usará Vite
-EXPOSE 80
-
-
-# Comando por defecto para iniciar Nginx
-CMD ["nginx", "-g", "daemon off;"]
+EXPOSE 3000
+# Comando para iniciar la aplicación
+CMD ["npm", "run", "preview"]
