@@ -12,13 +12,13 @@ RUN npm install
 # 5. Copiar el resto de la aplicación al contenedor
 COPY . .
 
-# 6. Construir la aplicación para producción
-RUN npm run build
+# # 6. Construir la aplicación para producción
+# RUN npm run build
 
-# 7. Servir la aplicación usando una imagen base de Nginx
-FROM nginx:alpine
+# # 7. Servir la aplicación usando una imagen base de Nginx
+# FROM nginx:alpine
 
-COPY --from=build /app/dist /usr/share/nginx/html
+# COPY --from=build /app/dist /usr/share/nginx/html
 
 # 8. Exponer el puerto en el que Nginx servirá la aplicación
 EXPOSE 5173
