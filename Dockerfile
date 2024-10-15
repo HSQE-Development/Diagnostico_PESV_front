@@ -15,6 +15,6 @@ COPY . .
 # Listar las dependencias instaladas
 RUN npm run build
 
-EXPOSE 3000
+EXPOSE 4173
 # Comando para iniciar la aplicación
 CMD ["npm", "run", "preview"]
