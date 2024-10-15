@@ -21,7 +21,7 @@ FROM nginx:alpine
 COPY --from=build /app/dist /usr/share/nginx/html
 
 # 8. Exponer el puerto en el que Nginx servirá la aplicación
-EXPOSE 80
+EXPOSE 4063
 
 # 9. Iniciar Nginx
 CMD ["nginx", "-g", "daemon off;"]
