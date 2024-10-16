@@ -17,5 +17,4 @@ export default {
   optimizeDeps: {
     include: ["react", "react-dom"],
   },
-  base: "./",
 };
