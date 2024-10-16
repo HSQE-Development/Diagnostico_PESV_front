@@ -10,6 +10,7 @@ export default {
     },
   },
   build: {
+    outDir: "dist",
     minify: "esbuild",
     chunkSizeWarningLimit: 500,
     sourcemap: true,
@@ -17,4 +18,5 @@ export default {
   optimizeDeps: {
     include: ["react", "react-dom"],
   },
+  base: "/", // Asegúrate de que este sea el correcto según tu configuración de Nginx
 };
