@@ -18,6 +18,9 @@ RUN npm run build
 # 7. Servir la aplicación usando una imagen base de Nginx
 FROM nginx:alpine
 
+# Copiar la configuración de Nginx
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 COPY --from=build /app/dist /usr/share/nginx/html
 
 EXPOSE 80
