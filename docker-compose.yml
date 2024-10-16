@@ -8,5 +8,4 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
-      - ./dist:/usr/share/nginx/html
     restart: unless-stopped 
