@@ -242,6 +242,6 @@ export function getColorByLevelPesv(level: number): ColorPalette {
  */
 export function timeAgo(date: Date): string {
   // Configura el locale en español
-  console.log(moment.locale());
+  //(moment.locale());
   return moment(date).fromNow();
 }

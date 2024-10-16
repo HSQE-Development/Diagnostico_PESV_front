@@ -150,7 +150,7 @@ export default function CompanyInfo({
       }
     } catch (error: any) {
       // Mostrar mensaje de error
-      console.log(error);
+      //(error);
       message.error(
         "Error interno del sistema, comuniquese con un Administrador"
       );

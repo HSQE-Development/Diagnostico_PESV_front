@@ -181,7 +181,7 @@ export default function CompanyForm({
         }
       }
     } catch (error: any) {
-      console.log("ERROR", error);
+      //("ERROR", error);
       toastHandler(TOAST_TYPE.ERROR_TOAST, error.data.error);
     }
   };

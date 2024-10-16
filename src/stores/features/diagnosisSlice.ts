@@ -233,8 +233,8 @@ const calculateTotalValueObtainedFromDiagnosisData = (
   diagnosisData: DiagnosisDTO[]
 ): number => {
   return diagnosisData.reduce((total, data) => {
-    // console.log("data.obtained_value", data.obtained_value);
-    // console.log("data.compliance", data.compliance);
+    // //("data.obtained_value", data.obtained_value);
+    // //("data.compliance", data.compliance);
     return total + data.obtained_value;
   }, 0);
 };

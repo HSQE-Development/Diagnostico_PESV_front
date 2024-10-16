@@ -38,7 +38,7 @@ export default function ArlForm({ id }: ArlFormProps) {
         await createArl(values);
       }
     } catch (error: any) {
-      console.log("ERROR", error);
+      //("ERROR", error);
       toastHandler(TOAST_TYPE.ERROR_TOAST, error.data.error);
     }
   };

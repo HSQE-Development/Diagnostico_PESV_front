@@ -19,7 +19,7 @@ export default function MainSteper() {
     : undefined;
   const dispatch = useAppDispatch();
   const externalCurrent = useAppSelector((state) => state.util.externalCurrent);
-  console.log(externalCurrent);
+  //(externalCurrent);
   const steps = useMemo(() => {
     // Crear un array de pasos condicionalmente
     const stepsArray = [];

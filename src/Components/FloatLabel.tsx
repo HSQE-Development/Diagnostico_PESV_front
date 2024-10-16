@@ -22,7 +22,7 @@ const FloatLabel: React.FC<FloatLabelProps> = ({
   const [inputValue, setInputValue] = useState<string | number | undefined>(
     initialValue
   );
-  //   console.log(children.props.value)
+  //   //(children.props.value)
 
   useEffect(() => {
     setInputValue(initialValue);

@@ -55,7 +55,7 @@ export default function CompanyList({ corporateId }: CompanyListProps) {
       }).unwrap();
       toastHandler(TOAST_TYPE.SUCCESS_TOAST, "Empresa agregada correctamente");
     } catch (error: any) {
-      console.log("ERROR", error);
+      //("ERROR", error);
       toastHandler(TOAST_TYPE.ERROR_TOAST, error.data.error);
     }
   };

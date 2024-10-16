@@ -32,7 +32,7 @@ export default function LoginForm() {
       toastHandler(TOAST_TYPE.SUCCESS_TOAST, "Ingreso Correcto");
       navigate("/app");
     } catch (error: any) {
-      console.log("ERROR", error);
+      //("ERROR", error);
       if (error.status === 400) {
         toastHandler(TOAST_TYPE.ERROR_TOAST, error.data.error);
       } else if (error.status === 500) {

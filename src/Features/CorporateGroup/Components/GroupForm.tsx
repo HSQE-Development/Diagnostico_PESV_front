@@ -61,7 +61,7 @@ export default function GroupForm() {
       dispatch(setCorporateGroup(savedGroups));
       toastHandler(TOAST_TYPE.SUCCESS_TOAST, "Registrado Correctamente");
     } catch (error: any) {
-      console.log("ERROR", error);
+      //("ERROR", error);
       toastHandler(TOAST_TYPE.ERROR_TOAST, error.data.error);
     }
   };

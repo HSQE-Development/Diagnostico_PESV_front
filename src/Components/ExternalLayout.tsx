@@ -19,7 +19,7 @@ export default function ExternalLayout() {
         dispatch(setAuthUser(userLogged));
         localStorage.setItem("accesToken", userLogged.tokens.access);
       } catch (error: any) {
-        console.log("ERROR", error);
+        // //("ERROR", error);
       }
     };
 

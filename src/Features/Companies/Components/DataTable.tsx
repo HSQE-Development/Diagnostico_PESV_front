@@ -71,7 +71,7 @@ export default function DataTable({ arlIdProp, onlyInfo }: DataTableProps) {
     );
     socket.onmessage = (diagnosis) => {
       const data = JSON.parse(diagnosis.data);
-      console.log(data);
+      //(data);
     };
   }, [authUser, dispatch]);
 

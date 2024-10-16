@@ -59,13 +59,13 @@ export default function MiniProfile({
       `${import.meta.env.VITE_PUBLIC_WEBSOCKET_URL}/diagnosis/`
     );
     socket.onopen = () => {
-      console.log("Conexion exitosa");
+      //("Conexion exitosa");
     };
 
     const handleMessage = (diagnosis: any) => {
       const data = JSON.parse(diagnosis.data);
       if (data.type === "external_count") {
-        // console.log(diagnosisData);
+        // //(diagnosisData);
       }
       if (data.type === "external_notification") {
         const notificationData: Notification = data.notification_data;

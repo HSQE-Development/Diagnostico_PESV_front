@@ -261,7 +261,7 @@ export default function Vehiculos({ companyId }: Props) {
         const fleetInfo = inputValues[record.id] || {
           third_party: 0,
         };
-        // console.log(fleetInfo);
+        // //(fleetInfo);
         return (
           <>
             <Input
@@ -288,7 +288,7 @@ export default function Vehiculos({ companyId }: Props) {
         const fleetInfo = inputValues[record.id] || {
           arrended: 0,
         };
-        // console.log(fleetInfo);
+        // //(fleetInfo);
         return (
           <>
             <Input
@@ -315,7 +315,7 @@ export default function Vehiculos({ companyId }: Props) {
         const fleetInfo = inputValues[record.id] || {
           contractors: 0,
         };
-        // console.log(fleetInfo);
+        // //(fleetInfo);
         return (
           <>
             <Input
@@ -342,7 +342,7 @@ export default function Vehiculos({ companyId }: Props) {
         const fleetInfo = inputValues[record.id] || {
           intermediation: 0,
         };
-        // console.log(fleetInfo);
+        // //(fleetInfo);
         return (
           <>
             <Input
@@ -369,7 +369,7 @@ export default function Vehiculos({ companyId }: Props) {
         const fleetInfo = inputValues[record.id] || {
           leasing: 0,
         };
-        // console.log(fleetInfo);
+        // //(fleetInfo);
         return (
           <>
             <Input
@@ -396,7 +396,7 @@ export default function Vehiculos({ companyId }: Props) {
         const fleetInfo = inputValues[record.id] || {
           renting: 0,
         };
-        // console.log(fleetInfo);
+        // //(fleetInfo);
         return (
           <>
             <Input
@@ -423,7 +423,7 @@ export default function Vehiculos({ companyId }: Props) {
         const fleetInfo = inputValues[record.id] || {
           renting: 0,
         };
-        // console.log(fleetInfo);
+        // //(fleetInfo);
         return (
           <>
             <Input

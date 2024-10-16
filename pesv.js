@@ -41,7 +41,7 @@ export const ${camelCaseName}Service = createApi({
   const filePath = path.join("src", "stores", "services", `${camelCaseName}Service.ts`);
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
   fs.writeFileSync(filePath, content, "utf8");
-  console.log(`Archivo ${camelCaseName}Service.ts creado en src/stores/services/`);
+  //(`Archivo ${camelCaseName}Service.ts creado en src/stores/services/`);
 
   // Actualizar el archivo de configuración del store
   updateStoreConfig(camelCaseName);
@@ -78,7 +78,7 @@ function updateStoreConfig(camelCaseName) {
   }
 
   fs.writeFileSync(storeConfigPath, content, "utf8");
-  console.log(`Archivo de configuración del store actualizado con ${camelCaseName}Service`);
+  //(`Archivo de configuración del store actualizado con ${camelCaseName}Service`);
 }
 
 // Definición del comando CLI
@@ -90,7 +90,7 @@ program
   .description("Crea un nuevo archivo de servicio")
   .requiredOption("--service <serviceName>", "Nombre del servicio")
   .action((options) => {
-    console.log("Options:", options);
+    //("Options:", options);
     const serviceName = options.service;
     if (!serviceName) {
       console.error("Por favor, proporciona un nombre para el servicio.");

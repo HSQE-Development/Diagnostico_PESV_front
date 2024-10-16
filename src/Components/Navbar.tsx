@@ -20,7 +20,7 @@ export default function Navbar({ isExternal }: NavbarProps) {
   useEffect(() => {
     if (authUser) {
       const userRoles = authUser.user.groups_detail.map((role) => role.name);
-      console.log(userRoles);
+      //(userRoles);
       if (userRoles.includes("Empresa Externa")) {
         setIsExternal(true);
       } else {

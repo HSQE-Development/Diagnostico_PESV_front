@@ -43,7 +43,7 @@ export default function PesvNoteAndSegmented({
     }
   }, [is_in_count, sizeCompany, totalVehicles, totalDrivers, company]);
 
-  // console.log(sizeData);
+  // //(sizeData);
   useEffect(() => {
     if (sizeData) {
       setSizeCompany(sizeData);

@@ -173,7 +173,7 @@ export default function DataDisplay() {
         "Empresa actualizada correctamente"
       );
     } catch (error: any) {
-      console.log("ERROR", error);
+      //("ERROR", error);
       toastHandler(
         TOAST_TYPE.ERROR_TOAST,
         error.data?.error || "Error desconocido"
@@ -198,7 +198,7 @@ export default function DataDisplay() {
         )}&corporate=${encryptId(group_id.toString())}`
       );
     } catch (error: any) {
-      console.log(error);
+      //(error);
       message.error(
         "Error interno del sistema, comuniquese con un Administrador"
       );
