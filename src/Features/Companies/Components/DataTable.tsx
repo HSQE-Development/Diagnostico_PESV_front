@@ -70,7 +70,7 @@ export default function DataTable({ arlIdProp, onlyInfo }: DataTableProps) {
       `${import.meta.env.VITE_PUBLIC_WEBSOCKET_URL}/diagnosis/`
     );
     socket.onmessage = (diagnosis) => {
-      const data = JSON.parse(diagnosis.data);
+      JSON.parse(diagnosis.data);
       //(data);
     };
   }, [authUser, dispatch]);
