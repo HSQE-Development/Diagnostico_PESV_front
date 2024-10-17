@@ -193,11 +193,15 @@ export default function DownLoadReport({
   const handleBackStep = () => dispatch(setPrevDiagnosisCurrent());
   return (
     <>
-      <div className="flex items-center justify-between mx-4 mb-4">
-        <Button icon={<MdArrowBackIosNew />} onClick={handleBackStep}>
+      <div className="flex flex-col md:flex-row items-center justify-between md:mx-4 mb-4 gap-4 w-full md:w-auto">
+        <Button
+          className="w-full md:w-auto"
+          icon={<MdArrowBackIosNew />}
+          onClick={handleBackStep}
+        >
           Atras
         </Button>
-        <div className="flex items-center justify-evenly gap-2">
+        <div className="flex flex-col md:flex-row items-center justify-start md:justify-evenly gap-2 w-full md:w-auto">
           <Popover
             content={
               <DownloadContent
@@ -211,7 +215,7 @@ export default function DownLoadReport({
             placement="bottom"
           >
             <Button
-              className=" text-orange-400 border-orange-400 active:bg-orange-700 hover:bg-orange-100"
+              className="w-full text-orange-400 border-orange-400 active:bg-orange-700 hover:bg-orange-100"
               icon={<IoIosCloudDownload />}
               type="dashed"
             >
@@ -221,11 +225,11 @@ export default function DownLoadReport({
           <DownLoadWorkPlan companyId={companyId} />
         </div>
       </div>
-      <div className="flex flex-1 justify-between items-start gap-4">
-        <div className="w-2/4">
+      <div className="flex flex-col md:flex-row w-full flex-1 justify-between items-start gap-4 ">
+        <div className="w-full md:w-2/4 ">
           <ReportTable companyid={companyId} />
         </div>
-        <div className="flex w-2/4 h-full flex-col items-center sticky top-2 gap-2 shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] m-2 py-4 rounded-lg bg-gradient-to-br from-slate-50 to-neutral-100">
+        <div className="flex w-full md:w-2/4 h-full flex-col items-center sticky top-2 gap-2 shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] m-2 py-4 rounded-lg bg-gradient-to-br from-slate-50 to-neutral-100">
           <TotalTable companyId={companyId} />
           <ReportDiagnosis companyId={companyId} />
         </div>

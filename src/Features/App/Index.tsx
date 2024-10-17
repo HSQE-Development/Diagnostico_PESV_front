@@ -17,11 +17,11 @@ export default function MainPage() {
         />
       </div>
       <div className="flex w-full flex-col justify-start items-center relative h-[45rem]">
-        <div className="absolute w-[80%]  border-2 p-4 rounded-xl flex flex-col justify-start items-start flex-1 shadow-blue-300 shadow-2xl">
+        <div className=" md:absolute w-full md:w-[80%]  border-2 p-4 rounded-xl flex flex-col justify-start items-start flex-1 shadow-blue-300 shadow-2xl">
           <span className="font-semibold">Tendencia</span>
           <ChecklistTrendChart />
         </div>
-        <div className="grid grid-cols-4 gap-4 w-full absolute bottom-0 md:bottom-16">
+        <div className="grid grid-cols-4 gap-4 w-full md:absolute bottom-0 md:bottom-16">
           <div className="flex flex-col w-full col-span-4 md:col-span-2 lg:col-span-1 bg-zinc-50 border-2 rounded-xl shadow-xl items-center justify-center p-4">
             <DiagnosisByCompanyChart />
           </div>
