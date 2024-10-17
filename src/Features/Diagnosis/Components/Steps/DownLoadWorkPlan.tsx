@@ -93,7 +93,7 @@ export default function DownLoadWorkPlan({ companyId }: DownloadWorkPlanProps) {
         placement="bottom"
       >
         <Button
-          className="text-orange-400 border-orange-400 active:bg-orange-300 hover:bg-orange-100"
+          className="text-orange-400 border-orange-400 active:bg-orange-300 hover:bg-orange-100 w-full md:w-auto"
           icon={<IoIosCloudDownload />}
           type="dashed"
         >

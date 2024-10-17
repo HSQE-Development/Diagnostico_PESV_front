@@ -63,8 +63,8 @@ export default function TotalTable({ companyId }: TotalTableProps) {
     },
   ];
   return (
-    <>
+    <div className="w-full overflow-auto">
       <Table columns={columns} dataSource={tableData} pagination={false} />
-    </>
+    </div>
   );
 }
