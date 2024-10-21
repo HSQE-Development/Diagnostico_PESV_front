@@ -19,10 +19,13 @@ import {
 import { useAppSelector } from "@/stores/hooks";
 import { Group } from "@/interfaces/Group";
 import { userService } from "@/stores/services/userService";
+import { GoEye } from "react-icons/go";
+import { IoEyeOff } from "react-icons/io5";
 
 const initialValues: UserDTO = {
   first_name: "",
   last_name: "",
+  password: "",
   email: "",
   avatar: "",
   cedula: "",
@@ -109,6 +112,7 @@ export default function ProfileForm({ id, useExternal }: ProfileProps) {
       onSubmit={async (values, actions) => {
         await handleSubmit(values);
         actions.setSubmitting(false);
+        actions.setFieldValue("password", "");
       }}
       enableReinitialize
     >
@@ -258,6 +262,22 @@ export default function ProfileForm({ id, useExternal }: ProfileProps) {
                       />
                     </FloatLabel>
                   </div>
+                  {id && (
+                    <div className="col-span-12">
+                      <FloatLabel label="Cambiar contraseña">
+                        <Input.Password
+                          size="large"
+                          className="p-4"
+                          iconRender={(visible) =>
+                            visible ? <GoEye /> : <IoEyeOff />
+                          }
+                          name="password"
+                          value={props.values.password ?? ""}
+                          onChange={props.handleChange}
+                        />
+                      </FloatLabel>
+                    </div>
+                  )}
                   <div className="col-span-12">
                     <FloatLabel label="Permisos">
                       <Select

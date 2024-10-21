@@ -49,6 +49,7 @@ export default function DataTable() {
     {
       title: "Nombre",
       dataIndex: "first_name",
+      width: 10,
       render: (_, record) => {
         const avatarUrl = getUservatarUrl(record.avatar ?? undefined);
 
@@ -56,17 +57,21 @@ export default function DataTable() {
           <>
             <div className="flex items-center justify-start gap-2">
               <Avatar src={avatarUrl} alt="User Image" />
-              <span>{record.first_name}</span>
+              <div className="flex flex-col justify-start items-start">
+                <h2 className="font-semibold">
+                  {record.first_name} {record.last_name}
+                </h2>
+                <p className="text-zinc-500">{record.email}</p>
+              </div>
             </div>
           </>
         );
       },
     },
-    { title: "Apellido", dataIndex: "last_name" },
-    { title: "Correo", dataIndex: "email" },
-    { title: "Cedula", dataIndex: "cedula" },
+    { title: "Cedula", dataIndex: "cedula", width: 5 },
     {
       title: "Roles",
+      width: 5,
       render: (_, record) => (
         <>
           <div className="flex flex-wrap flex-col items-start justify-center gap-2">
