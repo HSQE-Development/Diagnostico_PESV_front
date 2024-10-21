@@ -1,3 +1,4 @@
+import { MenuSideProps } from "@/Components/MenuSide";
 import { IAuth } from "@/interfaces/IAuth";
 import { IUser } from "@/interfaces/IUser";
 import axiosBaseQuery from "@/utils/axiosBaseQuery";
@@ -52,6 +53,15 @@ export const authService = createApi({
         method: "GET",
         params: {
           user: user,
+        },
+      }),
+    }),
+    menusByGrups: builder.query<MenuSideProps[], { groups: number[] }>({
+      query: ({ groups }) => ({
+        url: "/sign/menus/group",
+        method: "GET",
+        params: {
+          groups: groups.join(","),
         },
       }),
     }),
