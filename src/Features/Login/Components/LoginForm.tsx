@@ -30,7 +30,15 @@ export default function LoginForm() {
       dispatch(setAuthUser(userLogged));
       localStorage.setItem("accesToken", userLogged.tokens.access);
       toastHandler(TOAST_TYPE.SUCCESS_TOAST, "Ingreso Correcto");
-      navigate("/app");
+      if (
+        userLogged.user.groups_detail.some((group) =>
+          ["SuperAdmin", "Admin"].includes(group.name)
+        )
+      ) {
+        navigate("/app");
+      } else {
+        navigate("/app/companies");
+      }
     } catch (error: any) {
       //("ERROR", error);
       if (error.status === 400) {

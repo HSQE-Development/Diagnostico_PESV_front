@@ -1,35 +1,32 @@
-import { useAppDispatch, useAppSelector } from "@/stores/hooks";
+import { useAppSelector } from "@/stores/hooks";
 import { Tooltip } from "antd";
-import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import React, { useEffect, useMemo, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import clsx from "clsx";
-import { useMediaQuery } from "@/hooks/utilsHooks";
-import { setCollapsed } from "@/stores/features/sideBarSlice";
+import { iconByMenu, MenuType } from "@/utils/icon-by-menu.utility";
 export interface MenuSideProps {
-  icon: React.ReactElement;
   label: string;
-  onPress?: () => void;
-  urls?: string[];
+  icon: string;
+  path: string;
 }
 
-function MenuSide({ icon, label, onPress, urls }: MenuSideProps) {
-  const dispatch = useAppDispatch();
-
+function MenuSide({ icon, label, path }: MenuSideProps) {
   const sideBarState = useAppSelector((state) => state.sidebarState);
   const [active, setActive] = useState<boolean>(false);
   const location = useLocation();
 
   useEffect(() => {
-    if (urls && urls.length > 0) {
-      // Verificar si la URL actual está incluida en el array de URLs
-      const isActive = urls.some((url) => location.pathname === url);
-      setActive(isActive);
-    }
-  }, [urls, location.pathname]);
-  const isMdOrLess = useMediaQuery("(max-width: 768px)");
+    const isActive = path == location.pathname;
+    setActive(isActive);
+  }, [path, location.pathname]);
+
+  const menuIcon = useMemo(() => {
+    return iconByMenu(icon as MenuType);
+  }, [icon]);
   return (
     <Tooltip placement="right" title={label}>
-      <li
+      <Link
+        to={path}
         className={clsx(
           "cursor-pointer hover:bg-white active:bg-slate-200 hover:text-[#4D4E55] list-none rounded-md px-3 flex items-center transition-all",
           {
@@ -40,20 +37,14 @@ function MenuSide({ icon, label, onPress, urls }: MenuSideProps) {
             "justify-start w-full": sideBarState.isCollapsed,
           }
         )}
-        onClick={() => {
-          onPress?.();
-          if (isMdOrLess) {
-            dispatch(setCollapsed());
-          }
-        }}
       >
-        {icon}
+        {menuIcon}
         {sideBarState.isCollapsed && (
           <div className="p-2">
             <h3 className="font-normal tex-sm ml-1">{label}</h3>
           </div>
         )}
-      </li>
+      </Link>
     </Tooltip>
   );
 }

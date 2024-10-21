@@ -110,7 +110,7 @@ export default function DataTable() {
     },
   ];
 
-  const dataSource = users.map((user: IUser) => ({
+  const dataSource = (users ?? []).map((user: IUser) => ({
     ...user,
     key: user.id, // Utilizando el ID como clave única
   }));

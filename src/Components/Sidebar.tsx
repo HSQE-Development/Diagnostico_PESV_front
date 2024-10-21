@@ -1,12 +1,9 @@
 import React, { useMemo } from "react";
 import MenuSide, { MenuSideProps } from "./MenuSide";
-import { Button } from "antd";
+import { Button, Skeleton } from "antd";
 import { PiSignOutThin } from "react-icons/pi";
-import { IoBarChartOutline, IoBusiness } from "react-icons/io5";
-import { MdOutlineBusinessCenter } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "@/stores/hooks";
-import { FaLayerGroup, FaUserFriends } from "react-icons/fa";
 import clsx from "clsx";
 
 // Imágenes importadas normalmente
@@ -22,41 +19,54 @@ export default function Sidebar() {
   const authUser = useAppSelector((state) => state.auth.authUser);
   const [logout, { isLoading }] = authService.useLogoutMutation();
   const { isCollapsed } = useAppSelector((state) => state.sidebarState);
+  const {
+    data: menuData,
+    isLoading: menuLoading,
+    isFetching: menufetching,
+  } = authService.useMenusByGrupsQuery({
+    groups: authUser?.user.groups_detail.map((group) => group.id) ?? [],
+  });
   const navigate = useNavigate();
   const menuitems: MenuSideProps[] = useMemo(
-    () => [
-      {
-        icon: <IoBarChartOutline />,
-        label: "Dashboard",
-        urls: ["/app"],
-        onPress: () => navigate("/app"),
-      },
-      {
-        icon: <IoBusiness />,
-        label: "Empresas",
-        urls: ["/app/companies"],
-        onPress: () => navigate("/app/companies"),
-      },
-      {
-        icon: <MdOutlineBusinessCenter />,
-        label: "Arls",
-        urls: ["/app/arls"],
-        onPress: () => navigate("/app/arls"),
-      },
-      {
-        icon: <FaLayerGroup />,
-        label: "Grupos Empresariales",
-        urls: ["/app/corporate_group"],
-        onPress: () => navigate("/app/corporate_group"),
-      },
-      {
-        icon: <FaUserFriends />,
-        label: "Gestión de usuarios",
-        urls: ["/app/users"],
-        onPress: () => navigate("/app/users"),
-      },
-    ],
-    [navigate]
+    () =>
+      //   [
+      //   {
+      //     icon: <IoBarChartOutline />,
+      //     label: "Dashboard",
+      //     urls: ["/app"],
+      //     onPress: () => navigate("/app"),
+      //   },
+      //   {
+      //     icon: <IoBusiness />,
+      //     label: "Empresas",
+      //     urls: ["/app/companies"],
+      //     onPress: () => navigate("/app/companies"),
+      //   },
+      //   {
+      //     icon: <MdOutlineBusinessCenter />,
+      //     label: "Arls",
+      //     urls: ["/app/arls"],
+      //     onPress: () => navigate("/app/arls"),
+      //   },
+      //   {
+      //     icon: <FaLayerGroup />,
+      //     label: "Grupos Empresariales",
+      //     urls: ["/app/corporate_group"],
+      //     onPress: () => navigate("/app/corporate_group"),
+      //   },
+      //   {
+      //     icon: <FaUserFriends />,
+      //     label: "Gestión de usuarios",
+      //     urls: ["/app/users"],
+      //     onPress: () => navigate("/app/users"),
+      //   },
+      // ],
+      menuData?.map((menu) => ({
+        label: menu.label,
+        icon: menu.icon,
+        path: menu.path,
+      })) ?? [],
+    [menuData]
   );
 
   const handleLogout = async () => {
@@ -97,15 +107,21 @@ export default function Sidebar() {
             "items-center": !isCollapsed,
           })}
         >
-          {menuitems.map((items, i) => (
-            <MenuSide
-              key={i}
-              icon={items.icon}
-              label={items.label}
-              onPress={items.onPress}
-              urls={items.urls}
-            />
-          ))}
+          {menuLoading && <Skeleton className="w-4 h-4" />}
+          {!menuLoading && menufetching ? (
+            <Skeleton.Node className="w-full h-12" active children={<></>} />
+          ) : (
+            <>
+              {menuitems.map((items, i) => (
+                <MenuSide
+                  key={i}
+                  icon={items.icon}
+                  label={items.label}
+                  path={items.path}
+                />
+              ))}
+            </>
+          )}
         </ul>
       </div>
       <div className="w-full my-4 flex justify-center items-center">
