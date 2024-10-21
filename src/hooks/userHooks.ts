@@ -70,6 +70,7 @@ const useUser = (props?: useUserArgs) => {
         licensia_sst: values.licensia_sst,
         email: values.email,
         avatar: values.avatar,
+        password: values.password,
       }).unwrap();
       toastHandler(TOAST_TYPE.SUCCESS_TOAST, "Actualizado Correctamente");
       if (is_my_profile) dispatch(updateUser(updatedUser));

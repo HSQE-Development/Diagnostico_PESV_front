@@ -1,9 +1,5 @@
 import { IUser } from "@/interfaces/IUser";
-import {
-  addItemToArray,
-  deleteItemFromArray,
-  updateItemInArray,
-} from "@/utils/utilsMethods";
+import { deleteItemFromArray, updateItemInArray } from "@/utils/utilsMethods";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 const initialState = {
@@ -18,7 +14,7 @@ export const userSlice = createSlice({
       state.users = action.payload;
     },
     setUser: (state, action: PayloadAction<IUser>) => {
-      state.users = addItemToArray(state.users, action.payload);
+      state.users.push(action.payload);
     },
     setUpdateUser: (state, action: PayloadAction<IUser>) => {
       state.users = updateItemInArray(state.users, action.payload);
