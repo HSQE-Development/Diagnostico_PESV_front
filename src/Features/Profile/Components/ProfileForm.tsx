@@ -271,6 +271,7 @@ export default function ProfileForm({ id, useExternal }: ProfileProps) {
                           iconRender={(visible) =>
                             visible ? <GoEye /> : <IoEyeOff />
                           }
+                          id="password"
                           name="password"
                           value={props.values.password ?? ""}
                           onChange={props.handleChange}
