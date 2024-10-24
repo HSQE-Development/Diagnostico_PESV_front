@@ -70,7 +70,9 @@ export default function ProfileForm({ id, useExternal }: ProfileProps) {
     email: Yup.string()
       .required("Campo Obligatorio")
       .email("Ingrese un correo valido"),
-    cedula: Yup.string().required("Campo Obligatorio"),
+    cedula: Yup.string()
+      .required("Campo Obligatorio")
+      .min(10, "La cedula debe tener almenos 10 caracteres"),
   });
 
   const handleSubmit = async (values: UserDTO) => {
@@ -198,15 +200,18 @@ export default function ProfileForm({ id, useExternal }: ProfileProps) {
                 />
               )}
             </div>
-            <div className="flex items-center justify-start gap-2">
-              <CiCircleInfo />
-              <small>
-                Nota: Al correo registrado se enviara una contraseña al usuario
-              </small>
-            </div>
+            {!id && (
+              <div className="flex items-center justify-start gap-2">
+                <CiCircleInfo />
+                <small>
+                  Nota: Al correo registrado se enviara una contraseña al
+                  usuario <br /> porfavor verifica que sea correcto.
+                </small>
+              </div>
+            )}
             <div className="grid grid-cols-12 mt-8 gap-4 gap-y-6">
               <div className="col-span-6">
-                <FloatLabel label="Nombre">
+                <FloatLabel label="Nombre" obligatory>
                   <Input
                     id="first_name"
                     name="first_name"
@@ -217,7 +222,7 @@ export default function ProfileForm({ id, useExternal }: ProfileProps) {
                 </FloatLabel>
               </div>
               <div className="col-span-6">
-                <FloatLabel label="Apellido">
+                <FloatLabel label="Apellido" obligatory>
                   <Input
                     id="last_name"
                     name="last_name"
@@ -228,7 +233,7 @@ export default function ProfileForm({ id, useExternal }: ProfileProps) {
                 </FloatLabel>
               </div>
               <div className="col-span-6">
-                <FloatLabel label="Email">
+                <FloatLabel label="Email" obligatory>
                   <Input
                     id="email"
                     name="email"
@@ -239,13 +244,14 @@ export default function ProfileForm({ id, useExternal }: ProfileProps) {
                 </FloatLabel>
               </div>
               <div className="col-span-6">
-                <FloatLabel label="Cedula">
+                <FloatLabel label="Cedula" obligatory>
                   <Input
                     id="cedula"
                     name="cedula"
                     type="text"
                     value={props.values.cedula}
                     onChange={props.handleChange}
+                    maxLength={10}
                   />
                 </FloatLabel>
               </div>
@@ -280,7 +286,7 @@ export default function ProfileForm({ id, useExternal }: ProfileProps) {
                     </div>
                   )}
                   <div className="col-span-12">
-                    <FloatLabel label="Permisos">
+                    <FloatLabel label="Permisos" obligatory>
                       <Select
                         showSearch
                         value={props.values.groups}

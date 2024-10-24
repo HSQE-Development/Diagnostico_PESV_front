@@ -19,6 +19,7 @@ import axiosBaseQuery from "@/utils/axiosBaseQuery";
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { userService } from "./userService";
 import { Notification } from "@/interfaces/Notification";
+import { companyService } from "./companyService";
 
 // const { useLoginMutation } = companyService;
 // export { useLoginMutation }; // Esta exportación causa un error de TypeScript
@@ -209,6 +210,7 @@ export const diagnosisService = createApi({
       onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
         await queryFulfilled;
         dispatch(userService.util.invalidateTags(["FindUserById"]));
+        dispatch(companyService.util.invalidateTags(["GetCompamies"]));
       },
     }),
     initDiagnosisCorporate: builder.mutation<Diagnosis, { corporate: number }>({

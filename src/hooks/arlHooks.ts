@@ -44,9 +44,9 @@ const useArl = () => {
       const deletedArl = await deleteArl({
         id,
       }).unwrap();
-      dispatch(setDeleteArl(deletedArl.id));
+      dispatch(setDeleteArl(deletedArl.id ?? id));
     } catch (error: any) {
-      console.error("Error creating company:", error);
+      throw error;
     }
   };
 

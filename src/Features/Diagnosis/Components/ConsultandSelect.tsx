@@ -34,7 +34,7 @@ export default function ConsultandSelect({
 
   return (
     <div className="col-span-6 mt-4">
-      <FloatLabel label="Consultor a cargo">
+      <FloatLabel label="Consultor a cargo" obligatory>
         <Select
           showSearch
           optionFilterProp="label"

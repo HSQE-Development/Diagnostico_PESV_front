@@ -2,19 +2,12 @@ import ProfileForm from "@/Features/Profile/Components/ProfileForm";
 import useUser from "@/hooks/userHooks";
 import { IUser } from "@/interfaces/IUser";
 import { useAppSelector } from "@/stores/hooks";
+import { userService } from "@/stores/services/userService";
 import { getColorByRole, getUservatarUrl } from "@/utils/getUserAvatarImage";
-import {
-  Avatar,
-  Badge,
-  Button,
-  Modal,
-  Popconfirm,
-  Table,
-  TableColumnsType,
-} from "antd";
+import { Avatar, Badge, Button, Modal, Table, TableColumnsType } from "antd";
 import React, { useEffect, useState } from "react";
 import { CiEdit } from "react-icons/ci";
-import { MdDeleteOutline, MdEdit } from "react-icons/md";
+import { MdEdit } from "react-icons/md";
 
 interface DataType extends IUser {
   key: React.Key;
@@ -28,16 +21,19 @@ export default function DataTable() {
     isOpen: false,
     userId: undefined,
   });
-  const { fetchUsers, fetchLoading, refetchAll } = useUser();
+  const { fetchUsers } = useUser();
+
+  const { data: usersData, isLoading: fetchLoading } =
+    userService.useFindAllQuery(undefined, {
+      refetchOnMountOrArgChange: true,
+      refetchOnFocus: true,
+    });
+
+  useEffect(() => {
+    if (usersData) fetchUsers(usersData);
+  }, [usersData]);
+
   const users = useAppSelector((state) => state.users.users);
-
-  useEffect(() => {
-    refetchAll();
-  }, [refetchAll]);
-  useEffect(() => {
-    fetchUsers();
-  }, [fetchLoading]);
-
   const handleEditModal = (id: number) => {
     setEditModal({
       isOpen: true,
@@ -98,16 +94,17 @@ export default function DataTable() {
                 icon={<CiEdit />}
                 onClick={() => handleEditModal(record.id)}
               />
-              <Popconfirm
+              {/* <Popconfirm
                 title="Eliminar Empresa"
                 description="Estas seguro de eliminar esta empresa?"
                 //   onConfirm={async () => await confirm(record.id)}
                 onCancel={() => null}
                 okText="Eliminar"
                 cancelText="No"
+                className=""
               >
                 <Button danger icon={<MdDeleteOutline />} />
-              </Popconfirm>
+              </Popconfirm> */}
             </div>
           </>
         );
@@ -129,7 +126,6 @@ export default function DataTable() {
         scroll={{ x: "max-content" }}
         showSorterTooltip={{ target: "sorter-icon" }}
         loading={fetchLoading}
-        //@ts-ignore
         pagination={{
           defaultPageSize: 10,
           showSizeChanger: true,
