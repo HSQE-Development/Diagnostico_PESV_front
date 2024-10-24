@@ -54,7 +54,7 @@ export const companyService = createApi({
     }),
     deleteCompany: builder.mutation<Company, { id: number }>({
       query: ({ id }) => ({
-        url: `/companies/delete/${id}`,
+        url: `/companies/${id}/`,
         method: "DELETE",
       }),
       invalidatesTags: ["GetCompamies"],

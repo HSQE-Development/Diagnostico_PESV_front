@@ -70,10 +70,10 @@ export default function DataTable() {
     const hideLoadingMessage = message.loading("Eliminando..", 0);
     try {
       await deleteArlById(id);
-      message.success("Compañía eliminada exitosamente");
+      message.success("Arl eliminada exitosamente");
     } catch (error: any) {
       message.error(
-        error.data?.error || "Ocurrió un error al eliminar la compañía"
+        error.data?.message || "Ocurrió un error al eliminar la arl"
       );
     } finally {
       hideLoadingMessage();
