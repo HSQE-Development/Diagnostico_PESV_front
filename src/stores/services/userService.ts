@@ -66,7 +66,7 @@ export const userService = createApi({
         method: "POST",
         data: dataToChange,
       }),
-      invalidatesTags: ["FetchUsers", "FindUserById"],
+      invalidatesTags: ["FetchUsers"],
     }),
     findById: builder.query<IUser, { id: number }>({
       query: ({ id }) => ({

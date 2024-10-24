@@ -155,9 +155,11 @@ export default function CompanyForm({
     name: Yup.string().required("Campo Obligatorio"),
     email: Yup.string().email("Correo electronico invalido"),
     // .required("Campo Obligatorio"),
-    nit: Yup.string().required("Campo Obligatorio"),
+    nit: Yup.string()
+      .required("Campo Obligatorio")
+      .min(10, "El NIT debe contener 10 digitos"),
     // diagnosis: Yup.string().required("Campo Obligatorio"),
-    // dependant: Yup.string().required("Campo Obligatorio"),
+    dependant_phone: Yup.number(),
     // dependant_phone: Yup.string().required("Campo Obligatorio"),
     // acquired_certification: Yup.string().required("Campo ObligatoriformatNIT(e.target.value)o"),
     segment: Yup.number().required("Campo Obligatorio"),
@@ -224,7 +226,7 @@ export default function CompanyForm({
           >
             <div className="grid grid-cols-12 gap-4 gap-y-8 mt-4">
               <div className="col-span-12 md:col-span-6">
-                <FloatLabel label="Nombre de la empresa">
+                <FloatLabel label="Nombre de la empresa" obligatory>
                   <Input
                     id="name"
                     name="name"
@@ -235,7 +237,7 @@ export default function CompanyForm({
                 </FloatLabel>
               </div>
               <div className="col-span-12 md:col-span-6">
-                <FloatLabel label="NIT de la empresa">
+                <FloatLabel label="NIT de la empresa" obligatory>
                   <Input
                     id="nit"
                     name="nit"
@@ -254,7 +256,7 @@ export default function CompanyForm({
                 ) : null}
               </div>
               <div className="col-span-12 md:col-span-3">
-                <FloatLabel label="Correo Electrónico">
+                <FloatLabel label="Correo Electrónico" obligatory>
                   <Input
                     id="email"
                     name="email"
@@ -268,7 +270,7 @@ export default function CompanyForm({
                 ) : null}
               </div>
               <div className="col-span-12 md:col-span-3">
-                <FloatLabel label="Arl a la que pertenece">
+                <FloatLabel label="Arl a la que pertenece" obligatory>
                   <Select
                     showSearch
                     optionFilterProp="label"
@@ -321,7 +323,7 @@ export default function CompanyForm({
               </div>
 
               <div className="col-span-12 md:col-span-3">
-                <FloatLabel label="Segmento al que pertenece">
+                <FloatLabel label="Segmento al que pertenece" obligatory>
                   <Select
                     showSearch
                     optionFilterProp="label"
@@ -391,6 +393,7 @@ export default function CompanyForm({
                   <Input
                     id="dependant_phone"
                     name="dependant_phone"
+                    type="number"
                     value={props.values.dependant_phone ?? ""}
                     onChange={props.handleChange}
                     onBlur={props.handleBlur}
@@ -404,7 +407,7 @@ export default function CompanyForm({
                 ) : null}
               </div>
               <div className="col-span-12 md:col-span-6">
-                <FloatLabel label="Misionalidad de la empresa">
+                <FloatLabel label="Misionalidad de la empresa" obligatory>
                   <Select
                     showSearch
                     optionFilterProp="label"

@@ -68,7 +68,7 @@ export default function ArlForm({ id }: ArlFormProps) {
           >
             <div className="grid grid-cols-12 gap-4 gap-y-8 mt-4">
               <div className="col-span-12">
-                <FloatLabel label="Nombre de la arl">
+                <FloatLabel label="Nombre de la arl" obligatory>
                   <Input
                     id="name"
                     name="name"

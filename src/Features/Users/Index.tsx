@@ -5,8 +5,8 @@ import React, { lazy, Suspense } from "react";
 import { CiSaveDown1 } from "react-icons/ci";
 import { FaUserFriends } from "react-icons/fa";
 import { IoMdAdd } from "react-icons/io";
-import ProfileForm from "../Profile/Components/ProfileForm";
 const DataTable = lazy(() => import("./Components/DataTable"));
+const ProfileForm = lazy(() => import("../Profile/Components/ProfileForm"));
 
 export default function UsersPage() {
   const { isOpen, open, close } = useModal();
@@ -45,7 +45,13 @@ export default function UsersPage() {
         onCancel={close}
         footer={null}
       >
-        <ProfileForm />
+        <Suspense
+          fallback={
+            <Skeleton.Node children={<></>} className="w-full h-20" active />
+          }
+        >
+          <ProfileForm />
+        </Suspense>
       </Modal>
     </div>
   );

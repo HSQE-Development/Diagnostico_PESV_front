@@ -7,6 +7,7 @@ interface FloatLabelProps {
   children: ReactElement<InputProps | SelectProps>;
   value?: string | number | undefined;
   onChange?: (value: string | number, option?: any) => void;
+  obligatory?: boolean;
 }
 
 const FloatLabel: React.FC<FloatLabelProps> = ({
@@ -14,6 +15,7 @@ const FloatLabel: React.FC<FloatLabelProps> = ({
   children,
   value: propValue,
   onChange,
+  obligatory,
 }) => {
   const [focus, setFocus] = useState(false);
   //   const [inputValue, setInputValue] = useState<string | number | undefined>(propValue);
@@ -66,7 +68,9 @@ const FloatLabel: React.FC<FloatLabelProps> = ({
   return (
     <div className="float-label">
       {React.cloneElement(children, { ...childProps, ...children.props })}
-      <label className={labelClass}>{label}</label>
+      <label className={labelClass}>
+        {label} {obligatory && <span className="text-red-500">*</span>}
+      </label>
     </div>
   );
 };

@@ -67,7 +67,7 @@ export const DownloadContent = ({
     <>
       <div className="flex flex-col items-center justify-center gap-4 ">
         <div className="flex flex-col gap-4 gap-y-5">
-          <FloatLabel label="Cronograma">
+          <FloatLabel label="Cronograma" obligatory>
             <Input
               id="name"
               name="name"
@@ -76,7 +76,7 @@ export const DownloadContent = ({
               onChange={(e) => setSchedule(e.target.value)}
             />
           </FloatLabel>
-          <FloatLabel label="Secuencia">
+          <FloatLabel label="Secuencia" obligatory>
             <Input
               id="name"
               name="name"

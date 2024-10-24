@@ -1,4 +1,4 @@
-import { UserDTO } from "@/interfaces/IUser";
+import { IUser, UserDTO } from "@/interfaces/IUser";
 import { updateUser } from "@/stores/features/authSlice";
 import { setUpdateUser, setUser, setUsers } from "@/stores/features/userSlice";
 import { useAppDispatch, useAppSelector } from "@/stores/hooks";
@@ -20,23 +20,14 @@ const useUser = (props?: useUserArgs) => {
   const [register, { isLoading: createLoading }] =
     userService.useRegisterMutation();
 
-  const {
-    data: users,
-    refetch: refetchAll,
-    isLoading: fetchLoading,
-  } = userService.useFindAllQuery();
-
   const { data: userById, isLoading: findUserLoading } =
     userService.useFindByIdQuery(props?.id ? { id: props.id } : skipToken);
 
-  const fetchUsers = async () => {
+  const fetchUsers = async (users: IUser[]) => {
     try {
-      if (users) {
-        dispatch(setUsers(users));
-      }
+      dispatch(setUsers(users));
     } catch (error: any) {
       toastHandler(TOAST_TYPE.ERROR_TOAST, "Error al consultar");
-      console.error("Error updating user:", error);
     }
   };
 
@@ -50,7 +41,6 @@ const useUser = (props?: useUserArgs) => {
         }
       } catch (error: any) {
         toastHandler(TOAST_TYPE.ERROR_TOAST, "Error al buscar usuario");
-        console.error("Error fetching user by ID:", error);
       }
     }
     return user;
@@ -78,7 +68,6 @@ const useUser = (props?: useUserArgs) => {
       dispatch(setUpdateUser(updatedUser));
     } catch (error: any) {
       toastHandler(TOAST_TYPE.ERROR_TOAST, "Error al actualizar");
-      console.error("Error updating user:", error);
     }
   };
 
@@ -89,7 +78,6 @@ const useUser = (props?: useUserArgs) => {
       dispatch(setUser(registered));
     } catch (error: any) {
       toastHandler(TOAST_TYPE.ERROR_TOAST, "Error al actualizar");
-      console.error("Error updating user:", error);
     }
   };
 
@@ -99,8 +87,6 @@ const useUser = (props?: useUserArgs) => {
     createUser,
     createLoading,
     fetchUsers,
-    fetchLoading, // Exportar el estado de carga
-    refetchAll,
     findUserById,
     findUserLoading,
   };

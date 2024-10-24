@@ -85,7 +85,7 @@ export default function GroupForm() {
             >
               <div className="grid grid-cols-12 gap-4 gap-y-8 mt-4">
                 <div className="col-span-12">
-                  <FloatLabel label="Nombre del grupo">
+                  <FloatLabel label="Nombre del grupo" obligatory>
                     <Input
                       id="name"
                       name="name"
