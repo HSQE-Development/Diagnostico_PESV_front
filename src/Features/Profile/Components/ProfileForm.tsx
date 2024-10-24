@@ -220,6 +220,9 @@ export default function ProfileForm({ id, useExternal }: ProfileProps) {
                     onChange={props.handleChange}
                   />
                 </FloatLabel>
+                {props.touched.first_name && props.errors.first_name ? (
+                  <div className="text-red-600">{props.errors.first_name}</div>
+                ) : null}
               </div>
               <div className="col-span-6">
                 <FloatLabel label="Apellido" obligatory>
@@ -231,6 +234,9 @@ export default function ProfileForm({ id, useExternal }: ProfileProps) {
                     onChange={props.handleChange}
                   />
                 </FloatLabel>
+                {props.touched.last_name && props.errors.last_name ? (
+                  <div className="text-red-600">{props.errors.last_name}</div>
+                ) : null}
               </div>
               <div className="col-span-6">
                 <FloatLabel label="Email" obligatory>
@@ -242,6 +248,9 @@ export default function ProfileForm({ id, useExternal }: ProfileProps) {
                     onChange={props.handleChange}
                   />
                 </FloatLabel>
+                {props.touched.email && props.errors.email ? (
+                  <div className="text-red-600">{props.errors.email}</div>
+                ) : null}
               </div>
               <div className="col-span-6">
                 <FloatLabel label="Cedula" obligatory>
@@ -254,6 +263,9 @@ export default function ProfileForm({ id, useExternal }: ProfileProps) {
                     maxLength={10}
                   />
                 </FloatLabel>
+                {props.touched.cedula && props.errors.cedula ? (
+                  <div className="text-red-600">{props.errors.cedula}</div>
+                ) : null}
               </div>
               {!useExternal && (
                 <>

@@ -23,17 +23,21 @@ export default function DataTable() {
   });
   const { fetchUsers } = useUser();
 
-  const { data: usersData, isLoading: fetchLoading } =
-    userService.useFindAllQuery(undefined, {
-      refetchOnMountOrArgChange: true,
-      refetchOnFocus: true,
-    });
+  const {
+    data: usersData,
+    isLoading: fetchLoading,
+    isFetching,
+  } = userService.useFindAllQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+    refetchOnFocus: true,
+  });
 
   useEffect(() => {
     if (usersData) fetchUsers(usersData);
   }, [usersData]);
 
-  const users = useAppSelector((state) => state.users.users);
+  const users = useAppSelector((state) => state.users.users) || [];
+
   const handleEditModal = (id: number) => {
     setEditModal({
       isOpen: true,
@@ -94,17 +98,6 @@ export default function DataTable() {
                 icon={<CiEdit />}
                 onClick={() => handleEditModal(record.id)}
               />
-              {/* <Popconfirm
-                title="Eliminar Empresa"
-                description="Estas seguro de eliminar esta empresa?"
-                //   onConfirm={async () => await confirm(record.id)}
-                onCancel={() => null}
-                okText="Eliminar"
-                cancelText="No"
-                className=""
-              >
-                <Button danger icon={<MdDeleteOutline />} />
-              </Popconfirm> */}
             </div>
           </>
         );
@@ -125,7 +118,7 @@ export default function DataTable() {
         dataSource={dataSource}
         scroll={{ x: "max-content" }}
         showSorterTooltip={{ target: "sorter-icon" }}
-        loading={fetchLoading}
+        loading={fetchLoading || isFetching}
         pagination={{
           defaultPageSize: 10,
           showSizeChanger: true,
